@@ -1,0 +1,109 @@
+{
+  "version": "1.0",
+  "mappings": [
+    {
+      "id": "mapping-001",
+      "document": "docs/example.md",
+      "codeFiles": [
+        "core/example.ts"
+      ],
+      "type": "one-to-one",
+      "syncEnabled": true,
+      "syncStatus": "pending"
+    }
+  ],
+  "globalSettings": {
+    "autoSync": true,
+    "syncInterval": 300,
+    "conflictResolution": "manual",
+    "notificationEnabled": true
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics": {
+      "syncSuccessRate": {
+        "enabled": true,
+        "threshold": {
+          "warning": 95,
+          "critical": 90
+        },
+        "calculationInterval": 60
+      },
+      "syncLatency": {
+        "enabled": true,
+        "threshold": {
+          "warning": 5000,
+          "critical": 10000
+        },
+        "unit": "ms"
+      },
+      "syncThroughput": {
+        "enabled": true,
+        "threshold": {
+          "warning": 50,
+          "critical": 30
+        },
+        "unit": "files/minute"
+      },
+      "errorRate": {
+        "enabled": true,
+        "threshold": {
+          "warning": 5,
+          "critical": 10
+        },
+        "unit": "percent"
+      },
+      "systemResources": {
+        "enabled": true,
+        "cpu": {
+          "threshold": {
+            "warning": 70,
+            "critical": 85
+          },
+          "unit": "percent"
+        },
+        "memory": {
+          "threshold": {
+            "warning": 80,
+            "critical": 90
+          },
+          "unit": "percent"
+        },
+        "disk": {
+          "threshold": {
+            "warning": 80,
+            "critical": 90
+          },
+          "unit": "percent"
+        }
+      }
+    },
+    "alerts": {
+      "enabled": true,
+      "channels": [
+        {
+          "type": "console",
+          "enabled": true,
+          "level": "all"
+        },
+        {
+          "type": "file",
+          "enabled": true,
+          "level": "warning",
+          "path": "logs/alerts.log"
+        },
+        {
+          "type": "email",
+          "enabled": false,
+          "level": "critical",
+          "recipients": ["admin@yyc3.com"]
+        }
+      ]
+    },
+    "dashboard": {
+      "enabled": true,
+      "port": 3101,
+      "refreshInterval": 5
+    }
+  }
+}

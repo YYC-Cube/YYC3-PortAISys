@@ -1,0 +1,261 @@
+# Prometheus告警规则
+# YYC³ PortAISys监控告警
+
+groups:
+  # 系统资源告警
+  - name: system_alerts
+    interval: 30s
+    rules:
+      # 高CPU使用率
+      - alert: HighCPUUsage
+        expr: yyc3_process_cpu_usage > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "CPU使用率过高"
+          description: "CPU使用率 {{ $value }}% 超过阈值 (实例: {{ $labels.instance }})"
+
+      # 极高CPU使用率
+      - alert: CriticalCPUUsage
+        expr: yyc3_process_cpu_usage > 95
+        for: 2m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "CPU使用率极高"
+          description: "CPU使用率 {{ $value }}% 已达到危险水平"
+
+      # 高内存使用
+      - alert: HighMemoryUsage
+        expr: (yyc3_process_memory_usage_bytes / yyc3_process_heap_usage_bytes) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "内存使用率过高"
+          description: "内存使用率超过85%"
+
+      # 内存泄漏检测
+      - alert: MemoryLeak
+        expr: rate(yyc3_process_memory_usage_bytes[30m]) > 0
+        for: 1h
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "可能存在内存泄漏"
+          description: "内存使用量持续增长"
+
+  # 性能告警
+  - name: performance_alerts
+    interval: 30s
+    rules:
+      # API响应时间过长
+      - alert: SlowAPIResponse
+        expr: histogram_quantile(0.95, rate(yyc3_http_request_duration_seconds_bucket[5m])) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "API响应时间过长"
+          description: "95%的请求响应时间超过200ms (当前: {{ $value }}s)"
+
+      # API响应时间严重过长
+      - alert: CriticalAPIResponse
+        expr: histogram_quantile(0.95, rate(yyc3_http_request_duration_seconds_bucket[5m])) > 1
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "API响应时间严重过长"
+          description: "95%的请求响应时间超过1秒"
+
+      # 高错误率
+      - alert: HighErrorRate
+        expr: rate(yyc3_http_requests_total{status_code=~"5.."}[5m]) / rate(yyc3_http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "HTTP错误率过高"
+          description: "错误率超过5%"
+
+      # 请求吞吐量下降
+      - alert: LowThroughput
+        expr: rate(yyc3_http_requests_total[5m]) < 10
+        for: 10m
+        labels:
+          severity: info
+          component: api
+        annotations:
+          summary: "请求吞吐量较低"
+          description: "每秒请求数低于10"
+
+  # 数据库告警
+  - name: database_alerts
+    interval: 30s
+    rules:
+      # 数据库查询慢
+      - alert: SlowDatabaseQuery
+        expr: histogram_quantile(0.95, rate(yyc3_database_query_duration_seconds_bucket[5m])) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "数据库查询缓慢"
+          description: "95%的查询时间超过100ms"
+
+      # 数据库连接池耗尽
+      - alert: DatabaseConnectionPoolExhausted
+        expr: yyc3_database_connections_active / yyc3_database_connections_max > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "数据库连接池即将耗尽"
+          description: "活动连接数占比超过90%"
+
+      # 数据库查询错误率高
+      - alert: HighDatabaseErrorRate
+        expr: rate(yyc3_database_errors_total[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "数据库错误率高"
+          description: "每秒数据库错误超过1次"
+
+  # 缓存告警
+  - name: cache_alerts
+    interval: 30s
+    rules:
+      # 低缓存命中率
+      - alert: LowCacheHitRate
+        expr: (rate(yyc3_cache_hits_total[5m]) / (rate(yyc3_cache_hits_total[5m]) + rate(yyc3_cache_misses_total[5m]))) < 0.7
+        for: 10m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "缓存命中率低"
+          description: "缓存命中率低于70% (当前: {{ $value }})"
+
+      # 极低缓存命中率
+      - alert: CriticalCacheHitRate
+        expr: (rate(yyc3_cache_hits_total[5m]) / (rate(yyc3_cache_hits_total[5m]) + rate(yyc3_cache_misses_total[5m]))) < 0.5
+        for: 5m
+        labels:
+          severity: critical
+          component: cache
+        annotations:
+          summary: "缓存命中率极低"
+          description: "缓存命中率低于50%"
+
+      # 缓存淘汰率高
+      - alert: HighCacheEvictionRate
+        expr: rate(yyc3_cache_evictions_total[5m]) > 100
+        for: 10m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "缓存淘汰率高"
+          description: "每秒缓存淘汰次数超过100"
+
+  # 安全告警
+  - name: security_alerts
+    interval: 30s
+    rules:
+      # 认证失败次数过多
+      - alert: HighAuthenticationFailures
+        expr: rate(yyc3_auth_failures_total[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "认证失败次数过多"
+          description: "每秒认证失败超过5次"
+
+      # 未授权访问尝试
+      - alert: UnauthorizedAccessAttempts
+        expr: rate(yyc3_http_requests_total{status_code="403"}[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "检测到大量未授权访问尝试"
+          description: "每秒403错误超过10次"
+
+      # 可疑活动
+      - alert: SuspiciousActivity
+        expr: rate(yyc3_security_violations_total[5m]) > 1
+        for: 2m
+        labels:
+          severity: critical
+          component: security
+        annotations:
+          summary: "检测到可疑安全活动"
+          description: "安全违规事件频繁发生"
+
+  # 可用性告警
+  - name: availability_alerts
+    interval: 30s
+    rules:
+      # 服务下线
+      - alert: ServiceDown
+        expr: up{job="yyc3-portaisys"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: availability
+        annotations:
+          summary: "服务不可用"
+          description: "{{ $labels.instance }} 服务已下线"
+
+      # 服务重启
+      - alert: ServiceRestarted
+        expr: changes(yyc3_process_start_time_seconds[5m]) > 0
+        labels:
+          severity: warning
+          component: availability
+        annotations:
+          summary: "服务已重启"
+          description: "服务在过去5分钟内重启"
+
+  # 业务指标告警
+  - name: business_alerts
+    interval: 1m
+    rules:
+      # 活跃用户数异常低
+      - alert: LowActiveUsers
+        expr: yyc3_active_users < 10
+        for: 15m
+        labels:
+          severity: info
+          component: business
+        annotations:
+          summary: "活跃用户数偏低"
+          description: "当前活跃用户数: {{ $value }}"
+
+      # 任务失败率高
+      - alert: HighTaskFailureRate
+        expr: rate(yyc3_tasks_failed_total[10m]) / rate(yyc3_tasks_total[10m]) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          component: business
+        annotations:
+          summary: "任务失败率过高"
+          description: "任务失败率超过10%"

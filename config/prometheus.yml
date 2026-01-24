@@ -1,0 +1,91 @@
+# Prometheus配置文件
+# 用于YYC³ PortAISys系统监控
+
+global:
+  # 抓取间隔
+  scrape_interval: 15s
+  # 评估间隔
+  evaluation_interval: 15s
+  # 外部标签
+  external_labels:
+    cluster: 'yyc3-portaisys'
+    environment: 'production'
+
+# 告警管理器配置
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'localhost:9093'
+
+# 规则文件
+rule_files:
+  - 'prometheus-alerts.yml'
+  - 'recording-rules.yml'
+
+# 抓取配置
+scrape_configs:
+  # YYC³ PortAISys 主应用
+  - job_name: 'yyc3-portaisys'
+    static_configs:
+      - targets: ['localhost:3200']
+        labels:
+          service: 'main-app'
+          component: 'backend'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # YYC³ 指标导出器
+  - job_name: 'yyc3-metrics-exporter'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'metrics'
+          component: 'exporter'
+
+  # Node Exporter (系统指标)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+        labels:
+          service: 'system'
+          component: 'node-exporter'
+
+  # PostgreSQL Exporter (数据库指标)
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['localhost:9187']
+        labels:
+          service: 'database'
+          component: 'postgres'
+
+  # Redis Exporter (缓存指标)
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['localhost:9121']
+        labels:
+          service: 'cache'
+          component: 'redis'
+
+  # Web Dashboard
+  - job_name: 'web-dashboard'
+    static_configs:
+      - targets: ['localhost:3000']
+        labels:
+          service: 'web'
+          component: 'dashboard'
+    metrics_path: '/api/metrics'
+
+# 远程写入配置（可选）
+# remote_write:
+#   - url: 'http://prometheus-remote-storage:9009/api/v1/write'
+#     queue_config:
+#       capacity: 10000
+#       max_shards: 50
+#       min_shards: 1
+#       max_samples_per_send: 5000
+
+# 远程读取配置（可选）
+# remote_read:
+#   - url: 'http://prometheus-remote-storage:9009/api/v1/read'

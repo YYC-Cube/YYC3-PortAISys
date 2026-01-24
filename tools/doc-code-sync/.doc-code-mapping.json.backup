@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "mappings": [
+    {
+      "id": "mapping-001",
+      "document": "docs/example.md",
+      "codeFiles": [
+        "core/example.ts"
+      ],
+      "type": "one-to-one",
+      "syncEnabled": true,
+      "syncStatus": "pending"
+    },
+    {
+      "id": "mapping-002",
+      "document": "docs/test-bug001.md",
+      "codeFiles": [
+        "core/test-bug001.ts"
+      ],
+      "type": "one-to-one",
+      "syncEnabled": true,
+      "syncStatus": "success"
+    },
+    {
+      "id": "mapping-003",
+      "document": "docs/test-bug002.md",
+      "codeFiles": [
+        "core/test-bug002.ts"
+      ],
+      "type": "one-to-one",
+      "syncEnabled": true,
+      "syncStatus": "success",
+      "lastSync": "2026-01-20T05:52:53.565Z"
+    }
+  ],
+  "globalSettings": {
+    "autoSync": true,
+    "syncInterval": 300,
+    "conflictResolution": "manual",
+    "notificationEnabled": true
+  }
+}

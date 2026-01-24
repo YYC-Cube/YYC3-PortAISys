@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "mappings": [
+    {
+      "id": "mapping-001",
+      "document": "docs/example.md",
+      "codeFiles": [
+        "core/example.ts"
+      ],
+      "type": "one-to-one",
+      "syncEnabled": true,
+      "syncStatus": "pending"
+    },
+    {
+      "id": "mapping-002",
+      "document": "docs/test-single.md",
+      "codeFiles": [
+        "core/test-single.ts"
+      ],
+      "type": "one-to-one",
+      "syncEnabled": true,
+      "syncStatus": "failed"
+    }
+  ],
+  "globalSettings": {
+    "autoSync": true,
+    "syncInterval": 300,
+    "conflictResolution": "manual",
+    "notificationEnabled": true
+  }
+}

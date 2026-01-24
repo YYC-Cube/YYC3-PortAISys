@@ -1,0 +1,86 @@
+{
+  "name": "yyc3-call",
+  "version": "1.0.0",
+  "description": "YYC³ 可插拔式拖拽移动AI系统 - 言启象限 | 语枢未来",
+  "author": "YYC³ Team",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:run": "vitest run",
+    "test:watch": "vitest watch",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:security": "vitest run tests/security",
+    "test:performance": "vitest run tests/performance",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report test-reports/playwright",
+    "test:phase1": "vitest run tests/unit tests/integration tests/e2e",
+    "test:phase2": "vitest run tests/performance tests/security",
+    "test:phase3": "vitest run tests/unit/ai tests/integration/plugin-system.test.ts tests/integration/mobile-app.test.ts tests/integration/multimodal.test.ts tests/integration/multi-model.test.ts tests/e2e/complete-workflow.test.ts",
+    "test:full": "./scripts/run-phase123-tests.sh",
+    "quick-test": "./scripts/quick-start-tests.sh",
+    "test:all": "pnpm test:unit && pnpm test:integration && pnpm test:e2e",
+    "test:all:vitest": "vitest run && tsx scripts/generate-test-report.ts",
+    "test:report": "tsx scripts/generate-test-report.ts",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "typecheck": "tsc --noEmit",
+    "verify": "tsx scripts/verify-implementation.ts",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "jsdom": "^27.4.0",
+    "prettier": "^3.1.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "yyc3",
+    "ai",
+    "pluggable",
+    "drag-and-drop",
+    "autonomous",
+    "self-learning",
+    "self-healing",
+    "ui-system",
+    "dynamic-interaction"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yyc3/call"
+  },
+  "bugs": {
+    "url": "https://github.com/yyc3/call/issues"
+  },
+  "homepage": "https://github.com/yyc3/call#readme",
+  "devDependencies": {
+    "eventemitter3": "^5.0.4"
+  }
+}
