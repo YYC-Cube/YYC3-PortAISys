@@ -1,7 +1,7 @@
 # YYC³ Portable Intelligent AI System
 
 <div align="center">
-  <img src="https://github.com/YYC-Cube/YYC3-Portable-Intelligent-AI-System/raw/main/public/yyc3-article-cover-02.png" alt="YYC³ Logo" style="max-width: 100%; height: auto; margin-bottom: 20px;">
+  <img src="./public/yyc3-article-cover-02.png" alt="YYC³ Logo" style="max-width: 100%; height: auto; margin-bottom: 20px;">
   
   <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0;">
     <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version">
@@ -703,7 +703,7 @@ YYC³ Portable Intelligent AI System 采用 MIT 许可证 - 详见 [LICENSE](LIC
 
 ## 🌟 如果 YYC³ Portable Intelligent AI System 对你有帮助，请给我们一个Star！
 
-[![Star History Chart](https://api.star-history.com/svg?repos=YYC-Cube/YYC3-Portable-Intelligent-AI-System&type=Date)]
+[![Star History Chart](https://api.star-history.com/svg?repos=YYC-Cube/YYC3-PortAISys&type=Date)](https://star-history.com/#YYC-Cube/YYC3-PortAISys&Date)
 
 </div>
 
