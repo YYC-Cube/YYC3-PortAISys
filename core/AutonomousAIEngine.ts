@@ -10,6 +10,7 @@
 import { logger } from './utils/logger';
 import { metrics } from './utils/metrics';
 import { MessageBus } from './MessageBus';
+import { withSpan, setSpanAttribute, recordSpanException } from './tracing';
 import {
   EngineConfig,
   EngineStatus,
@@ -83,7 +84,7 @@ export class AutonomousAIEngine {
       },
       ...config
     };
-    
+
     this.messageBus = new MessageBus(this.config.messageConfig);
 
     logger.info('自治AI引擎初始化', 'AutonomousAIEngine', {
@@ -95,65 +96,81 @@ export class AutonomousAIEngine {
   // ================= 生命周期管理 =================
 
   async initialize(config?: EngineConfig): Promise<void> {
-    logger.info('引擎初始化中...', 'AutonomousAIEngine');
-    this.status = EngineStatus.INITIALIZING;
+    return withSpan('AutonomousAIEngine.initialize', async (span) => {
+      logger.info('引擎初始化中...', 'AutonomousAIEngine');
+      this.status = EngineStatus.INITIALIZING;
 
-    try {
-      if (config) {
-        this.config = { ...this.config, ...config };
-      }
+      setSpanAttribute('engine.version', this.config.version || '1.0.0');
+      setSpanAttribute('engine.environment', this.config.environment || 'development');
 
-      // 注册默认消息处理器
-      this.registerDefaultMessageHandlers();
-
-      for (const [name, subsystem] of this.subsystems) {
-        try {
-          await subsystem.initialize();
-          logger.info(`子系统 ${name} 初始化成功`, 'AutonomousAIEngine');
-        } catch (error) {
-          logger.error(`子系统 ${name} 初始化失败`, 'AutonomousAIEngine', { error });
+      try {
+        if (config) {
+          this.config = { ...this.config, ...config };
         }
-      }
 
-      this.status = EngineStatus.STOPPED;
-      logger.info('引擎初始化完成', 'AutonomousAIEngine');
-    } catch (error) {
-      this.status = EngineStatus.ERROR;
-      logger.error('引擎初始化失败', 'AutonomousAIEngine', { error });
-      throw error;
-    }
+        // 注册默认消息处理器
+        this.registerDefaultMessageHandlers();
+
+        for (const [name, subsystem] of this.subsystems) {
+          try {
+            await subsystem.initialize();
+            logger.info(`子系统 ${name} 初始化成功`, 'AutonomousAIEngine');
+          } catch (error) {
+            logger.error(`子系统 ${name} 初始化失败`, 'AutonomousAIEngine', { error });
+          }
+        }
+
+        this.status = EngineStatus.STOPPED;
+        setSpanAttribute('engine.subsystems.count', this.subsystems.size);
+        logger.info('引擎初始化完成', 'AutonomousAIEngine');
+      } catch (error) {
+        this.status = EngineStatus.ERROR;
+        logger.error('引擎初始化失败', 'AutonomousAIEngine', { error });
+        if (error instanceof Error) {
+          recordSpanException(error);
+        }
+        throw error;
+      }
+    });
   }
 
   async start(): Promise<void> {
-    logger.info('启动引擎...', 'AutonomousAIEngine');
-    this.status = EngineStatus.STARTING;
+    return withSpan('AutonomousAIEngine.start', async (span) => {
+      logger.info('启动引擎...', 'AutonomousAIEngine');
+      this.status = EngineStatus.STARTING;
 
-    try {
-      this.startTime = new Date();
+      try {
+        this.startTime = new Date();
+        setSpanAttribute('engine.start_time', this.startTime.toISOString());
 
-      for (const [name, subsystem] of this.subsystems) {
-        try {
-          await subsystem.start();
-          logger.info(`子系统 ${name} 启动成功`, 'AutonomousAIEngine');
-        } catch (error) {
-          logger.error(`子系统 ${name} 启动失败`, 'AutonomousAIEngine', { error });
+        for (const [name, subsystem] of this.subsystems) {
+          try {
+            await subsystem.start();
+            logger.info(`子系统 ${name} 启动成功`, 'AutonomousAIEngine');
+          } catch (error) {
+            logger.error(`子系统 ${name} 启动失败`, 'AutonomousAIEngine', { error });
+          }
         }
+
+        await this.messageBus.publish({
+          id: this.generateId(),
+          type: MessageType.SYSTEM_START,
+          content: { timestamp: new Date() },
+          timestamp: new Date()
+        });
+
+        this.status = EngineStatus.RUNNING;
+        setSpanAttribute('engine.status', this.status);
+        logger.info('引擎启动成功', 'AutonomousAIEngine');
+      } catch (error) {
+        this.status = EngineStatus.ERROR;
+        logger.error('引擎启动失败', 'AutonomousAIEngine', { error });
+        if (error instanceof Error) {
+          recordSpanException(error);
+        }
+        throw error;
       }
-
-      await this.messageBus.publish({
-        id: this.generateId(),
-        type: MessageType.SYSTEM_START,
-        content: { timestamp: new Date() },
-        timestamp: new Date()
-      });
-
-      this.status = EngineStatus.RUNNING;
-      logger.info('引擎启动成功', 'AutonomousAIEngine');
-    } catch (error) {
-      this.status = EngineStatus.ERROR;
-      logger.error('引擎启动失败', 'AutonomousAIEngine', { error });
-      throw error;
-    }
+    });
   }
 
   async pause(): Promise<void> {
@@ -190,51 +207,64 @@ export class AutonomousAIEngine {
     return this.status;
   }
 
-  // ================= 消息处理 =================
-
   async processMessage(input: AgentMessage): Promise<AgentResponse> {
-    if (this.status !== EngineStatus.RUNNING) {
-      throw new Error(`引擎状态错误：${this.status}，无法处理消息`);
-    }
-
-    const startTime = Date.now();
-
-    try {
-      await this.messageBus.publish(input);
-
-      const handler = this.messageHandlers.get(input.type);
-      if (!handler) {
-        throw new Error(`没有找到消息类型的处理器：${input.type}`);
+    return withSpan('AutonomousAIEngine.processMessage', async (span) => {
+      if (this.status !== EngineStatus.RUNNING) {
+        throw new Error(`引擎状态错误：${this.status}，无法处理消息`);
       }
 
-      const response = await handler(input, this.createProcessingContext(input));
+      const startTime = Date.now();
 
-      const processingTime = Date.now() - startTime;
-      this.performanceStats.messageCount++;
-      this.performanceStats.totalProcessingTime += processingTime;
+      // 添加span属性
+      setSpanAttribute('message.type', input.type);
+      setSpanAttribute('message.id', input.id);
 
-      metrics.increment('engine.messages_processed');
-      metrics.histogram('engine.processing_time', processingTime);
+      try {
+        await this.messageBus.publish(input);
 
-      return response;
-    } catch (error) {
-      const processingTime = Date.now() - startTime;
-      this.performanceStats.errorCount++;
+        const handler = this.messageHandlers.get(input.type);
+        if (!handler) {
+          throw new Error(`没有找到消息类型的处理器：${input.type}`);
+        }
 
-      logger.error('消息处理失败', 'AutonomousAIEngine', { error });
+        const response = await handler(input, this.createProcessingContext(input));
 
-      metrics.increment('engine.messages_failed');
+        const processingTime = Date.now() - startTime;
+        this.performanceStats.messageCount++;
+        this.performanceStats.totalProcessingTime += processingTime;
 
-      return {
-        success: false,
-        content: null,
-        error: {
-          code: 'MESSAGE_PROCESSING_ERROR',
-          message: error instanceof Error ? error.message : String(error)
-        },
-        metadata: { processingTime }
-      };
-    }
+        setSpanAttribute('message.processing_time_ms', processingTime);
+        setSpanAttribute('message.success', true);
+
+        metrics.increment('engine.messages_processed');
+        metrics.histogram('engine.processing_time', processingTime);
+
+        return response;
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        this.performanceStats.errorCount++;
+
+        logger.error('消息处理失败', 'AutonomousAIEngine', { error });
+
+        setSpanAttribute('message.processing_time_ms', processingTime);
+        setSpanAttribute('message.success', false);
+        if (error instanceof Error) {
+          recordSpanException(error);
+        }
+
+        metrics.increment('engine.messages_failed');
+
+        return {
+          success: false,
+          content: null,
+          error: {
+            code: 'MESSAGE_PROCESSING_ERROR',
+            message: error instanceof Error ? error.message : String(error)
+          },
+          metadata: { processingTime }
+        };
+      }
+    });
   }
 
   registerMessageHandler(type: MessageType, handler: Function): void {
@@ -412,17 +442,17 @@ export class AutonomousAIEngine {
     const response = await this.processMessage(message);
 
     // 转换响应格式以匹配测试期望
-    return {
-      response: response.content,
-      success: response.success,
-      error: response.error
-    };
-  }
+      return {
+        response: response.content,
+        success: response.success,
+        error: response.error
+      };
+    }
 
-  /**
-   * 分析用户意图
-   */
-  async analyzeIntent(text: string): Promise<any> {
+    /**
+     * 分析用户意图
+     */
+    async analyzeIntent(text: string): Promise<any> {
     // 简单的意图识别实现
     const intent = {
       type: 'query',

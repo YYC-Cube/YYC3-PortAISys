@@ -4,5 +4,6 @@
     "Retryable",
     "retryable",
     "yyc3"
-  ]
+  ],
+  "editor.codeActions.triggerOnFocusChange": true
 }
