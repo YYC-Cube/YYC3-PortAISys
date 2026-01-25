@@ -5,6 +5,9 @@
  * @author YYC³
  * @version 1.0.0
  * @created 2026-01-21
+ * @modified 2026-01-26
+ * @copyright Copyright (c) 2025 YYC³
+ * @license MIT
  */
 
 import { EventEmitter } from 'events';
@@ -99,6 +102,23 @@ export class AgentOrchestrator extends EventEmitter {
   private agents: Map<string, BaseAgent> = new Map();
   private workflows: Map<string, WorkflowDefinition> = new Map();
   private activeWorkflows: Map<string, WorkflowContext> = new Map();
+  private workflowHistory: Map<string, Array<{
+    timestamp: number;
+    status: 'completed' | 'failed' | 'cancelled';
+    duration: number;
+    nodesExecuted: number;
+    error?: string;
+  }>> = new Map();
+  private workflowSnapshots: Map<string, WorkflowDefinition> = new Map();
+  private workflowTemplates: Map<string, WorkflowDefinition> = new Map();
+  private workflowDependencies: Map<string, Set<string>> = new Map();
+  private performanceMetrics: Map<string, {
+    avgDuration: number;
+    successRate: number;
+    executionCount: number;
+  }> = new Map();
+  private debugMode: boolean = false;
+  private maxHistorySize: number = 1000;
 
   constructor(config: OrchestratorConfig = {}) {
     super();
@@ -231,6 +251,7 @@ export class AgentOrchestrator extends EventEmitter {
       context.endTime = Date.now();
       context.status = 'completed';
       
+      this.recordWorkflowExecution(workflowId, context);
       this.emit('workflow:completed', { workflowId, context });
       return context;
     } catch (error) {
@@ -406,9 +427,489 @@ export class AgentOrchestrator extends EventEmitter {
   }
 
   /**
+   * 创建工作流快照
+   */
+  createWorkflowSnapshot(workflowId: string, snapshotId?: string): string {
+    const workflow = this.workflows.get(workflowId);
+    if (!workflow) {
+      throw new Error(`Workflow ${workflowId} not found`);
+    }
+
+    const id = snapshotId || `snapshot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const snapshot: WorkflowDefinition = {
+      ...workflow,
+      id,
+      name: `${workflow.name} (Snapshot)`,
+    };
+
+    this.workflowSnapshots.set(id, snapshot);
+    this.emit('workflow:snapshot:created', { workflowId, snapshotId: id });
+    return id;
+  }
+
+  /**
+   * 恢复工作流快照
+   */
+  restoreWorkflowSnapshot(snapshotId: string, targetWorkflowId?: string): void {
+    const snapshot = this.workflowSnapshots.get(snapshotId);
+    if (!snapshot) {
+      throw new Error(`Snapshot ${snapshotId} not found`);
+    }
+
+    const workflowId = targetWorkflowId || snapshot.id;
+    this.workflows.set(workflowId, snapshot);
+    this.emit('workflow:snapshot:restored', { snapshotId, workflowId });
+  }
+
+  /**
+   * 删除工作流快照
+   */
+  deleteWorkflowSnapshot(snapshotId: string): void {
+    this.workflowSnapshots.delete(snapshotId);
+    this.emit('workflow:snapshot:deleted', { snapshotId });
+  }
+
+  /**
+   * 创建工作流模板
+   */
+  createWorkflowTemplate(templateId: string, workflow: WorkflowDefinition): void {
+    this.workflowTemplates.set(templateId, workflow);
+    this.emit('workflow:template:created', { templateId });
+  }
+
+  /**
+   * 从模板创建工作流
+   */
+  createWorkflowFromTemplate(
+    templateId: string,
+    workflowId: string,
+    name: string
+  ): void {
+    const template = this.workflowTemplates.get(templateId);
+    if (!template) {
+      throw new Error(`Template ${templateId} not found`);
+    }
+
+    const workflow: WorkflowDefinition = {
+      ...template,
+      id: workflowId,
+      name,
+    };
+
+    this.registerWorkflow(workflow);
+    this.emit('workflow:created:from:template', { templateId, workflowId });
+  }
+
+  /**
+   * 获取工作流模板
+   */
+  getWorkflowTemplate(templateId: string): WorkflowDefinition | undefined {
+    return this.workflowTemplates.get(templateId);
+  }
+
+  /**
+   * 获取所有工作流模板
+   */
+  getAllWorkflowTemplates(): WorkflowDefinition[] {
+    return Array.from(this.workflowTemplates.values());
+  }
+
+  /**
+   * 设置工作流依赖
+   */
+  setWorkflowDependencies(workflowId: string, dependencies: string[]): void {
+    this.workflowDependencies.set(workflowId, new Set(dependencies));
+    this.emit('workflow:dependencies:set', { workflowId, dependencies });
+  }
+
+  /**
+   * 获取工作流依赖
+   */
+  getWorkflowDependencies(workflowId: string): string[] {
+    return Array.from(this.workflowDependencies.get(workflowId) || []);
+  }
+
+  /**
+   * 检查工作流依赖
+   */
+  checkWorkflowDependencies(workflowId: string): {
+    satisfied: boolean;
+    missing: string[];
+  } {
+    const dependencies = this.workflowDependencies.get(workflowId) || new Set();
+    const missing: string[] = [];
+
+    for (const dep of dependencies) {
+      if (!this.workflows.has(dep)) {
+        missing.push(dep);
+      }
+    }
+
+    return {
+      satisfied: missing.length === 0,
+      missing,
+    };
+  }
+
+  /**
+   * 批量执行工作流
+   */
+  async executeWorkflows(
+    workflowIds: string[],
+    initialData?: Record<string, any>
+  ): Promise<Map<string, WorkflowContext>> {
+    const results = new Map<string, WorkflowContext>();
+
+    if (this.config.strategy === OrchestrationStrategy.PARALLEL) {
+      const promises = workflowIds.map(async (workflowId) => {
+        try {
+          const context = await this.executeWorkflow(workflowId, initialData);
+          results.set(workflowId, context);
+        } catch (error) {
+          this.emit('workflow:error', { workflowId, error });
+        }
+      });
+      await Promise.all(promises);
+    } else {
+      for (const workflowId of workflowIds) {
+        try {
+          const context = await this.executeWorkflow(workflowId, initialData);
+          results.set(workflowId, context);
+        } catch (error) {
+          this.emit('workflow:error', { workflowId, error });
+        }
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * 获取工作流历史
+   */
+  getWorkflowHistory(workflowId: string, limit: number = 100): Array<{
+    timestamp: number;
+    status: 'completed' | 'failed' | 'cancelled';
+    duration: number;
+    nodesExecuted: number;
+    error?: string;
+  }> {
+    const history = this.workflowHistory.get(workflowId) || [];
+    return history.slice(-limit);
+  }
+
+  /**
+   * 获取工作流性能指标
+   */
+  getWorkflowPerformanceMetrics(workflowId?: string): Record<string, any> {
+    if (workflowId) {
+      const metrics = this.performanceMetrics.get(workflowId);
+      if (!metrics) {
+        return { workflowId, avgDuration: 0, successRate: 0, executionCount: 0 };
+      }
+      return {
+        workflowId,
+        avgDuration: metrics.avgDuration,
+        successRate: metrics.successRate,
+        executionCount: metrics.executionCount,
+      };
+    }
+
+    const result: Record<string, any> = {};
+    for (const [id, metrics] of this.performanceMetrics) {
+      result[id] = {
+        avgDuration: metrics.avgDuration,
+        successRate: metrics.successRate,
+        executionCount: metrics.executionCount,
+      };
+    }
+    return result;
+  }
+
+  /**
+   * 记录工作流执行
+   */
+  private recordWorkflowExecution(
+    workflowId: string,
+    context: WorkflowContext
+  ): void {
+    const history = this.workflowHistory.get(workflowId) || [];
+    const duration = (context.endTime || Date.now()) - context.startTime;
+
+    history.push({
+      timestamp: context.startTime,
+      status: context.status || 'completed',
+      duration,
+      nodesExecuted: context.visitedNodes.length,
+      error: context.error,
+    });
+
+    if (history.length > this.maxHistorySize) {
+      history.shift();
+    }
+
+    this.workflowHistory.set(workflowId, history);
+
+    const metrics = this.performanceMetrics.get(workflowId) || {
+      avgDuration: 0,
+      successRate: 0,
+      executionCount: 0,
+    };
+
+    const newExecutionCount = metrics.executionCount + 1;
+    const newAvgDuration =
+      (metrics.avgDuration * metrics.executionCount + duration) / newExecutionCount;
+    const newSuccessRate =
+      (metrics.successRate * metrics.executionCount +
+        (context.status === 'completed' ? 1 : 0)) /
+      newExecutionCount;
+
+    this.performanceMetrics.set(workflowId, {
+      avgDuration: newAvgDuration,
+      successRate: newSuccessRate,
+      executionCount: newExecutionCount,
+    });
+  }
+
+  /**
+   * 清除工作流历史
+   */
+  clearWorkflowHistory(workflowId?: string): void {
+    if (workflowId) {
+      this.workflowHistory.delete(workflowId);
+      this.emit('workflow:history:cleared', { workflowId });
+    } else {
+      this.workflowHistory.clear();
+      this.emit('workflow:history:cleared', { all: true });
+    }
+  }
+
+  /**
+   * 设置调试模式
+   */
+  setDebugMode(enabled: boolean): void {
+    this.debugMode = enabled;
+    this.emit('debug:mode:changed', { enabled });
+  }
+
+  /**
+   * 获取调试模式
+   */
+  isDebugMode(): boolean {
+    return this.debugMode;
+  }
+
+  /**
+   * 验证工作流
+   */
+  validateWorkflow(workflow: WorkflowDefinition): {
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
+  } {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    if (!workflow.id) {
+      errors.push('Workflow must have an ID');
+    }
+
+    if (!workflow.name) {
+      errors.push('Workflow must have a name');
+    }
+
+    const hasStart = workflow.nodes.some(n => n.type === WorkflowNodeType.START);
+    const hasEnd = workflow.nodes.some(n => n.type === WorkflowNodeType.END);
+
+    if (!hasStart) {
+      errors.push('Workflow must have a START node');
+    }
+
+    if (!hasEnd) {
+      errors.push('Workflow must have an END node');
+    }
+
+    const nodeIds = new Set(workflow.nodes.map(n => n.id));
+    for (const edge of workflow.edges) {
+      if (!nodeIds.has(edge.from)) {
+        errors.push(`Edge references non-existent node: ${edge.from}`);
+      }
+      if (!nodeIds.has(edge.to)) {
+        errors.push(`Edge references non-existent node: ${edge.to}`);
+      }
+    }
+
+    const orphanNodes = workflow.nodes.filter(
+      n => !workflow.edges.some(e => e.from === n.id) && n.type !== WorkflowNodeType.START
+    );
+    for (const node of orphanNodes) {
+      warnings.push(`Node ${node.id} has no incoming edges`);
+    }
+
+    for (const node of workflow.nodes) {
+      if (node.type === WorkflowNodeType.AGENT && node.agentId) {
+        if (!this.agents.has(node.agentId)) {
+          warnings.push(`Agent ${node.agentId} not registered`);
+        }
+      }
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors,
+      warnings,
+    };
+  }
+
+  /**
+   * 优化工作流
+   */
+  optimizeWorkflow(workflowId: string): {
+    optimized: boolean;
+    suggestions: string[];
+  } {
+    const workflow = this.workflows.get(workflowId);
+    if (!workflow) {
+      throw new Error(`Workflow ${workflowId} not found`);
+    }
+
+    const suggestions: string[] = [];
+
+    const nodeCounts = new Map<WorkflowNodeType, number>();
+    for (const node of workflow.nodes) {
+      const count = nodeCounts.get(node.type) || 0;
+      nodeCounts.set(node.type, count + 1);
+    }
+
+    if (nodeCounts.get(WorkflowNodeType.DECISION)! > 5) {
+      suggestions.push('Consider reducing the number of decision nodes for better performance');
+    }
+
+    const avgEdgesPerNode = workflow.edges.length / workflow.nodes.length;
+    if (avgEdgesPerNode > 3) {
+      suggestions.push('Consider simplifying the workflow structure');
+    }
+
+    const metrics = this.getWorkflowPerformanceMetrics(workflowId);
+    if (metrics.avgDuration > 10000) {
+      suggestions.push('Workflow execution time is high, consider optimizing agent tasks');
+    }
+
+    if (metrics.successRate < 0.8) {
+      suggestions.push('Workflow success rate is low, review error handling');
+    }
+
+    return {
+      optimized: suggestions.length > 0,
+      suggestions,
+    };
+  }
+
+  /**
+   * 克隆工作流
+   */
+  cloneWorkflow(sourceWorkflowId: string, targetWorkflowId: string, name: string): void {
+    const sourceWorkflow = this.workflows.get(sourceWorkflowId);
+    if (!sourceWorkflow) {
+      throw new Error(`Workflow ${sourceWorkflowId} not found`);
+    }
+
+    const clonedWorkflow: WorkflowDefinition = {
+      ...sourceWorkflow,
+      id: targetWorkflowId,
+      name,
+      nodes: sourceWorkflow.nodes.map(node => ({ ...node })),
+      edges: sourceWorkflow.edges.map(edge => ({ ...edge })),
+    };
+
+    this.registerWorkflow(clonedWorkflow);
+    this.emit('workflow:cloned', { sourceWorkflowId, targetWorkflowId });
+  }
+
+  /**
+   * 导出工作流
+   */
+  exportWorkflow(workflowId: string): string {
+    const workflow = this.workflows.get(workflowId);
+    if (!workflow) {
+      throw new Error(`Workflow ${workflowId} not found`);
+    }
+    return JSON.stringify(workflow, null, 2);
+  }
+
+  /**
+   * 导入工作流
+   */
+  importWorkflow(workflowData: string): string {
+    const workflow: WorkflowDefinition = JSON.parse(workflowData);
+    this.registerWorkflow(workflow);
+    this.emit('workflow:imported', { workflowId: workflow.id });
+    return workflow.id;
+  }
+
+  /**
+   * 获取工作流统计
+   */
+  getWorkflowStatistics(): {
+    totalWorkflows: number;
+    totalAgents: number;
+    activeWorkflows: number;
+    avgNodesPerWorkflow: number;
+    avgEdgesPerWorkflow: number;
+    mostUsedNodeType: WorkflowNodeType;
+  } {
+    const workflows = Array.from(this.workflows.values());
+    const totalNodes = workflows.reduce((sum, wf) => sum + wf.nodes.length, 0);
+    const totalEdges = workflows.reduce((sum, wf) => sum + wf.edges.length, 0);
+
+    const nodeTypeCounts = new Map<WorkflowNodeType, number>();
+    for (const workflow of workflows) {
+      for (const node of workflow.nodes) {
+        const count = nodeTypeCounts.get(node.type) || 0;
+        nodeTypeCounts.set(node.type, count + 1);
+      }
+    }
+
+    let mostUsedNodeType = WorkflowNodeType.AGENT;
+    let maxCount = 0;
+    for (const [type, count] of nodeTypeCounts) {
+      if (count > maxCount) {
+        maxCount = count;
+        mostUsedNodeType = type;
+      }
+    }
+
+    return {
+      totalWorkflows: this.workflows.size,
+      totalAgents: this.agents.size,
+      activeWorkflows: this.activeWorkflows.size,
+      avgNodesPerWorkflow: workflows.length > 0 ? totalNodes / workflows.length : 0,
+      avgEdgesPerWorkflow: workflows.length > 0 ? totalEdges / workflows.length : 0,
+      mostUsedNodeType,
+    };
+  }
+
+  /**
+   * 重置编排器
+   */
+  reset(): void {
+    this.workflows.clear();
+    this.activeWorkflows.clear();
+    this.workflowHistory.clear();
+    this.workflowSnapshots.clear();
+    this.workflowTemplates.clear();
+    this.workflowDependencies.clear();
+    this.performanceMetrics.clear();
+    this.emit('orchestrator:reset');
+  }
+
+  /**
    * 生成编排报告
    */
   generateReport(): string {
+    const stats = this.getWorkflowStatistics();
+    const performanceMetrics = this.getWorkflowPerformanceMetrics();
+
     return `
 ╔══════════════════════════════════════════════════════════════╗
 ║            Agent Orchestrator Report                        ║
@@ -418,21 +919,54 @@ export class AgentOrchestrator extends EventEmitter {
 已注册Agent: ${this.agents.size}
 活动工作流: ${this.activeWorkflows.size}
 已注册工作流: ${this.workflows.size}
+工作流模板: ${this.workflowTemplates.size}
+工作流快照: ${this.workflowSnapshots.size}
 
 === 编排策略 ===
 当前策略: ${this.config.strategy}
 最大并发: ${this.config.maxConcurrency}
 超时时间: ${this.config.timeout}ms
+调试模式: ${this.debugMode ? '启用' : '禁用'}
+
+=== 工作流统计 ===
+总工作流数: ${stats.totalWorkflows}
+平均节点数/工作流: ${stats.avgNodesPerWorkflow.toFixed(2)}
+平均边数/工作流: ${stats.avgEdgesPerWorkflow.toFixed(2)}
+最常用节点类型: ${stats.mostUsedNodeType}
 
 === 已注册Agent ===
 ${Array.from(this.agents.values()).map(agent =>
   `- ${agent.getName()} (${agent.getId()})`
-).join('\n')}
+).join('\n') || '无'}
 
 === 已注册工作流 ===
-${Array.from(this.workflows.values()).map(wf =>
-  `- ${wf.name} (${wf.id}) - ${wf.nodes.length} nodes`
-).join('\n')}
+${Array.from(this.workflows.values()).map(wf => {
+  const validation = this.validateWorkflow(wf);
+  const status = validation.valid ? '✅' : '❌';
+  return `${status} ${wf.name} (${wf.id}) - ${wf.nodes.length} nodes, ${wf.edges.length} edges`;
+}).join('\n') || '无'}
+
+=== 工作流模板 ===
+${Array.from(this.workflowTemplates.values()).map(wf =>
+  `- ${wf.name} (${wf.id})`
+).join('\n') || '无'}
+
+=== 性能指标 ===
+${Object.entries(performanceMetrics)
+  .slice(0, 5)
+  .map(([workflowId, metrics]) =>
+    `${workflowId}:\n  平均执行时间: ${metrics.avgDuration.toFixed(2)}ms\n  成功率: ${(metrics.successRate * 100).toFixed(2)}%\n  执行次数: ${metrics.executionCount}`
+  )
+  .join('\n\n') || '无数据'}
+
+=== 工作流依赖 ===
+${Array.from(this.workflowDependencies.entries()).map(([workflowId, deps]) =>
+  `- ${workflowId}: ${Array.from(deps).join(', ')}`
+).join('\n') || '无依赖'}
+
+=== 调试信息 ===
+最大历史记录: ${this.maxHistorySize}
+总历史记录: ${Array.from(this.workflowHistory.values()).reduce((sum, history) => sum + history.length, 0)}
     `.trim();
   }
 }

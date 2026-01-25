@@ -5,6 +5,9 @@
  * @author YYC³
  * @version 1.0.0
  * @created 2026-01-21
+ * @modified 2026-01-26
+ * @copyright Copyright (c) 2025 YYC³
+ * @license MIT
  */
 
 import { BaseAgent } from '../BaseAgent'
@@ -86,6 +89,20 @@ export class LearningAgent extends BaseAgent {
     failedLearning: 0,
     avgConfidence: 0,
   }
+  private learningHistory: Array<{
+    timestamp: number
+    mode: LearningMode
+    success: boolean
+    samplesProcessed: number
+    knowledgeAdded: number
+  }> = []
+  private performanceMetrics: Map<string, Array<number>> = new Map()
+  private modelWeights: Map<string, number> = new Map()
+  private featureImportance: Map<string, number> = new Map()
+  private confidenceThreshold: number = 0.7
+  private maxRetries: number = 3
+  private learningRateDecay: number = 0.95
+  private minLearningRate: number = 0.001
 
   constructor(idOrConfig: string | LearningAgentConfig, legacyConfig?: LearningAgentConfig) {
     let finalConfig: LearningAgentConfig
@@ -585,9 +602,467 @@ export class LearningAgent extends BaseAgent {
   }
 
   /**
+   * 设置置信度阈值
+   */
+  setConfidenceThreshold(threshold: number): void {
+    this.confidenceThreshold = Math.max(0, Math.min(1, threshold))
+    this.emit('threshold:changed', { threshold: this.confidenceThreshold })
+  }
+
+  /**
+   * 获取置信度阈值
+   */
+  getConfidenceThreshold(): number {
+    return this.confidenceThreshold
+  }
+
+  /**
+   * 记录学习历史
+   */
+  private recordLearningHistory(
+    mode: LearningMode,
+    success: boolean,
+    samplesProcessed: number,
+    knowledgeAdded: number
+  ): void {
+    this.learningHistory.push({
+      timestamp: Date.now(),
+      mode,
+      success,
+      samplesProcessed,
+      knowledgeAdded,
+    })
+
+    if (this.learningHistory.length > 1000) {
+      this.learningHistory.shift()
+    }
+  }
+
+  /**
+   * 获取学习历史
+   */
+  getLearningHistory(limit: number = 100): Array<{
+    timestamp: number
+    mode: LearningMode
+    success: boolean
+    samplesProcessed: number
+    knowledgeAdded: number
+  }> {
+    return this.learningHistory.slice(-limit)
+  }
+
+  /**
+   * 分析学习趋势
+   */
+  analyzeLearningTrends(): {
+    avgSuccessRate: number
+    avgSamplesPerLearning: number
+    avgKnowledgePerLearning: number
+    mostUsedMode: LearningMode
+    trend: 'improving' | 'stable' | 'declining'
+  } {
+    if (this.learningHistory.length === 0) {
+      return {
+        avgSuccessRate: 0,
+        avgSamplesPerLearning: 0,
+        avgKnowledgePerLearning: 0,
+        mostUsedMode: LearningMode.REINFORCEMENT,
+        trend: 'stable',
+      }
+    }
+
+    const recentHistory = this.learningHistory.slice(-50)
+    const successCount = recentHistory.filter(h => h.success).length
+    const avgSuccessRate = successCount / recentHistory.length
+
+    const avgSamplesPerLearning =
+      recentHistory.reduce((sum, h) => sum + h.samplesProcessed, 0) / recentHistory.length
+    const avgKnowledgePerLearning =
+      recentHistory.reduce((sum, h) => sum + h.knowledgeAdded, 0) / recentHistory.length
+
+    const modeCounts: Map<LearningMode, number> = new Map()
+    for (const history of recentHistory) {
+      const count = modeCounts.get(history.mode) || 0
+      modeCounts.set(history.mode, count + 1)
+    }
+
+    let mostUsedMode = LearningMode.REINFORCEMENT
+    let maxCount = 0
+    for (const [mode, count] of modeCounts) {
+      if (count > maxCount) {
+        maxCount = count
+        mostUsedMode = mode
+      }
+    }
+
+    const oldHistory = this.learningHistory.slice(-100, -50)
+    const oldSuccessRate =
+      oldHistory.length > 0
+        ? oldHistory.filter(h => h.success).length / oldHistory.length
+        : avgSuccessRate
+
+    let trend: 'improving' | 'stable' | 'declining' = 'stable'
+    if (avgSuccessRate > oldSuccessRate + 0.1) {
+      trend = 'improving'
+    } else if (avgSuccessRate < oldSuccessRate - 0.1) {
+      trend = 'declining'
+    }
+
+    return {
+      avgSuccessRate,
+      avgSamplesPerLearning,
+      avgKnowledgePerLearning,
+      mostUsedMode,
+      trend,
+    }
+  }
+
+  /**
+   * 调整学习率
+   */
+  private adjustLearningRate(): void {
+    const trends = this.analyzeLearningTrends()
+
+    if (trends.trend === 'improving') {
+      this.strategy.learningRate *= 1.05
+    } else if (trends.trend === 'declining') {
+      this.strategy.learningRate *= this.learningRateDecay
+    }
+
+    this.strategy.learningRate = Math.max(
+      this.minLearningRate,
+      Math.min(0.1, this.strategy.learningRate)
+    )
+
+    this.emit('learningRate:adjusted', {
+      newRate: this.strategy.learningRate,
+      trend: trends.trend,
+    })
+  }
+
+  /**
+   * 获取模型权重
+   */
+  getModelWeights(): Map<string, number> {
+    return new Map(this.modelWeights)
+  }
+
+  /**
+   * 设置模型权重
+   */
+  setModelWeights(weights: Map<string, number>): void {
+    this.modelWeights = new Map(weights)
+    this.emit('weights:updated', { weights: Array.from(this.modelWeights) })
+  }
+
+  /**
+   * 获取特征重要性
+   */
+  getFeatureImportance(): Map<string, number> {
+    return new Map(this.featureImportance)
+  }
+
+  /**
+   * 计算特征重要性
+   */
+  private calculateFeatureImportance(): void {
+    const importance: Map<string, number> = new Map()
+
+    for (const knowledge of this.knowledgeBase.values()) {
+      const features = this.extractFeatures(knowledge)
+      for (const [feature, value] of Object.entries(features)) {
+        const current = importance.get(feature) || 0
+        importance.set(feature, current + value)
+      }
+    }
+
+    const maxImportance = Math.max(...Array.from(importance.values()))
+    for (const [feature, value] of importance) {
+      importance.set(feature, value / maxImportance)
+    }
+
+    this.featureImportance = importance
+    this.emit('features:calculated', { importance: Array.from(this.featureImportance) })
+  }
+
+  /**
+   * 提取特征
+   */
+  private extractFeatures(knowledge: KnowledgeEntry): Record<string, number> {
+    const features: Record<string, number> = {}
+
+    features.confidence = knowledge.confidence
+    features.exampleCount = knowledge.examples.length
+    features.age = (Date.now() - knowledge.createdAt.getTime()) / (1000 * 60 * 60 * 24)
+    features.updateFrequency =
+      (knowledge.updatedAt.getTime() - knowledge.createdAt.getTime()) /
+      (1000 * 60 * 60 * 24)
+
+    return features
+  }
+
+  /**
+   * 获取性能指标
+   */
+  getPerformanceMetrics(concept?: string): Record<string, any> {
+    if (concept) {
+      const metrics = this.performanceMetrics.get(concept) || []
+      return {
+        concept,
+        avgAccuracy: metrics.length > 0 ? metrics.reduce((a, b) => a + b, 0) / metrics.length : 0,
+        minAccuracy: metrics.length > 0 ? Math.min(...metrics) : 0,
+        maxAccuracy: metrics.length > 0 ? Math.max(...metrics) : 0,
+        count: metrics.length,
+      }
+    }
+
+    const result: Record<string, any> = {}
+    for (const [concept, metrics] of this.performanceMetrics) {
+      result[concept] = {
+        avgAccuracy: metrics.length > 0 ? metrics.reduce((a, b) => a + b, 0) / metrics.length : 0,
+        minAccuracy: metrics.length > 0 ? Math.min(...metrics) : 0,
+        maxAccuracy: metrics.length > 0 ? Math.max(...metrics) : 0,
+        count: metrics.length,
+      }
+    }
+    return result
+  }
+
+  /**
+   * 记录性能指标
+   */
+  private recordPerformanceMetric(concept: string, accuracy: number): void {
+    if (!this.performanceMetrics.has(concept)) {
+      this.performanceMetrics.set(concept, [])
+    }
+
+    const metrics = this.performanceMetrics.get(concept)!
+    metrics.push(accuracy)
+
+    if (metrics.length > 100) {
+      metrics.shift()
+    }
+  }
+
+  /**
+   * 批量学习
+   */
+  async batchLearn(samples: LearningSample[]): Promise<{
+    successful: number
+    failed: number
+    knowledgeAdded: number
+  }> {
+    let successful = 0
+    let failed = 0
+    let knowledgeAdded = 0
+
+    for (const sample of samples) {
+      try {
+        this.addSample(sample)
+        successful++
+      } catch (error) {
+        failed++
+      }
+    }
+
+    const result = {
+      successful,
+      failed,
+      knowledgeAdded: this.knowledgeBase.size,
+    }
+
+    this.emit('batch:completed', result)
+    return result
+  }
+
+  /**
+   * 重置学习
+   */
+  async resetLearning(): Promise<void> {
+    this.samples = []
+    this.knowledgeBase.clear()
+    this.learningHistory = []
+    this.performanceMetrics.clear()
+    this.modelWeights.clear()
+    this.featureImportance.clear()
+
+    this.learningMetrics = {
+      totalSamples: 0,
+      successfulLearning: 0,
+      failedLearning: 0,
+      avgConfidence: 0,
+    }
+
+    this.emit('learning:reset')
+  }
+
+  /**
+   * 导出学习状态
+   */
+  exportLearningState(): string {
+    return JSON.stringify(
+      {
+        knowledgeBase: Array.from(this.knowledgeBase.values()),
+        learningHistory: this.learningHistory,
+        performanceMetrics: Array.from(this.performanceMetrics.entries()).map(([concept, metrics]) => ({
+          concept,
+          metrics,
+        })),
+        modelWeights: Array.from(this.modelWeights),
+        featureImportance: Array.from(this.featureImportance),
+        learningMetrics: this.learningMetrics,
+        strategy: this.strategy,
+      },
+      null,
+      2
+    )
+  }
+
+  /**
+   * 导入学习状态
+   */
+  importLearningState(stateData: string): void {
+    const state = JSON.parse(stateData)
+
+    for (const knowledge of state.knowledgeBase) {
+      this.knowledgeBase.set(knowledge.id, knowledge)
+    }
+
+    this.learningHistory = state.learningHistory || []
+    this.learningMetrics = state.learningMetrics || this.learningMetrics
+    this.strategy = state.strategy || this.strategy
+
+    for (const { concept, metrics } of state.performanceMetrics || []) {
+      this.performanceMetrics.set(concept, metrics)
+    }
+
+    for (const [key, value] of state.modelWeights || []) {
+      this.modelWeights.set(key, value)
+    }
+
+    for (const [key, value] of state.featureImportance || []) {
+      this.featureImportance.set(key, value)
+    }
+
+    this.emit('learning:imported', { knowledgeCount: state.knowledgeBase.length })
+  }
+
+  /**
+   * 获取学习建议
+   */
+  getLearningRecommendations(): Array<{
+    type: 'increase_samples' | 'adjust_learning_rate' | 'change_mode' | 'prune_knowledge'
+    priority: 'high' | 'medium' | 'low'
+    description: string
+  }> {
+    const recommendations: Array<{
+      type: 'increase_samples' | 'adjust_learning_rate' | 'change_mode' | 'prune_knowledge'
+      priority: 'high' | 'medium' | 'low'
+      description: string
+    }> = []
+
+    const trends = this.analyzeLearningTrends()
+
+    if (trends.avgSuccessRate < 0.7) {
+      recommendations.push({
+        type: 'increase_samples',
+        priority: 'high',
+        description: '成功率较低，建议增加训练样本数量以提高学习效果',
+      })
+    }
+
+    if (this.strategy.learningRate > 0.05 && trends.trend === 'declining') {
+      recommendations.push({
+        type: 'adjust_learning_rate',
+        priority: 'high',
+        description: '学习率过高且性能下降，建议降低学习率',
+      })
+    }
+
+    if (this.knowledgeBase.size > this.maxKnowledgeEntries * 0.9) {
+      recommendations.push({
+        type: 'prune_knowledge',
+        priority: 'medium',
+        description: '知识库接近容量上限，建议清理低置信度知识',
+      })
+    }
+
+    if (trends.mostUsedMode !== this.strategy.mode) {
+      recommendations.push({
+        type: 'change_mode',
+        priority: 'low',
+        description: `当前学习模式可能不是最优，建议切换到${trends.mostUsedMode}模式`,
+      })
+    }
+
+    return recommendations
+  }
+
+  /**
+   * 清理低置信度知识
+   */
+  pruneKnowledge(threshold?: number): number {
+    const pruneThreshold = threshold || this.confidenceThreshold
+    const pruned: string[] = []
+
+    for (const [id, knowledge] of this.knowledgeBase) {
+      if (knowledge.confidence < pruneThreshold) {
+        pruned.push(id)
+      }
+    }
+
+    for (const id of pruned) {
+      this.knowledgeBase.delete(id)
+    }
+
+    this.emit('knowledge:pruned', { count: pruned.length, threshold: pruneThreshold })
+    return pruned.length
+  }
+
+  /**
+   * 获取知识统计
+   */
+  getKnowledgeStatistics(): {
+    totalEntries: number
+    avgConfidence: number
+    confidenceDistribution: { low: number; medium: number; high: number }
+    conceptDistribution: Record<string, number>
+  } {
+    const entries = Array.from(this.knowledgeBase.values())
+    const totalEntries = entries.length
+
+    const avgConfidence =
+      totalEntries > 0
+        ? entries.reduce((sum, k) => sum + k.confidence, 0) / totalEntries
+        : 0
+
+    const confidenceDistribution = {
+      low: entries.filter(k => k.confidence < 0.5).length,
+      medium: entries.filter(k => k.confidence >= 0.5 && k.confidence < 0.8).length,
+      high: entries.filter(k => k.confidence >= 0.8).length,
+    }
+
+    const conceptDistribution: Record<string, number> = {}
+    for (const knowledge of entries) {
+      conceptDistribution[knowledge.concept] = (conceptDistribution[knowledge.concept] || 0) + 1
+    }
+
+    return {
+      totalEntries,
+      avgConfidence,
+      confidenceDistribution,
+      conceptDistribution,
+    }
+  }
+
+  /**
    * 生成学习报告
    */
   generateLearningReport(): string {
+    const trends = this.analyzeLearningTrends()
+    const stats = this.getKnowledgeStatistics()
+    const recommendations = this.getLearningRecommendations()
+
     return `
 ╔══════════════════════════════════════════════════════════════╗
 ║            Learning Agent Report                            ║
@@ -602,21 +1077,54 @@ ID: ${this.getId()}
 失败学习: ${this.learningMetrics.failedLearning}
 成功率: ${((this.learningMetrics.successfulLearning / Math.max(1, this.learningMetrics.totalSamples)) * 100).toFixed(2)}%
 
+=== 学习趋势 ===
+平均成功率: ${(trends.avgSuccessRate * 100).toFixed(2)}%
+平均样本/学习: ${trends.avgSamplesPerLearning.toFixed(2)}
+平均知识/学习: ${trends.avgKnowledgePerLearning.toFixed(2)}
+最常用模式: ${trends.mostUsedMode}
+趋势: ${trends.trend === 'improving' ? '📈 提升' : trends.trend === 'declining' ? '📉 下降' : '➡️ 稳定'}
+
 === 知识库 ===
-知识条目数: ${this.knowledgeBase.size}
-平均置信度: ${this.learningMetrics.avgConfidence.toFixed(2)}
+知识条目数: ${stats.totalEntries}
+平均置信度: ${stats.avgConfidence.toFixed(2)}
+
+=== 置信度分布 ===
+低 (< 0.5): ${stats.confidenceDistribution.low}
+中 (0.5-0.8): ${stats.confidenceDistribution.medium}
+高 (≥ 0.8): ${stats.confidenceDistribution.high}
 
 === 学习策略 ===
 模式: ${this.strategy.mode}
-学习率: ${this.strategy.learningRate}
+学习率: ${this.strategy.learningRate.toFixed(4)}
 批次大小: ${this.strategy.batchSize}
 自适应学习: ${this.enableAdaptiveLearning ? '启用' : '禁用'}
+置信度阈值: ${this.confidenceThreshold.toFixed(2)}
 
 === Top 5 知识条目 ===
 ${this.getAllKnowledge()
   .slice(0, 5)
-  .map((k, i) => `${i + 1}. ${k.concept} (置信度: ${k.confidence.toFixed(2)})`)
+  .map((k, i) => `${i + 1}. ${k.concept} (置信度: ${k.confidence.toFixed(2)}, 示例: ${k.examples.length})`)
   .join('\n')}
+
+=== 概念分布 ===
+${Object.entries(stats.conceptDistribution)
+  .sort(([, a], [, b]) => b - a)
+  .slice(0, 5)
+  .map(([concept, count]) => `- ${concept}: ${count}`)
+  .join('\n')}
+
+=== 学习建议 ===
+${recommendations.length > 0
+  ? recommendations.map(r => `[${r.priority.toUpperCase()}] ${r.description}`).join('\n')
+  : '无建议'}
+
+=== 性能指标 ===
+${Object.entries(this.getPerformanceMetrics())
+  .slice(0, 3)
+  .map(([concept, metrics]) => 
+    `${concept}:\n  平均准确率: ${(metrics.avgAccuracy * 100).toFixed(2)}%\n  处理次数: ${metrics.count}`
+  )
+  .join('\n\n')}
     `.trim()
   }
 }

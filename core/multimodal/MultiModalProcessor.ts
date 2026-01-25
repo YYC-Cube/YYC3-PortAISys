@@ -5,6 +5,9 @@
  * @author YYC³
  * @version 1.0.0
  * @created 2026-01-21
+ * @modified 2026-01-26
+ * @copyright Copyright (c) 2025 YYC³
+ * @license MIT
  */
 
 import { EventEmitter } from 'events';
@@ -113,6 +116,18 @@ export class MultiModalProcessor extends EventEmitter {
   private config: Required<MultiModalConfig>;
   private cache: Map<string, ProcessingResult> = new Map();
   private processors: Map<ModalityType, any> = new Map();
+  private cacheHits: number = 0;
+  private cacheMisses: number = 0;
+  private processingQueue: Array<{
+    id: string;
+    input: MultiModalInput;
+    priority: number;
+    resolve: (result: ProcessingResult) => void;
+    reject: (error: Error) => void;
+  }> = [];
+  private isProcessing: boolean = false;
+  private performanceMetrics: Map<ModalityType, Array<number>> = new Map();
+  private modalityPriorities: Map<ModalityType, number> = new Map();
 
   constructor(config: MultiModalConfig = {}) {
     super();
@@ -154,7 +169,7 @@ export class MultiModalProcessor extends EventEmitter {
   async processModality(input: MultiModalInput | string, data?: string | any): Promise<ProcessingResult> {
     // 支持两种调用方式：processModality(input) 或 processModality(type, data)
     let modalityInput: MultiModalInput;
-    
+
     if (typeof input === 'string') {
       // 处理 processModality('text', 'Hello world') 形式的调用
       const type = input as any;
@@ -217,7 +232,7 @@ export class MultiModalProcessor extends EventEmitter {
       this.cacheResult(cacheKey, result);
     }
 
-    this.emit('processing:completed', { modality: input.type, result });
+    this.emit('processing:completed', { modality: modalityInput.type, result });
 
     return result;
   }
@@ -277,7 +292,7 @@ export class MultiModalProcessor extends EventEmitter {
   private async processText(input: TextInput): Promise<ProcessingResult> {
     // 模拟文本处理
     const embeddings = this.generateEmbeddings(input.content);
-    
+
     return {
       modality: ModalityType.TEXT,
       type: ModalityType.TEXT,
@@ -298,7 +313,7 @@ export class MultiModalProcessor extends EventEmitter {
   private async processImage(input: ImageInput): Promise<ProcessingResult> {
     // 模拟图像处理
     const embeddings = this.generateEmbeddings('image-features');
-    
+
     return {
       modality: ModalityType.IMAGE,
       content: input.url || input.base64,
@@ -320,7 +335,7 @@ export class MultiModalProcessor extends EventEmitter {
   private async processAudio(input: AudioInput): Promise<ProcessingResult> {
     // 模拟音频处理
     const embeddings = this.generateEmbeddings('audio-features');
-    
+
     return {
       modality: ModalityType.AUDIO,
       content: input.url || input.base64,
@@ -342,7 +357,7 @@ export class MultiModalProcessor extends EventEmitter {
   private async processVideo(input: VideoInput): Promise<ProcessingResult> {
     // 模拟视频处理
     const embeddings = this.generateEmbeddings('video-features');
-    
+
     return {
       modality: ModalityType.VIDEO,
       content: input.url,
@@ -423,14 +438,14 @@ export class MultiModalProcessor extends EventEmitter {
    */
   private averageEmbeddings(embeddings: number[]): number[] {
     if (embeddings.length === 0) return [];
-    
+
     const dim = 768;
     const result = new Array(dim).fill(0);
-    
+
     for (let i = 0; i < embeddings.length; i++) {
       result[i % dim] += embeddings[i];
     }
-    
+
     return result.map(val => val / Math.ceil(embeddings.length / dim));
   }
 
@@ -450,7 +465,7 @@ export class MultiModalProcessor extends EventEmitter {
       const firstKey = this.cache.keys().next().value;
       this.cache.delete(firstKey);
     }
-    
+
     this.cache.set(key, result);
   }
 
@@ -466,11 +481,289 @@ export class MultiModalProcessor extends EventEmitter {
    * 获取缓存统计
    */
   getCacheStats(): { size: number; maxSize: number; hitRate: number } {
+    const total = this.cacheHits + this.cacheMisses;
+    const hitRate = total > 0 ? this.cacheHits / total : 0;
     return {
       size: this.cache.size,
       maxSize: this.config.maxCacheSize,
-      hitRate: 0 // 需要实际实现命中率追踪
+      hitRate
     };
+  }
+
+  /**
+   * 设置模态优先级
+   */
+  setModalityPriority(modality: ModalityType, priority: number): void {
+    this.modalityPriorities.set(modality, priority);
+    this.emit('priority:changed', { modality, priority });
+  }
+
+  /**
+   * 获取模态优先级
+   */
+  getModalityPriority(modality: ModalityType): number {
+    return this.modalityPriorities.get(modality) || 0;
+  }
+
+  /**
+   * 添加到处理队列
+   */
+  private async queueProcessing(
+    input: MultiModalInput,
+    priority: number = 0
+  ): Promise<ProcessingResult> {
+    return new Promise((resolve, reject) => {
+      const id = `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      this.processingQueue.push({
+        id,
+        input,
+        priority,
+        resolve,
+        reject
+      });
+
+      this.processingQueue.sort((a, b) => b.priority - a.priority);
+
+      if (!this.isProcessing) {
+        this.processQueue();
+      }
+    });
+  }
+
+  /**
+   * 处理队列
+   */
+  private async processQueue(): Promise<void> {
+    if (this.isProcessing || this.processingQueue.length === 0) {
+      return;
+    }
+
+    this.isProcessing = true;
+
+    while (this.processingQueue.length > 0) {
+      const item = this.processingQueue.shift()!;
+
+      try {
+        const result = await this.processModality(item.input);
+        item.resolve(result);
+      } catch (error) {
+        item.reject(error as Error);
+      }
+    }
+
+    this.isProcessing = false;
+  }
+
+  /**
+   * 记录性能指标
+   */
+  private recordPerformance(modality: ModalityType, latency: number): void {
+    if (!this.performanceMetrics.has(modality)) {
+      this.performanceMetrics.set(modality, []);
+    }
+
+    const metrics = this.performanceMetrics.get(modality)!;
+    metrics.push(latency);
+
+    if (metrics.length > 100) {
+      metrics.shift();
+    }
+  }
+
+  /**
+   * 获取性能指标
+   */
+  getPerformanceMetrics(modality?: ModalityType): Record<string, any> {
+    if (modality) {
+      const metrics = this.performanceMetrics.get(modality) || [];
+      return {
+        modality,
+        avgLatency: metrics.length > 0
+          ? metrics.reduce((a, b) => a + b, 0) / metrics.length
+          : 0,
+        minLatency: metrics.length > 0 ? Math.min(...metrics) : 0,
+        maxLatency: metrics.length > 0 ? Math.max(...metrics) : 0,
+        count: metrics.length
+      };
+    }
+
+    const result: Record<string, any> = {};
+    for (const [m, metrics] of this.performanceMetrics) {
+      result[m] = {
+        avgLatency: metrics.length > 0
+          ? metrics.reduce((a, b) => a + b, 0) / metrics.length
+          : 0,
+        minLatency: metrics.length > 0 ? Math.min(...metrics) : 0,
+        maxLatency: metrics.length > 0 ? Math.max(...metrics) : 0,
+        count: metrics.length
+      };
+    }
+    return result;
+  }
+
+  /**
+   * 批量处理模态
+   */
+  async batchProcess(
+    inputs: Array<{ input: MultiModalInput; priority?: number }>
+  ): Promise<ProcessingResult[]> {
+    if (this.config.enableParallelProcessing) {
+      return Promise.all(
+        inputs.map(({ input, priority }) =>
+          this.processModality(input)
+        )
+      );
+    } else {
+      const results: ProcessingResult[] = [];
+      for (const { input, priority } of inputs) {
+        const result = await this.processModality(input);
+        results.push(result);
+      }
+      return results;
+    }
+  }
+
+  /**
+   * 取消处理
+   */
+  cancelProcessing(): void {
+    this.processingQueue = [];
+    this.isProcessing = false;
+    this.emit('processing:cancelled');
+  }
+
+  /**
+   * 重置统计
+   */
+  resetStats(): void {
+    this.cacheHits = 0;
+    this.cacheMisses = 0;
+    this.performanceMetrics.clear();
+    this.emit('stats:reset');
+  }
+
+  /**
+   * 获取支持的模态
+   */
+  getSupportedModalities(): ModalityType[] {
+    return Array.from(this.processors.keys());
+  }
+
+  /**
+   * 检查模态是否支持
+   */
+  isModalitySupported(modality: ModalityType): boolean {
+    return this.processors.has(modality);
+  }
+
+  /**
+   * 预热缓存
+   */
+  async warmCache(inputs: MultiModalInput[]): Promise<void> {
+    for (const input of inputs) {
+      await this.processModality(input);
+    }
+    this.emit('cache:warmed', { count: inputs.length });
+  }
+
+  /**
+   * 获取缓存键列表
+   */
+  getCacheKeys(): string[] {
+    return Array.from(this.cache.keys());
+  }
+
+  /**
+   * 清理过期缓存
+   */
+  cleanExpiredCache(maxAge: number = 3600000): void {
+    const now = Date.now();
+    const expiredKeys: string[] = [];
+
+    for (const [key, result] of this.cache) {
+      const age = now - (result.metadata?.timestamp || 0);
+      if (age > maxAge) {
+        expiredKeys.push(key);
+      }
+    }
+
+    for (const key of expiredKeys) {
+      this.cache.delete(key);
+    }
+
+    if (expiredKeys.length > 0) {
+      this.emit('cache:cleaned', { count: expiredKeys.length });
+    }
+  }
+
+  /**
+   * 导出缓存
+   */
+  exportCache(): string {
+    const cacheData: Record<string, ProcessingResult> = {};
+    for (const [key, result] of this.cache) {
+      cacheData[key] = result;
+    }
+    return JSON.stringify(cacheData, null, 2);
+  }
+
+  /**
+   * 导入缓存
+   */
+  importCache(cacheData: string): void {
+    const data: Record<string, ProcessingResult> = JSON.parse(cacheData);
+    for (const [key, result] of Object.entries(data)) {
+      this.cache.set(key, result);
+    }
+    this.emit('cache:imported', { count: Object.keys(data).length });
+  }
+
+  /**
+   * 获取处理历史
+   */
+  getProcessingHistory(limit: number = 100): Array<{
+    modality: ModalityType;
+    timestamp: number;
+    latency: number;
+    success: boolean;
+  }> {
+    const history: Array<any> = [];
+    const allMetrics: Array<{ modality: ModalityType; latency: number }> = [];
+
+    for (const [modality, metrics] of this.performanceMetrics) {
+      for (const latency of metrics) {
+        allMetrics.push({ modality, latency });
+      }
+    }
+
+    allMetrics.sort((a, b) => b.latency - a.latency);
+
+    return allMetrics.slice(0, limit).map(item => ({
+      modality: item.modality,
+      timestamp: Date.now(),
+      latency: item.latency,
+      success: true
+    }));
+  }
+
+  /**
+   * 优化性能
+   */
+  optimizePerformance(): void {
+    const metrics = this.getPerformanceMetrics();
+
+    for (const [modalityStr, data] of Object.entries(metrics)) {
+      const modality = modalityStr as ModalityType;
+      if (data.avgLatency > 1000) {
+        this.setModalityPriority(modality, 10);
+      } else if (data.avgLatency > 500) {
+        this.setModalityPriority(modality, 5);
+      } else {
+        this.setModalityPriority(modality, 0);
+      }
+    }
+
+    this.emit('performance:optimized', { metrics });
   }
 
   /**
@@ -478,6 +771,8 @@ export class MultiModalProcessor extends EventEmitter {
    */
   generateReport(): string {
     const cacheStats = this.getCacheStats();
+    const perfMetrics = this.getPerformanceMetrics();
+    const supportedModalities = this.getSupportedModalities();
 
     return `
 ╔══════════════════════════════════════════════════════════════╗
@@ -491,13 +786,30 @@ export class MultiModalProcessor extends EventEmitter {
 
 === 缓存统计 ===
 缓存大小: ${cacheStats.size}/${cacheStats.maxSize}
-命中率: ${cacheStats.hitRate.toFixed(2)}%
+命中率: ${(cacheStats.hitRate * 100).toFixed(2)}%
+缓存命中: ${this.cacheHits}
+缓存未命中: ${this.cacheMisses}
+
+=== 性能指标 ===
+${Object.entries(perfMetrics).map(([modality, data]) => `
+${modality.toUpperCase()}:
+  平均延迟: ${data.avgLatency.toFixed(2)}ms
+  最小延迟: ${data.minLatency.toFixed(2)}ms
+  最大延迟: ${data.maxLatency.toFixed(2)}ms
+  处理次数: ${data.count}
+`).join('')}
 
 === 支持的模态 ===
-✅ 文本 (TEXT)
-✅ 图像 (IMAGE)
-✅ 音频 (AUDIO)
-✅ 视频 (VIDEO)
+${supportedModalities.map(m => `✅ ${m.toUpperCase()}`).join('\n')}
+
+=== 队列状态 ===
+队列大小: ${this.processingQueue.length}
+处理中: ${this.isProcessing ? '是' : '否'}
+
+=== 模态优先级 ===
+${Array.from(this.modalityPriorities.entries()).map(([modality, priority]) =>
+  `${modality.toUpperCase()}: ${priority}`
+).join('\n') || '无设置'}
     `.trim();
   }
 }
