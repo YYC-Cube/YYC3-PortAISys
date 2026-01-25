@@ -34,6 +34,9 @@ import {
 } from '../error-handler/ErrorTypes';
 import { ErrorHandler } from '../error-handler/ErrorHandler';
 import { ErrorBoundary } from '../error-handler/ErrorBoundary';
+import { OpenAIModelAdapter } from '../adapters/OpenAIModelAdapter';
+import { ModelGenerationRequest } from '../adapters/ModelAdapter';
+import { AutonomousAIConfig } from '../autonomous-ai-widget/types';
 
 export class ChatInterface extends EventEmitter implements IChatInterface {
   private sessions: Map<string, ChatSession>;
@@ -47,8 +50,9 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
   private messageQueue: Map<string, ChatMessage[]>;
   private errorHandler: ErrorHandler;
   private errorBoundary: ErrorBoundary;
+  private modelAdapter: OpenAIModelAdapter;
 
-  constructor(errorHandler?: ErrorHandler) {
+  constructor(errorHandler?: ErrorHandler, modelConfig?: AutonomousAIConfig) {
     super();
     this.sessions = new Map();
     this.currentSessionId = null;
@@ -66,6 +70,19 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
       retryDelay: 1000
     });
     
+    // 初始化模型适配器
+    const defaultConfig: AutonomousAIConfig = {
+      apiKey: process.env.OPENAI_API_KEY || '',
+      apiType: 'openai',
+      modelName: 'gpt-4',
+      baseURL: 'https://api.openai.com',
+      endpoint: 'https://api.openai.com/v1/chat/completions',
+      timeout: 30000,
+      maxTokens: 4096,
+      temperature: 0.7
+    };
+    
+    this.modelAdapter = new OpenAIModelAdapter(modelConfig || defaultConfig, this.errorHandler);
     this.initializeDefaultTheme();
     this.setupErrorHandling();
   }
@@ -130,27 +147,66 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
   private async processMessage(message: ChatMessage): Promise<string> {
     this.emit('message:processing', message);
     
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const responseId = this.generateId();
-        const response: ChatMessage = {
-          id: responseId,
-          role: 'assistant',
-          content: `这是对消息的响应: ${message.content}`,
-          timestamp: Date.now(),
-          status: 'sent',
-        };
-        
-        const session = this.getCurrentSession();
-        if (session) {
-          session.messages.push(response);
-          session.updatedAt = Date.now();
+    try {
+      // 构建模型请求
+      const session = this.getCurrentSession();
+      const messages = session ? session.messages.filter(m => m.role !== 'system') : [];
+      
+      const request: ModelGenerationRequest = {
+        prompt: message.content,
+        messages: messages.map(m => ({
+          role: m.role,
+          content: m.content
+        })),
+        modelConfig: {
+          maxTokens: 4096,
+          temperature: 0.7
         }
-        
-        this.emit('message:received', response);
-        resolve(response.content);
-      }, 1000);
-    });
+      };
+      
+      // 调用模型适配器生成响应
+      const result = await this.modelAdapter.generate(request);
+      
+      // 构建响应消息
+      const responseId = this.generateId();
+      const response: ChatMessage = {
+        id: responseId,
+        role: 'assistant',
+        content: result.content,
+        timestamp: Date.now(),
+        status: 'sent',
+      };
+      
+      if (session) {
+        session.messages.push(response);
+        session.updatedAt = Date.now();
+      }
+      
+      this.emit('message:received', response);
+      return result.content;
+    } catch (error) {
+      // 处理错误
+      this.emit('error', { error, message });
+      
+      // 生成错误响应
+      const errorResponseId = this.generateId();
+      const errorResponse: ChatMessage = {
+        id: errorResponseId,
+        role: 'assistant',
+        content: `抱歉，处理您的请求时发生错误：${error instanceof Error ? error.message : '未知错误'}`,
+        timestamp: Date.now(),
+        status: 'error',
+      };
+      
+      const session = this.getCurrentSession();
+      if (session) {
+        session.messages.push(errorResponse);
+        session.updatedAt = Date.now();
+      }
+      
+      this.emit('message:received', errorResponse);
+      return errorResponse.content;
+    }
   }
 
   async editMessage(messageId: string, newContent: string): Promise<void> {

@@ -9,7 +9,7 @@
 
 import { EventEmitter } from 'events';
 import { BaseAgent } from './BaseAgent';
-import { CollaborativeAgent } from './agents/CollaborativeAgent';
+
 
 /**
  * 工作流节点类型
@@ -36,6 +36,17 @@ export interface WorkflowNode {
 }
 
 /**
+ * 工作流边
+ */
+export interface WorkflowEdge {
+  id: string;
+  from: string;
+  to: string;
+  condition?: (context: any) => boolean;
+  metadata?: Record<string, any>;
+}
+
+/**
  * 工作流定义
  */
 export interface WorkflowDefinition {
@@ -43,6 +54,7 @@ export interface WorkflowDefinition {
   name: string;
   description?: string;
   nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
   initialContext?: Record<string, any>;
 }
 

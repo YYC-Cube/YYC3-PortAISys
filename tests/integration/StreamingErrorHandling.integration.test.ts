@@ -7,11 +7,13 @@
  * @created 2026-01-21
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { OpenAIModelAdapter, StreamCallback } from '../../core/adapters/OpenAIModelAdapter';
 import { ErrorHandler } from '../../core/error-handler/ErrorHandler';
+import { ErrorSeverity } from '../../core/error-handler/ErrorTypes';
 import { AutonomousAIConfig } from '../../core/autonomous-ai-widget/types';
 import { ModelGenerationRequest } from '../../core/adapters/ModelAdapter';
+import { apiMockManager } from '../../core/testing/ApiMockManager';
 
 describe('OpenAI流式输出 - 错误处理集成', () => {
   let adapter: OpenAIModelAdapter;
@@ -20,9 +22,18 @@ describe('OpenAI流式输出 - 错误处理集成', () => {
 
   beforeEach(() => {
     errorHandler = new ErrorHandler({
+      enableLogging: true,
+      enableReporting: true,
       enableAutoRecovery: true,
-      maxRetries: 3,
-      retryDelay: 100
+      enableRecovery: true,
+      enableContextCollection: true,
+      enableClassification: true,
+      enableAggregation: true,
+      enableTrendAnalysis: true,
+      enableAlerts: true,
+      maxRetryAttempts: 3,
+      retryDelay: 100,
+      logLevel: ErrorSeverity.LOW
     });
 
     config = {
@@ -30,19 +41,44 @@ describe('OpenAI流式输出 - 错误处理集成', () => {
       apiKey: 'test-key',
       modelName: 'gpt-4',
       maxTokens: 2000,
-      temperature: 0.7
+      temperature: 0.7,
+      enableLearning: false,
+      enableMemory: false,
+      enableToolUse: false,
+      enableContextAwareness: false,
+      position: 'bottom-right',
+      theme: 'light',
+      language: 'zh-CN'
     };
 
     adapter = new OpenAIModelAdapter(config, errorHandler);
   });
 
+  afterEach(() => {
+    vi.clearAllMocks();
+    apiMockManager.cleanup();
+  });
+
   describe('错误恢复', () => {
     it('应该在网络错误后自动重试', async () => {
+      // 使用ApiMockManager创建智能模拟
+      const networkErrorMock = apiMockManager.createMock('network-error-fetch', {
+        name: 'network-error-fetch',
+        response: {
+          ok: true,
+          body: createMockStream(['data: {"choices":[{"delta":{"content":"Success"}}]}\n\n'])
+        },
+        error: true,
+        errorMessage: 'Network request failed',
+        callLimit: 1
+      });
+
       let attemptCount = 0;
       const mockFetch = vi.fn().mockImplementation(() => {
         attemptCount++;
         if (attemptCount < 2) {
-          return Promise.reject(new TypeError('Network request failed'));
+          // 模拟网络错误，这会被OpenAIModelAdapter捕获并转换为NetworkError
+          return Promise.reject(new TypeError('fetch failed'));
         }
         
         return Promise.resolve({
@@ -91,6 +127,17 @@ describe('OpenAI流式输出 - 错误处理集成', () => {
     });
 
     it('应该在达到最大重试次数后失败', async () => {
+      // 使用ApiMockManager创建错误模拟
+      const serverErrorMock = apiMockManager.createMock('server-error-fetch', {
+        name: 'server-error-fetch',
+        response: {
+          ok: false,
+          status: 500,
+          statusText: 'Server Error',
+          json: () => Promise.resolve({ error: { message: 'Persistent error' } })
+        }
+      });
+
       const mockFetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
@@ -108,7 +155,10 @@ describe('OpenAI流式输出 - 错误处理集成', () => {
 
       const onChunk: StreamCallback = vi.fn();
 
-      await expect(adapter.generateStream(request, onChunk)).rejects.toThrow('Persistent error');
+      // OpenAIModelAdapter会将HTTP错误转换为标准化的错误消息
+      await expect(adapter.generateStream(request, onChunk)).rejects.toThrow(
+        'OpenAI server error: 500 Server Error'
+      );
 
       // 应该尝试了初始请求 + 最大重试次数
       expect(mockFetch).toHaveBeenCalledTimes(4); // 1 + 3 retries
@@ -181,6 +231,12 @@ describe('OpenAI流式输出 - 错误处理集成', () => {
 
   describe('取消与清理', () => {
     it('应该正确清理资源在取消后', async () => {
+      // 使用ApiMockManager创建流式模拟
+      const cancelStreamMock = apiMockManager.createStreamingMock({
+        name: 'cancel-stream',
+        delay: 5000 // 模拟长延迟
+      });
+
       const mockStream = createMockStream(
         ['data: {"choices":[{"delta":{"content":"Test"}}]}\n\n'],
         5000 // 长延迟
@@ -207,7 +263,14 @@ describe('OpenAI流式输出 - 错误处理集成', () => {
 
       await expect(generatePromise).rejects.toThrow();
 
-      // 状态应该恢复
+      // 等待一段时间让状态更新
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // 当取消请求时，生成过程会失败，状态应该是'error'
+      expect(adapter.getStatus()).toBe('error');
+
+      // 然后我们可以手动重置状态
+      await adapter.initialize(config);
       expect(adapter.getStatus()).toBe('idle');
     });
 

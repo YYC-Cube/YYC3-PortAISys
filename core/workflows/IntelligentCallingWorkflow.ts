@@ -129,6 +129,7 @@ export interface RealTimeAI {
   sentimentAnalysis: SentimentAnalysis;
   intentRecognition: IntentRecognition;
   nextBestAction: NextBestAction;
+  analyze: (transcript: string) => Promise<any>;
 }
 
 export interface ScriptGuidance {
@@ -203,24 +204,66 @@ export interface CallingResult {
 }
 
 export class CallOrchestrator {
-  async orchestrateCall(preparation: CallPreparation): Promise<CallExecution> {
-    return {} as CallExecution;
+  async orchestrateCall(_preparation: CallPreparation): Promise<CallExecution> {
+    return {
+      realTimeAI: {
+        speechToText: {
+          transcript: '',
+          confidence: 0
+        },
+        sentimentAnalysis: {
+          sentiment: '',
+          confidence: 0
+        },
+        intentRecognition: {
+          intent: '',
+          confidence: 0
+        },
+        nextBestAction: {
+          action: '',
+          reason: ''
+        },
+        analyze: async (_transcript: string) => {
+          return {};
+        }
+      },
+      agentAssistance: {
+        scriptGuidance: {
+          script: '',
+          variations: []
+        },
+        knowledgeSupport: {
+          articles: [],
+          faqs: []
+        },
+        emotionCoaching: {
+          tips: [],
+          alerts: []
+        }
+      },
+      qualityAssurance: {
+        complianceMonitoring: {
+          compliant: true,
+          violations: []
+        },
+        qualityScoring: {
+          score: 0,
+          factors: []
+        },
+        interventionTriggers: {
+          triggers: [],
+          severity: ''
+        }
+      }
+    };
   }
 }
 
-export class RealTimeAI {
-  async analyze(transcript: string): Promise<any> {
-    return {};
-  }
-}
+
 
 export class IntelligentCallingWorkflow {
-  private callOrchestrator: CallOrchestrator;
-  private realTimeAI: RealTimeAI;
 
   constructor() {
-    this.callOrchestrator = new CallOrchestrator();
-    this.realTimeAI = new RealTimeAI();
   }
   
   async executeEndToEndCalling(customer: Customer, campaign: Campaign): Promise<CallingResult> {
@@ -274,13 +317,16 @@ export class IntelligentCallingWorkflow {
     };
   }
   
-  private async duringCallAssistance(preparation: CallPreparation): Promise<CallExecution> {
+  private async duringCallAssistance(_preparation: CallPreparation): Promise<CallExecution> {
     return {
       realTimeAI: {
         speechToText: await this.transcribeCallRealtime(),
         sentimentAnalysis: await this.analyzeSentimentRealtime(),
         intentRecognition: await this.detectIntentRealtime(),
-        nextBestAction: await this.suggestNextBestAction()
+        nextBestAction: await this.suggestNextBestAction(),
+        analyze: async (_transcript: string) => {
+          return {};
+        }
       },
       agentAssistance: {
         scriptGuidance: await this.provideScriptGuidance(),
@@ -295,21 +341,21 @@ export class IntelligentCallingWorkflow {
     };
   }
 
-  private async postCallProcessing(callExecution: CallExecution): Promise<PostCallProcessing> {
+  private async postCallProcessing(_callExecution: CallExecution): Promise<PostCallProcessing> {
     return {
       summary: '呼叫已完成',
       actionItems: ['跟进客户', '更新记录']
     };
   }
 
-  private async learningAndOptimization(postCall: PostCallProcessing): Promise<Optimization> {
+  private async learningAndOptimization(_postCall: PostCallProcessing): Promise<Optimization> {
     return {
       insights: ['洞察1', '洞察2'],
       improvements: ['改进1', '改进2']
     };
   }
 
-  private async measureBusinessOutcome(postCall: PostCallProcessing): Promise<BusinessOutcome> {
+  private async measureBusinessOutcome(_postCall: PostCallProcessing): Promise<BusinessOutcome> {
     return {
       success: true,
       metrics: {
@@ -328,35 +374,35 @@ export class IntelligentCallingWorkflow {
     };
   }
 
-  private async analyzeRecentBehavior(customerId: string): Promise<BehaviorData> {
+  private async analyzeRecentBehavior(_customerId: string): Promise<BehaviorData> {
     return {
       recentActivity: ['活动1', '活动2'],
       preferences: ['偏好1', '偏好2']
     };
   }
 
-  private async predictCallReceptivity(customerId: string): Promise<SentimentData> {
+  private async predictCallReceptivity(_customerId: string): Promise<SentimentData> {
     return {
       score: 0.8,
       trend: '上升'
     };
   }
 
-  private async calculateCustomerValue(customerId: string): Promise<CustomerValue> {
+  private async calculateCustomerValue(_customerId: string): Promise<CustomerValue> {
     return {
       ltv: 50000,
       potential: 75000
     };
   }
 
-  private async calculateOptimalCallTime(customer: Customer): Promise<OptimalTiming> {
+  private async calculateOptimalCallTime(_customer: Customer): Promise<OptimalTiming> {
     return {
       bestTime: '14:00',
       confidence: 0.9
     };
   }
 
-  private async generateConversationStrategy(customer: Customer, campaign: Campaign): Promise<ConversationStrategy> {
+  private async generateConversationStrategy(_customer: Customer, _campaign: Campaign): Promise<ConversationStrategy> {
     return {
       approach: '友好',
       keyPoints: ['点1', '点2'],
@@ -364,14 +410,14 @@ export class IntelligentCallingWorkflow {
     };
   }
 
-  private async prepareObjectionResponses(customer: Customer): Promise<ObjectionResponses> {
+  private async prepareObjectionResponses(_customer: Customer): Promise<ObjectionResponses> {
     return {
       commonObjections: ['异议1', '异议2'],
       responses: ['回应1', '回应2']
     };
   }
 
-  private async alignWithBusinessGoals(campaign: Campaign): Promise<GoalAlignment> {
+  private async alignWithBusinessGoals(_campaign: Campaign): Promise<GoalAlignment> {
     return {
       alignment: 0.95,
       recommendations: ['建议1', '建议2']
@@ -385,14 +431,14 @@ export class IntelligentCallingWorkflow {
     };
   }
 
-  private async prepareCallingAgent(customer: Customer, campaign: Campaign): Promise<AgentPreparation> {
+  private async prepareCallingAgent(_customer: Customer, _campaign: Campaign): Promise<AgentPreparation> {
     return {
       brief: '准备呼叫',
       tools: ['工具1', '工具2']
     };
   }
 
-  private async verifyCompliance(customer: Customer, campaign: Campaign): Promise<ComplianceVerification> {
+  private async verifyCompliance(_customer: Customer, _campaign: Campaign): Promise<ComplianceVerification> {
     return {
       compliant: true,
       issues: []

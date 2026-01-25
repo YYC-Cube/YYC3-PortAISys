@@ -1,7 +1,7 @@
 # YYC³ Portable Intelligent AI System
 
 <div align="center">
-  <img src="./public/yyc3-article-cover-02.png" alt="YYC³ Logo" style="max-width: 100%; height: auto; margin-bottom: 20px;">
+  <img src="/yyc3-article-cover-02.png" alt="YYC³ Logo" style="max-width: 100%; height: auto; margin-bottom: 20px;">
   
   <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0;">
     <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version">
@@ -53,6 +53,40 @@
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
+
+### 微服务架构
+
+YYC³ Portable Intelligent AI System 采用清晰的微服务架构，明确定义了各服务的边界和职责：
+
+**核心服务：**
+- **Customer Management Service**：客户信息管理
+- **Form Service**：表单定义和提交管理
+- **Workflow Service**：工作流管理和执行
+- **Content Management Service**：系统内容管理
+- **Sales Automation Service**：销售流程和机会管理
+- **Customer Service**：客户服务请求和工单管理
+- **Analytics Service**：数据分析和报表
+- **AI Service**：AI能力和模型管理
+
+**支持服务：**
+- **Authentication Service**：身份认证和授权
+- **API Gateway Service**：API请求和路由管理
+- **Service Registry Service**：服务注册和发现
+
+### 自动扩缩容机制
+
+系统实现了智能的自动扩缩容机制，基于多维度指标进行预测性分析：
+
+- **预测性分析**：使用线性趋势分析预测未来指标
+- **多维度决策**：基于CPU、内存、请求率、响应时间、错误率等指标
+- **智能扩容因子**：根据负载自动计算扩容数量
+- **冷却期保护**：避免频繁扩缩容
+- **服务健康检查**：确保服务实例正常运行
+
+**扩缩容策略：**
+- **水平扩展**：大多数服务采用水平扩展策略
+- **垂直扩展**：分析服务等计算密集型服务采用垂直扩展策略
+- **自动扩展**：AI服务根据负载自动调整实例数量
 
 ### 技术栈
 

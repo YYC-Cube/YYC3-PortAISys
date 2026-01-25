@@ -17,23 +17,34 @@ import {
   AgentResponse,
   AgentConfig,
   AgentCapability,
-  AgentRoute,
-  AgentStatus,
-  AgentEvent,
-  AgentStatistics,
-  AgentContext
+  AgentStats
 } from './AgentProtocol';
+
+export enum AgentStatusType {
+  IDLE = 'idle',
+  PROCESSING = 'processing',
+  ERROR = 'error',
+  STOPPED = 'stopped'
+}
+
+export interface AgentRoute {
+  id: string;
+  from: string;
+  to: string;
+  routes: string[];
+  conditions?: {
+    messageTypes?: string[];
+    priority?: string;
+  };
+}
+
 import { BaseAgent } from './BaseAgent';
 import {
   ConflictError,
-  NotFoundError,
-  TimeoutError,
-  InternalError,
-  NetworkError
+  TimeoutError
 } from '../error-handler/ErrorTypes';
 import { ErrorHandler } from '../error-handler/ErrorHandler';
 import { ErrorBoundary } from '../error-handler/ErrorBoundary';
-import { isRetryable } from '../error-handler/ErrorTypes';
 
 export interface AgentManagerConfig {
   maxQueueSize?: number;
@@ -53,8 +64,8 @@ export interface AgentRegistration {
   config: AgentConfig;
   registeredAt: number;
   lastActive: number;
-  status: AgentStatus;
-  statistics: AgentStatistics;
+  status: AgentStatusType;
+  statistics: AgentStats;
 }
 
 export interface MessageQueueItem {
@@ -131,14 +142,16 @@ export class AgentManager extends EventEmitter {
       config,
       registeredAt: Date.now(),
       lastActive: Date.now(),
-      status: 'idle',
+      status: AgentStatusType.IDLE,
       statistics: {
         messagesReceived: 0,
         messagesProcessed: 0,
         messagesFailed: 0,
-        averageProcessingTime: 0,
-        lastError: null,
-        uptime: 0
+        avgResponseTime: 0,
+        activeAgents: 0,
+        totalAgents: 0,
+        queueLength: 0,
+        isQueueProcessing: false
       }
     };
 
@@ -211,7 +224,7 @@ export class AgentManager extends EventEmitter {
     }
 
     registration.lastActive = Date.now();
-    registration.status = 'processing';
+    registration.status = AgentStatusType.PROCESSING;
     registration.statistics.messagesReceived++;
 
     this.addToHistory(message);
@@ -222,10 +235,10 @@ export class AgentManager extends EventEmitter {
         this.createTimeoutPromise(this.config.defaultTimeout)
       ]);
 
-      registration.status = 'idle';
+      registration.status = AgentStatusType.IDLE;
       registration.statistics.messagesProcessed++;
-      registration.statistics.averageProcessingTime = 
-        (registration.statistics.averageProcessingTime * (registration.statistics.messagesProcessed - 1) + 
+      registration.statistics.avgResponseTime = 
+        (registration.statistics.avgResponseTime * (registration.statistics.messagesProcessed - 1) + 
          (response.executionTime || 0)) / registration.statistics.messagesProcessed;
 
       this.emit('message:sent', {
@@ -236,7 +249,7 @@ export class AgentManager extends EventEmitter {
 
       return response;
     } catch (error) {
-      registration.status = 'error';
+      registration.status = AgentStatusType.ERROR;
       registration.statistics.messagesFailed++;
       registration.statistics.lastError = {
         code: 'PROCESSING_ERROR',
@@ -350,7 +363,7 @@ export class AgentManager extends EventEmitter {
   }
 
   removeRoute(routeId: string): void {
-    for (const [from, routes] of this.routes.entries()) {
+    for (const [_from, routes] of this.routes.entries()) {
       const index = routes.findIndex(r => r.id === routeId);
       if (index !== -1) {
         routes.splice(index, 1);
@@ -412,13 +425,13 @@ export class AgentManager extends EventEmitter {
     return capabilities;
   }
 
-  getAgentStatistics(agentId: string): AgentStatistics | undefined {
+  getAgentStatistics(agentId: string): AgentStats | undefined {
     const registration = this.agents.get(agentId);
     return registration?.statistics;
   }
 
-  getAllStatistics(): Map<string, AgentStatistics> {
-    const statistics = new Map<string, AgentStatistics>();
+  getAllStatistics(): Map<string, AgentStats> {
+    const statistics = new Map<string, AgentStats>();
 
     for (const [agentId, registration] of this.agents.entries()) {
       statistics.set(agentId, registration.statistics);
@@ -427,13 +440,13 @@ export class AgentManager extends EventEmitter {
     return statistics;
   }
 
-  getAgentStatus(agentId: string): AgentStatus | undefined {
+  getAgentStatus(agentId: string): AgentStatusType | undefined {
     const registration = this.agents.get(agentId);
     return registration?.status;
   }
 
-  getAllStatuses(): Map<string, AgentStatus> {
-    const statuses = new Map<string, AgentStatus>();
+  getAllStatuses(): Map<string, AgentStatusType> {
+    const statuses = new Map<string, AgentStatusType>();
 
     for (const [agentId, registration] of this.agents.entries()) {
       statuses.set(agentId, registration.status);
@@ -442,12 +455,14 @@ export class AgentManager extends EventEmitter {
     return statuses;
   }
 
-  private updateAgentStatistics(agentId: string, data: any): void {
+  private updateAgentStatistics(agentId: string, _data: any): void {
     const registration = this.agents.get(agentId);
     
     if (registration) {
       registration.lastActive = Date.now();
       registration.statistics.uptime = Date.now() - registration.registeredAt;
+      registration.statistics.activeAgents = this.agents.size;
+      registration.statistics.totalAgents = this.agents.size;
     }
   }
 
@@ -472,7 +487,7 @@ export class AgentManager extends EventEmitter {
   private createTimeoutPromise(timeout: number): Promise<never> {
     return new Promise((_, reject) => {
       setTimeout(() => {
-        reject(new TimeoutError(`操作超时: ${timeout}ms`, { timeout }));
+        reject(new TimeoutError(`操作超时: ${timeout}ms`, timeout));
       }, timeout);
     });
   }
@@ -499,7 +514,7 @@ export class AgentManager extends EventEmitter {
     this.stopMetricsCollection();
 
     for (const [agentId, registration] of this.agents.entries()) {
-      await registration.agent.shutdown();
+      registration.agent.destroy();
       this.unregisterAgent(agentId);
     }
 

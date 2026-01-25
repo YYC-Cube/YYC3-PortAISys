@@ -14,7 +14,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { AutonomousAIEngine } from '../../core/AutonomousAIEngine'
-import { IntelligentCacheLayer } from '../../core/cache/CacheLayer'
+import { CacheLayer } from '../../core/cache/CacheLayer'
 import { StateManager } from '../../core/state-manager/StateManager'
 import { MessageBus } from '../../core/MessageBus'
 import * as os from 'os'

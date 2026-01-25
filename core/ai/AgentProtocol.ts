@@ -107,6 +107,12 @@ export interface AgentStats {
   totalAgents: number;
   queueLength: number;
   isQueueProcessing: boolean;
+  lastError?: {
+    code: string;
+    message: string;
+    timestamp: number;
+  };
+  uptime?: number;
 }
 
 export interface MessageRoute {

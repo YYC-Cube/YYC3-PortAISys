@@ -10,10 +10,10 @@
 import { ModelAdapter, ModelGenerationRequest, ModelGenerationResponse } from './ModelAdapter';
 import { AutonomousAIConfig } from '../autonomous-ai-widget/types';
 import { AITool } from '../tools/types';
-import { 
-  ValidationError, 
-  NetworkError, 
-  InternalError, 
+import {
+  ValidationError,
+  NetworkError,
+  InternalError,
   TimeoutError,
   AuthenticationError,
   isRetryable
@@ -89,8 +89,8 @@ export class OpenAIModelAdapter implements ModelAdapter {
    * 检查适配器是否已初始化
    */
   isInitialized(): boolean {
-    return this.status !== 'initializing' && 
-           !!this.config.apiKey && 
+    return this.status !== 'initializing' &&
+           !!this.config.apiKey &&
            !!this.config.apiType &&
            !!this.config.modelName;
   }
@@ -122,17 +122,20 @@ export class OpenAIModelAdapter implements ModelAdapter {
 
     // 处理超时
     const timeout = (request as any).timeout;
-    let timeoutId: NodeJS.Timeout | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     let timeoutPromise: Promise<never> | undefined;
-    
+
     if (timeout) {
       timeoutPromise = new Promise<never>((_, reject) => {
         timeoutId = setTimeout(() => {
           this.abortController?.abort();
           reject(new TimeoutError(
             `Request timeout after ${timeout}ms`,
-            this.config.baseURL || 'https://api.openai.com',
-            { additionalData: { timeout } }
+            timeout,
+            {
+              path: this.config.baseURL || 'https://api.openai.com',
+              additionalData: { timeout }
+            }
           ));
         }, timeout);
       });
@@ -140,24 +143,24 @@ export class OpenAIModelAdapter implements ModelAdapter {
 
     try {
       const generatePromise = this.generateWithRetry(request);
-      const result = timeout 
+      const result = timeout
         ? await Promise.race([generatePromise, timeoutPromise!])
         : await generatePromise;
-      
+
       const responseTime = Math.max(1, Date.now() - startTime); // 确保至少1ms
       this.responseTimes.push(responseTime);
       this.successfulRequests++;
-      
+
       // 统计token使用
       if (result.usage?.totalTokens) {
         this.totalTokensUsed += result.usage.totalTokens;
       }
-      
+
       return result;
     } catch (error) {
       this.failedRequests++;
       this.status = 'error';
-      
+
       await this.errorHandler.handleError(error as Error, {
         operation: 'generate',
         adapter: 'OpenAIModelAdapter',
@@ -174,7 +177,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
 
   private async generateWithRetry(request: ModelGenerationRequest): Promise<ModelGenerationResponse> {
     let lastError: Error | null = null;
-    
+
     // 从request中获取重试配置，如果没有则使用实例默认值
     const maxRetries = (request as any).maxRetries ?? this.maxRetries;
     const retryDelay = (request as any).retryDelay ?? this.retryDelay;
@@ -186,7 +189,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
         return this.convertOpenAIResponse(response, request);
       } catch (error) {
         lastError = error as Error;
-        
+
         if (!isRetryable(error as Error) || attempt >= maxRetries) {
           break;
         }
@@ -206,7 +209,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
    * @returns 最终的完整响应
    */
   async generateStream(
-    request: ModelGenerationRequest,
+    _request: ModelGenerationRequest,
     onChunk: StreamCallback
   ): Promise<ModelGenerationResponse> {
     this.status = 'generating';
@@ -215,17 +218,17 @@ export class OpenAIModelAdapter implements ModelAdapter {
     this.totalRequests++;
 
     try {
-      const result = await this.generateStreamWithRetry(request, onChunk);
-      
+      const result = await this.generateStreamWithRetry(_request, onChunk);
+
       const responseTime = Math.max(1, Date.now() - startTime); // 确保至少1ms
       this.responseTimes.push(responseTime);
       this.successfulRequests++;
-      
+
       // 统计token使用
       if (result.usage?.totalTokens) {
         this.totalTokensUsed += result.usage.totalTokens;
       }
-      
+
       return result;
     } catch (error) {
       this.failedRequests++;
@@ -233,7 +236,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
       await this.errorHandler.handleError(error as Error, {
         operation: 'generateStream',
         adapter: 'OpenAIModelAdapter',
-        request
+        _request
       });
       throw error;
     } finally {
@@ -242,18 +245,18 @@ export class OpenAIModelAdapter implements ModelAdapter {
   }
 
   private async generateStreamWithRetry(
-    request: ModelGenerationRequest,
+    _request: ModelGenerationRequest,
     onChunk: StreamCallback
   ): Promise<ModelGenerationResponse> {
     let lastError: Error | null = null;
 
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
-        const openaiRequest = this.buildOpenAIRequest(request, true);
-        return await this.callOpenAIStreamAPI(openaiRequest, request, onChunk);
+        const openaiRequest = this.buildOpenAIRequest(_request, true);
+        return await this.callOpenAIStreamAPI(openaiRequest, _request, onChunk);
       } catch (error) {
         lastError = error as Error;
-        
+
         if (!isRetryable(error as Error) || attempt >= this.maxRetries) {
           break;
         }
@@ -272,7 +275,8 @@ export class OpenAIModelAdapter implements ModelAdapter {
   async cancel(): Promise<void> {
     if (this.abortController) {
       this.abortController.abort();
-      this.abortController = null;
+      // 不要立即设置为null，因为processStreamResponse方法可能还在检查取消状态
+      // this.abortController = null;
     }
     this.status = 'idle';
   }
@@ -299,7 +303,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
       });
 
       if (!response.ok) {
-        throw new NetworkError(`Failed to create embedding: ${response.statusText}`, url);
+        throw new NetworkError(`Failed to create embedding: ${response.statusText}`, { path: url });
       }
 
       const data = await response.json();
@@ -333,7 +337,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
       });
 
       if (!response.ok) {
-        throw new NetworkError(`Failed to create embeddings: ${response.statusText}`, url);
+        throw new NetworkError(`Failed to create embeddings: ${response.statusText}`, { path: url });
       }
 
       const data = await response.json();
@@ -387,7 +391,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
     const averageResponseTime = this.responseTimes.length > 0
       ? this.responseTimes.reduce((sum, time) => sum + time, 0) / this.responseTimes.length
       : 0;
-    
+
     const averageTokensPerRequest = this.totalTokensUsed > 0 && this.successfulRequests > 0
       ? this.totalTokensUsed / this.successfulRequests
       : 0;
@@ -477,19 +481,20 @@ export class OpenAIModelAdapter implements ModelAdapter {
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new NetworkError(
           `Network error connecting to OpenAI: ${error.message}`,
-          baseURL,
           {
-            additionalData: { originalError: error.message },
-            retryable: true
-          }
+            path: baseURL,
+            additionalData: { originalError: error.message }
+          },
+          error as Error
         );
       }
 
       if (error instanceof DOMException && error.name === 'AbortError') {
         throw new TimeoutError(
           `OpenAI request was cancelled`,
-          baseURL,
+          this.config.timeout || 30000,
           {
+            path: baseURL,
             additionalData: { reason: 'aborted' }
           }
         );
@@ -507,7 +512,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
    */
   private async processStreamResponse(
     body: ReadableStream<Uint8Array>,
-    request: ModelGenerationRequest,
+    _request: ModelGenerationRequest,
     onChunk: StreamCallback
   ): Promise<ModelGenerationResponse> {
     const reader = body.getReader();
@@ -519,9 +524,19 @@ export class OpenAIModelAdapter implements ModelAdapter {
 
     try {
       while (true) {
+        // 检查是否被取消
+        if (this.abortController?.signal.aborted) {
+          throw new Error('Request cancelled');
+        }
+
         const { done, value } = await reader.read();
-        
+
         if (done) break;
+
+        // 检查是否被取消
+        if (this.abortController?.signal.aborted) {
+          throw new Error('Request cancelled');
+        }
 
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split('\n').filter(line => line.trim() !== '');
@@ -529,7 +544,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
-            
+
             if (data === '[DONE]') {
               continue;
             }
@@ -544,7 +559,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
               // 处理内容增量
               if (delta.content) {
                 fullContent += delta.content;
-                
+
                 // 调用回调
                 onChunk({
                   content: delta.content,
@@ -583,6 +598,11 @@ export class OpenAIModelAdapter implements ModelAdapter {
         }
       }
 
+      // 检查是否被取消（在流结束但还没返回结果时）
+      if (this.abortController?.signal.aborted) {
+        throw new Error('Request cancelled');
+      }
+
       // 发送最终完成回调
       onChunk({
         content: '',
@@ -617,6 +637,8 @@ export class OpenAIModelAdapter implements ModelAdapter {
       };
     } finally {
       reader.releaseLock();
+      // 只有在finally块中才清理abortController
+      this.abortController = null;
     }
   }
 
@@ -630,10 +652,10 @@ export class OpenAIModelAdapter implements ModelAdapter {
     if (response.status === 401 || response.status === 403) {
       return new AuthenticationError(
         `OpenAI authentication failed: ${response.status} ${response.statusText} ${errorData.error?.message}`,
-        baseURL,
         {
-          additionalData: { 
-            status: response.status, 
+          path: baseURL,
+          additionalData: {
+            status: response.status,
             statusText: response.statusText,
             errorData
           }
@@ -644,10 +666,11 @@ export class OpenAIModelAdapter implements ModelAdapter {
     if (response.status === 408 || response.status === 504) {
       return new TimeoutError(
         `OpenAI request timeout: ${response.status} ${response.statusText}`,
-        baseURL,
+        30000,
         {
-          additionalData: { 
-            status: response.status, 
+          path: baseURL,
+          additionalData: {
+            status: response.status,
             statusText: response.statusText,
             errorData
           }
@@ -659,14 +682,13 @@ export class OpenAIModelAdapter implements ModelAdapter {
       const errorMessage = errorData?.error?.message || 'Rate limit exceeded';
       return new NetworkError(
         errorMessage,
-        baseURL,
         {
-          additionalData: { 
-            status: response.status, 
+          path: baseURL,
+          additionalData: {
+            status: response.status,
             statusText: response.statusText,
             errorData
-          },
-          retryable: true
+          }
         }
       );
     }
@@ -674,24 +696,23 @@ export class OpenAIModelAdapter implements ModelAdapter {
     if (response.status >= 500) {
       return new NetworkError(
         `OpenAI server error: ${response.status} ${response.statusText}`,
-        baseURL,
         {
-          additionalData: { 
-            status: response.status, 
+          path: baseURL,
+          additionalData: {
+            status: response.status,
             statusText: response.statusText,
             errorData
-          },
-          retryable: true
+          }
         }
       );
     }
 
     return new NetworkError(
       `OpenAI API error: ${response.status} ${response.statusText} ${errorData.error?.message}`,
-      baseURL,
       {
-        additionalData: { 
-          status: response.status, 
+        path: baseURL,
+        additionalData: {
+          status: response.status,
           statusText: response.statusText,
           errorData
         }
@@ -724,10 +745,10 @@ export class OpenAIModelAdapter implements ModelAdapter {
         if (response.status === 401 || response.status === 403) {
           throw new AuthenticationError(
             `OpenAI authentication failed: ${response.status} ${response.statusText} ${errorData.error?.message}`,
-            baseURL,
             {
-              additionalData: { 
-                status: response.status, 
+              path: baseURL,
+              additionalData: {
+                status: response.status,
                 statusText: response.statusText,
                 errorData
               }
@@ -738,10 +759,11 @@ export class OpenAIModelAdapter implements ModelAdapter {
         if (response.status === 408 || response.status === 504) {
           throw new TimeoutError(
             `OpenAI request timeout: ${response.status} ${response.statusText}`,
-            baseURL,
+            30000,
             {
-              additionalData: { 
-                status: response.status, 
+              path: baseURL,
+              additionalData: {
+                status: response.status,
                 statusText: response.statusText,
                 errorData
               }
@@ -753,14 +775,13 @@ export class OpenAIModelAdapter implements ModelAdapter {
           const errorMessage = errorData?.error?.message || 'Rate limit exceeded';
           throw new NetworkError(
             errorMessage,
-            baseURL,
             {
-              additionalData: { 
-                status: response.status, 
+              path: baseURL,
+              additionalData: {
+                status: response.status,
                 statusText: response.statusText,
                 errorData
-              },
-              retryable: true
+              }
             }
           );
         }
@@ -768,24 +789,23 @@ export class OpenAIModelAdapter implements ModelAdapter {
         if (response.status >= 500) {
           throw new NetworkError(
             `OpenAI server error: ${response.status} ${response.statusText}`,
-            baseURL,
             {
-              additionalData: { 
-                status: response.status, 
+              path: baseURL,
+              additionalData: {
+                status: response.status,
                 statusText: response.statusText,
                 errorData
-              },
-              retryable: true
+              }
             }
           );
         }
 
         throw new NetworkError(
           `OpenAI API error: ${response.status} ${response.statusText} ${errorData.error?.message}`,
-          baseURL,
           {
-            additionalData: { 
-              status: response.status, 
+            path: baseURL,
+            additionalData: {
+              status: response.status,
               statusText: response.statusText,
               errorData
             }
@@ -798,19 +818,20 @@ export class OpenAIModelAdapter implements ModelAdapter {
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new NetworkError(
           `Network error connecting to OpenAI: ${error.message}`,
-          baseURL,
           {
-            additionalData: { originalError: error.message },
-            retryable: true
-          }
+            path: baseURL,
+            additionalData: { originalError: error.message }
+          },
+          error as Error
         );
       }
 
       if (error instanceof DOMException && error.name === 'AbortError') {
         throw new TimeoutError(
           `OpenAI request was cancelled`,
-          baseURL,
+          this.config.timeout || 30000,
           {
+            path: baseURL,
             additionalData: { reason: 'aborted' }
           }
         );
@@ -825,8 +846,8 @@ export class OpenAIModelAdapter implements ModelAdapter {
    * @param openaiResponse OpenAI API响应
    * @param request 原始请求
    */
-  private convertOpenAIResponse(openaiResponse: any, request: ModelGenerationRequest): ModelGenerationResponse {
-    const message = openaiResponse.choices[0].message;
+  private convertOpenAIResponse(openaiResponse: any, _request: ModelGenerationRequest): ModelGenerationResponse {
+    const message = openaiResponse?.choices?.[0]?.message || {};
     const toolCall = message.tool_calls?.[0];
 
     this.status = 'idle';

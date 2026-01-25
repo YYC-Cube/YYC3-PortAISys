@@ -11,7 +11,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -27,6 +26,7 @@ model User {
   modelConfigs ModelConfig[]
   plugins      Plugin[]
   workflows    Workflow[]
+  auditLogs    AuditLog[]
 }
 
 enum UserRole {

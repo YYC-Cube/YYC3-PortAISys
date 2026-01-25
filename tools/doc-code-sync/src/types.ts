@@ -1,5 +1,6 @@
 export interface MappingConfig {
   version: string;
+  lastUpdated?: string;
   mappings: Mapping[];
   globalSettings: GlobalSettings;
 }
@@ -41,6 +42,7 @@ export interface FileChangeEvent {
 }
 
 export interface SyncStatus {
+  isProcessing: boolean;
   isRunning: boolean;
   lastSyncTime?: string;
   totalMappings: number;
@@ -49,10 +51,12 @@ export interface SyncStatus {
 }
 
 export interface Notification {
+  id: string;
   type: 'info' | 'success' | 'warning' | 'error';
   title: string;
   message: string;
   timestamp: string;
+  read?: boolean;
 }
 
 export interface ValidationResult {

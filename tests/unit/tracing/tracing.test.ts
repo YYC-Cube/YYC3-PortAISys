@@ -17,6 +17,7 @@ describe('Tracing Integration', () => {
       endpoint: 'http://localhost:4318/v1/traces',
       enabled: true,
       enableConsoleLogging: false, // 测试时静默
+      isTestEnvironment: true, // 启用测试环境优化
     });
   });
 

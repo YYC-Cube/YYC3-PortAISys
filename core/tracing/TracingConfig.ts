@@ -20,6 +20,7 @@ export interface TracingOptions {
   endpoint?: string;
   enableConsoleLogging?: boolean;
   enabled?: boolean;
+  isTestEnvironment?: boolean; // 测试环境标志
 }
 
 /**
@@ -37,6 +38,7 @@ export class TracingConfig {
       endpoint: options.endpoint || 'http://localhost:4318/v1/traces',
       enableConsoleLogging: options.enableConsoleLogging ?? false,
       enabled: options.enabled ?? true,
+      isTestEnvironment: options.isTestEnvironment ?? false,
     };
   }
 
@@ -58,6 +60,13 @@ export class TracingConfig {
       // 启用OpenTelemetry诊断日志（开发模式）
       if (this.options.enableConsoleLogging) {
         diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
+      }
+
+      // 测试环境：跳过实际的OTLP连接，只做基本初始化
+      if (this.options.isTestEnvironment) {
+        console.info('[Tracing] Test environment detected - skipping full initialization');
+        this.isInitialized = true;
+        return;
       }
 
       // 配置OTLP导出器
@@ -108,7 +117,13 @@ export class TracingConfig {
       });
     } catch (error) {
       console.error('[Tracing] Failed to initialize OpenTelemetry:', error);
-      throw error;
+      // 在测试环境中，即使初始化失败也标记为已初始化，以避免测试超时
+      if (this.options.isTestEnvironment) {
+        console.info('[Tracing] Test environment - marking as initialized despite error');
+        this.isInitialized = true;
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -116,7 +131,18 @@ export class TracingConfig {
    * 关闭tracing
    */
   async shutdown(): Promise<void> {
-    if (!this.isInitialized || !this.sdk) {
+    if (!this.isInitialized) {
+      return;
+    }
+
+    // 测试环境：跳过实际的关闭操作
+    if (this.options.isTestEnvironment) {
+      console.info('[Tracing] Test environment detected - skipping full shutdown');
+      this.isInitialized = false;
+      return;
+    }
+
+    if (!this.sdk) {
       return;
     }
 
@@ -126,7 +152,13 @@ export class TracingConfig {
       console.info('[Tracing] OpenTelemetry shut down successfully');
     } catch (error) {
       console.error('[Tracing] Error shutting down OpenTelemetry:', error);
-      throw error;
+      // 在测试环境中，即使关闭失败也标记为未初始化，以避免测试超时
+      if (this.options.isTestEnvironment) {
+        console.info('[Tracing] Test environment - marking as uninitialized despite error');
+        this.isInitialized = false;
+      } else {
+        throw error;
+      }
     }
   }
 

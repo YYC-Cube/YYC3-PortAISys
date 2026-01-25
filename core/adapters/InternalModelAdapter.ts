@@ -9,7 +9,7 @@
 
 import { ModelAdapter, ModelGenerationRequest, ModelGenerationResponse } from './ModelAdapter';
 import { AutonomousAIConfig } from '../autonomous-ai-widget/types';
-import type { AITool } from '../tools/types';
+
 import {
   NetworkError,
   InternalError,
@@ -89,7 +89,7 @@ export class InternalModelAdapter implements ModelAdapter {
               temperature: this.config.temperature
             }
           }),
-          signal: this.abortController.signal
+          signal: this.abortController?.signal
         });
         
         if (!response.ok) {

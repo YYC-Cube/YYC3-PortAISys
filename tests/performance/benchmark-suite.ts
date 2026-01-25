@@ -205,8 +205,8 @@ export class BenchmarkSuite {
       timestamp: new Date().toISOString(),
       results: this.results,
       baseline: Array.from(this.baseline.entries()).map(([name, result]) => ({
-        name,
-        ...result
+        ...result,
+        name
       }))
     }, null, 2);
   }

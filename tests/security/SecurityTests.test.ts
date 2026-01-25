@@ -8,9 +8,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { ComprehensiveSecurityCenter } from '@/security/ComprehensiveSecurityCenter';
-import { ThreatDetector } from '@/security/ThreatDetector';
-import { ComplianceManager } from '@/security/ComplianceManager';
+import { ComprehensiveSecurityCenter } from '../../core/security/ComprehensiveSecurityCenter';
+import { ThreatDetector } from '../../core/security/ThreatDetector';
+import { ComplianceManager } from '../../core/security/ComplianceManager';
 
 describe('安全性测试', () => {
   let securityCenter: ComprehensiveSecurityCenter;
@@ -21,7 +21,8 @@ describe('安全性测试', () => {
     securityCenter = new ComprehensiveSecurityCenter({
       enableRealTimeMonitoring: true,
       enableThreatDetection: true,
-      enableCompliance: true
+      enableCompliance: true,
+      encryptionKey: 'test-encryption-key-32-bytes-long-123456'
     });
 
     threatDetector = new ThreatDetector({

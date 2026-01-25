@@ -26,6 +26,8 @@ import {
 } from './types';
 import { ThreatDetector as ThreatDetectorImpl } from './ThreatDetector';
 import { ComplianceManager as ComplianceManagerImpl } from './ComplianceManager';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
 export class ComprehensiveSecurityCenter {
   private threatDetector: ThreatDetector;
@@ -40,7 +42,11 @@ export class ComprehensiveSecurityCenter {
       enableThreatDetection: true,
       enableComplianceManagement: true,
       enableSecurityMonitoring: true,
+      enableSecurityAudit: true,
+      enablePenetrationTesting: true,
       auditRetentionDays: 2555,
+      securityAuditSchedule: 'weekly',
+      penetrationTestingSchedule: 'quarterly',
       alertThresholds: {
         severity: 'high',
         responseTime: 60
@@ -50,6 +56,9 @@ export class ComprehensiveSecurityCenter {
 
     this.threatDetector = new ThreatDetectorImpl();
     this.complianceManager = new ComplianceManagerImpl();
+    
+    // 初始化安全审计和渗透测试调度器
+    this.initializeSecuritySchedulers();
   }
 
   /**
@@ -80,8 +89,8 @@ export class ComprehensiveSecurityCenter {
       };
     }
 
-    // 简单的密码验证
-    if (!user || user.password !== credentials.password) {
+    // 使用bcrypt验证密码
+    if (!user || !(await this.verifyPassword(credentials.password, user.password))) {
       // 增加失败次数
       if (user) {
         user.failedAttempts = (user.failedAttempts || 0) + 1;
@@ -152,8 +161,11 @@ export class ComprehensiveSecurityCenter {
       return { success: false, error: 'User already exists' };
     }
 
+    // 使用bcrypt哈希密码
+    const hashedPassword = await this.hashPassword(userData.password);
+
     this.users.set(userData.username, {
-      password: userData.password,
+      password: hashedPassword,
       email: userData.email,
       mfa: userData.enableMFA || false,
       locked: false,
@@ -290,18 +302,66 @@ export class ComprehensiveSecurityCenter {
 
   /**
    * 加密数据
+   * 使用AES-256-GCM进行安全加密
    */
   async encryptData(data: string, key?: string): Promise<string> {
-    // 简化的加密（实际应使用真实加密库）
-    return Buffer.from(data).toString('base64');
+    // 生成加密密钥
+    const encryptionKey = key ? crypto.createHash('sha256').update(key).digest() : this.generateEncryptionKey();
+    
+    // 生成随机初始化向量
+    const iv = crypto.randomBytes(16);
+    
+    // 生成认证标签
+    const cipher = crypto.createCipheriv('aes-256-gcm', encryptionKey, iv);
+    
+    // 加密数据
+    const encrypted = Buffer.concat([cipher.update(data, 'utf8'), cipher.final()]);
+    
+    // 获取认证标签
+    const tag = cipher.getAuthTag();
+    
+    // 返回iv、tag和加密数据的组合
+    return Buffer.concat([iv, tag, encrypted]).toString('base64');
   }
 
   /**
    * 解密数据
+   * 使用AES-256-GCM进行安全解密
    */
-  async decryptData(encryptedData: string): Promise<string> {
-    // 简化的解密
-    return Buffer.from(encryptedData, 'base64').toString('utf-8');
+  async decryptData(encryptedData: string, key?: string): Promise<string> {
+    // 解码加密数据
+    const buffer = Buffer.from(encryptedData, 'base64');
+    
+    // 提取iv、tag和加密数据
+    const iv = buffer.subarray(0, 16);
+    const tag = buffer.subarray(16, 32);
+    const encrypted = buffer.subarray(32);
+    
+    // 生成解密密钥
+    const encryptionKey = key ? crypto.createHash('sha256').update(key).digest() : this.generateEncryptionKey();
+    
+    // 创建解密器
+    const decipher = crypto.createDecipheriv('aes-256-gcm', encryptionKey, iv);
+    decipher.setAuthTag(tag);
+    
+    // 解密数据
+    const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+    
+    return decrypted.toString('utf8');
+  }
+
+  /**
+   * 生成加密密钥
+   * 在实际生产环境中，应使用安全的密钥管理系统
+   */
+  private generateEncryptionKey(): Buffer {
+    // 使用环境变量或配置中的密钥
+    // 生产环境建议使用AWS KMS、HashiCorp Vault等密钥管理服务
+    const keyMaterial = this.config.encryptionKey;
+    if (!keyMaterial) {
+      throw new Error('Encryption key is not configured. Please set encryptionKey in config or use environment variable.');
+    }
+    return crypto.createHash('sha256').update(keyMaterial).digest();
   }
 
   /**
@@ -573,11 +633,13 @@ export class ComprehensiveSecurityCenter {
    * 加密数据（新别名方法）
    */
   async encrypt(data: string, config?: any): Promise<string> {
+    // 始终使用真正的加密算法，无论是否指定了algorithm参数
+    const encrypted = await this.encryptData(data);
     if (config && config.algorithm) {
-      // 如果指定了算法，返回一个看起来加密的字符串
-      return Buffer.from(data).toString('base64') + '_' + config.algorithm;
+      // 如果指定了算法，添加算法标记
+      return encrypted + '_' + config.algorithm;
     }
-    return this.encryptData(data);
+    return encrypted;
   }
 
   /**
@@ -600,30 +662,19 @@ export class ComprehensiveSecurityCenter {
   }
 
   /**
-   * 哈希密码（改进版本）
+   * 哈希密码（使用bcrypt）
    */
   async hashPassword(password: string): Promise<string> {
-    // 简化的哈希（实际应使用 bcrypt 或 argon2）
-    // 创建一个足够长的哈希（> 50 个字符）
-    const base64 = Buffer.from(password).toString('base64');
-    const extended = base64 + ':' + 'SECURITY_HASH_SALT_12345:' + base64.split('').reverse().join('');
-    const hash = Buffer.from(extended).toString('base64');
-    return hash;
+    const saltRounds = 12;
+    return await bcrypt.hash(password, saltRounds);
   }
 
   /**
    * 验证密码
    */
   async verifyPassword(password: string, hash: string): Promise<boolean> {
-    // 简化的验证（实际应使用 bcrypt 或 argon2）
     try {
-      // 重新哈希密码并进行基本的长度检查
-      const base64OfPassword = Buffer.from(password).toString('base64');
-      const extended = base64OfPassword + ':' + 'SECURITY_HASH_SALT_12345:' + base64OfPassword.split('').reverse().join('');
-      const newHash = Buffer.from(extended).toString('base64');
-      
-      // 检查 hash 是否与新生成的匹配（简化的验证）
-      return newHash === hash;
+      return await bcrypt.compare(password, hash);
     } catch (e) {
       return false;
     }
@@ -1350,6 +1401,562 @@ export class ComprehensiveSecurityCenter {
         }
       }
     };
+  }
+
+  /**
+   * 初始化安全审计和渗透测试调度器
+   */
+  private initializeSecuritySchedulers(): void {
+    if (this.config.enableSecurityAudit) {
+      this.setupSecurityAuditScheduler();
+    }
+
+    if (this.config.enablePenetrationTesting) {
+      this.setupPenetrationTestingScheduler();
+    }
+  }
+
+  /**
+   * 设置安全审计调度器
+   */
+  private setupSecurityAuditScheduler(): void {
+    const interval = this.getScheduleInterval(this.config.securityAuditSchedule);
+    if (interval > 0) {
+      setInterval(async () => {
+        await this.performSecurityAudit();
+      }, interval);
+    }
+  }
+
+  /**
+   * 设置渗透测试调度器
+   */
+  private setupPenetrationTestingScheduler(): void {
+    const interval = this.getScheduleInterval(this.config.penetrationTestingSchedule);
+    if (interval > 0) {
+      setInterval(async () => {
+        await this.performPenetrationTest();
+      }, interval);
+    }
+  }
+
+  /**
+   * 获取调度间隔（毫秒）
+   */
+  private getScheduleInterval(schedule: string): number {
+    const intervals: { [key: string]: number } = {
+      'daily': 24 * 60 * 60 * 1000,
+      'weekly': 7 * 24 * 60 * 60 * 1000,
+      'monthly': 30 * 24 * 60 * 60 * 1000,
+      'quarterly': 90 * 24 * 60 * 60 * 1000,
+      'yearly': 365 * 24 * 60 * 60 * 1000
+    };
+    return intervals[schedule] || 0;
+  }
+
+  /**
+   * 执行安全审计
+   */
+  async performSecurityAudit(): Promise<SecurityAuditResult> {
+    console.log('🔒 开始执行安全审计...');
+    
+    const auditStartTime = Date.now();
+    
+    try {
+      // 执行各项安全检查
+      const [vulnerabilityScan, complianceCheck, accessReview, configurationAudit] = await Promise.all([
+        this.scanForVulnerabilities(),
+        this.checkCompliance(),
+        this.reviewAccessControls(),
+        this.auditConfigurations()
+      ]);
+      
+      // 生成审计报告
+      const report = this.generateSecurityAuditReport({
+        vulnerabilityScan,
+        complianceCheck,
+        accessReview,
+        configurationAudit,
+        duration: Date.now() - auditStartTime
+      });
+      
+      // 发送审计通知
+      await this.notifySecurityAuditComplete(report);
+      
+      console.log('✅ 安全审计完成！');
+      return report;
+    } catch (error) {
+      console.error('❌ 安全审计失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 执行渗透测试
+   */
+  async performPenetrationTest(): Promise<PenetrationTestResult> {
+    console.log('🛡️ 开始执行渗透测试...');
+    
+    const testStartTime = Date.now();
+    
+    try {
+      // 执行各项渗透测试
+      const [networkTest, applicationTest, apiTest, socialEngineeringTest] = await Promise.all([
+        this.testNetworkSecurity(),
+        this.testApplicationSecurity(),
+        this.testAPISecurity(),
+        this.testSocialEngineering()
+      ]);
+      
+      // 生成测试报告
+      const report = this.generatePenetrationTestReport({
+        networkTest,
+        applicationTest,
+        apiTest,
+        socialEngineeringTest,
+        duration: Date.now() - testStartTime
+      });
+      
+      // 发送测试通知
+      await this.notifyPenetrationTestComplete(report);
+      
+      console.log('✅ 渗透测试完成！');
+      return report;
+    } catch (error) {
+      console.error('❌ 渗透测试失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 扫描漏洞
+   */
+  private async scanForVulnerabilities(): Promise<VulnerabilityScanResult> {
+    // 模拟漏洞扫描
+    return {
+      scanId: `scan_${Date.now()}`,
+      timestamp: new Date(),
+      target: 'entire-system',
+      vulnerabilities: [
+        {
+          id: 'CVE-2024-1234',
+          title: 'SQL注入漏洞',
+          severity: 'high',
+          description: '在用户登录接口中发现SQL注入漏洞',
+          location: '/api/auth/login',
+          cvss: 8.9,
+          status: 'open',
+          remediation: '使用参数化查询'
+        },
+        {
+          id: 'CVE-2024-5678',
+          title: '跨站脚本攻击',
+          severity: 'medium',
+          description: '在用户评论接口中发现XSS漏洞',
+          location: '/api/comments',
+          cvss: 6.1,
+          status: 'open',
+          remediation: '对输入进行适当转义'
+        }
+      ],
+      scanDuration: 120,
+      scannedItems: 156,
+      falsePositives: 5
+    };
+  }
+
+  /**
+   * 检查合规性
+   */
+  private async checkCompliance(): Promise<ComplianceCheckResult> {
+    const complianceStatus = await this.complianceManager.checkCompliance();
+    return {
+      timestamp: new Date(),
+      frameworks: complianceStatus.frameworks.map(f => ({
+        name: f.name,
+        status: f.status,
+        score: f.score,
+        gaps: f.gaps || []
+      })),
+      overallStatus: complianceStatus.compliant ? 'compliant' : 'non-compliant',
+      score: complianceStatus.score
+    };
+  }
+
+  /**
+   * 审查访问控制
+   */
+  private async reviewAccessControls(): Promise<AccessReviewResult> {
+    // 模拟访问控制审查
+    return {
+      timestamp: new Date(),
+      reviewedUsers: 120,
+      reviewedRoles: 15,
+      reviewedPermissions: 85,
+      issues: [
+        {
+          type: 'excessive-permissions',
+          count: 12,
+          description: '发现12个用户拥有过多权限'
+        },
+        {
+          type: 'orphaned-accounts',
+          count: 5,
+          description: '发现5个孤立账户'
+        },
+        {
+          type: 'expired-access',
+          count: 8,
+          description: '发现8个过期访问权限'
+        }
+      ],
+      recommendations: [
+        '实施定期访问权限审查',
+        '自动清理过期账户',
+        '实施最小权限原则'
+      ]
+    };
+  }
+
+  /**
+   * 审计配置
+   */
+  private async auditConfigurations(): Promise<ConfigurationAuditResult> {
+    // 模拟配置审计
+    return {
+      timestamp: new Date(),
+      auditedSystems: 25,
+      auditedConfigurations: 150,
+      issues: [
+        {
+          type: 'insecure-config',
+          count: 8,
+          description: '发现8个不安全的配置'
+        },
+        {
+          type: 'missing-updates',
+          count: 12,
+          description: '发现12个系统缺少安全更新'
+        },
+        {
+          type: 'weak-ciphers',
+          count: 3,
+          description: '发现3个系统使用弱加密算法'
+        }
+      ],
+      recommendations: [
+        '更新系统到最新版本',
+        '禁用弱加密算法',
+        '实施配置基线'
+      ]
+    };
+  }
+
+  /**
+   * 测试网络安全
+   */
+  private async testNetworkSecurity(): Promise<NetworkTestResult> {
+    // 模拟网络安全测试
+    return {
+      timestamp: new Date(),
+      target: 'internal-network',
+      tests: [
+        {
+          name: '端口扫描',
+          status: 'completed',
+          findings: 3,
+          severity: 'low'
+        },
+        {
+          name: '防火墙测试',
+          status: 'completed',
+          findings: 1,
+          severity: 'medium'
+        },
+        {
+          name: '网络分段测试',
+          status: 'completed',
+          findings: 0,
+          severity: 'none'
+        }
+      ],
+      vulnerabilities: [
+        {
+          id: 'NET-001',
+          title: '不必要的开放端口',
+          severity: 'low',
+          description: '发现3个不必要的开放端口'
+        },
+        {
+          id: 'NET-002',
+          title: '防火墙规则过于宽松',
+          severity: 'medium',
+          description: '发现1个过于宽松的防火墙规则'
+        }
+      ]
+    };
+  }
+
+  /**
+   * 测试应用安全
+   */
+  private async testApplicationSecurity(): Promise<ApplicationTestResult> {
+    // 模拟应用安全测试
+    return {
+      timestamp: new Date(),
+      target: 'web-application',
+      tests: [
+        {
+          name: '认证测试',
+          status: 'completed',
+          findings: 1,
+          severity: 'high'
+        },
+        {
+          name: '授权测试',
+          status: 'completed',
+          findings: 2,
+          severity: 'medium'
+        },
+        {
+          name: '输入验证测试',
+          status: 'completed',
+          findings: 3,
+          severity: 'medium'
+        }
+      ],
+      vulnerabilities: [
+        {
+          id: 'APP-001',
+          title: '认证绕过',
+          severity: 'high',
+          description: '发现认证绕过漏洞'
+        },
+        {
+          id: 'APP-002',
+          title: '授权缺失',
+          severity: 'medium',
+          description: '发现2个授权缺失问题'
+        },
+        {
+          id: 'APP-003',
+          title: '输入验证不足',
+          severity: 'medium',
+          description: '发现3个输入验证不足问题'
+        }
+      ]
+    };
+  }
+
+  /**
+   * 测试API安全
+   */
+  private async testAPISecurity(): Promise<APITestResult> {
+    // 模拟API安全测试
+    return {
+      timestamp: new Date(),
+      target: 'api-endpoints',
+      tests: [
+        {
+          name: 'API认证测试',
+          status: 'completed',
+          findings: 0,
+          severity: 'none'
+        },
+        {
+          name: 'API授权测试',
+          status: 'completed',
+          findings: 1,
+          severity: 'medium'
+        },
+        {
+          name: 'API速率限制测试',
+          status: 'completed',
+          findings: 1,
+          severity: 'low'
+        }
+      ],
+      vulnerabilities: [
+        {
+          id: 'API-001',
+          title: 'API授权问题',
+          severity: 'medium',
+          description: '发现1个API授权问题'
+        },
+        {
+          id: 'API-002',
+          title: 'API速率限制缺失',
+          severity: 'low',
+          description: '发现1个API缺少速率限制'
+        }
+      ]
+    };
+  }
+
+  /**
+   * 测试社会工程学
+   */
+  private async testSocialEngineering(): Promise<SocialEngineeringTestResult> {
+    // 模拟社会工程学测试
+    return {
+      timestamp: new Date(),
+      target: 'employees',
+      tests: [
+        {
+          name: '钓鱼邮件测试',
+          status: 'completed',
+          successRate: 15,
+          severity: 'medium'
+        },
+        {
+          name: '电话社会工程学测试',
+          status: 'completed',
+          successRate: 10,
+          severity: 'low'
+        },
+        {
+          name: '物理安全测试',
+          status: 'completed',
+          successRate: 5,
+          severity: 'low'
+        }
+      ],
+      recommendations: [
+        '加强员工安全意识培训',
+        '实施多因素认证',
+        '加强物理安全措施'
+      ]
+    };
+  }
+
+  /**
+   * 生成安全审计报告
+   */
+  private generateSecurityAuditReport(data: SecurityAuditData): SecurityAuditResult {
+    const highSeverityVulnerabilities = data.vulnerabilityScan.vulnerabilities.filter(v => v.severity === 'high').length;
+    const mediumSeverityVulnerabilities = data.vulnerabilityScan.vulnerabilities.filter(v => v.severity === 'medium').length;
+    const lowSeverityVulnerabilities = data.vulnerabilityScan.vulnerabilities.filter(v => v.severity === 'low').length;
+    
+    const overallStatus = highSeverityVulnerabilities === 0 && data.complianceCheck.overallStatus === 'compliant' ? 'pass' : 'fail';
+    
+    return {
+      auditId: `audit_${Date.now()}`,
+      timestamp: new Date(),
+      status: overallStatus,
+      duration: data.duration,
+      summary: {
+        totalVulnerabilities: data.vulnerabilityScan.vulnerabilities.length,
+        highSeverityVulnerabilities,
+        mediumSeverityVulnerabilities,
+        lowSeverityVulnerabilities,
+        complianceStatus: data.complianceCheck.overallStatus,
+        complianceScore: data.complianceCheck.score,
+        accessControlIssues: data.accessReview.issues.reduce((sum, issue) => sum + issue.count, 0),
+        configurationIssues: data.configurationAudit.issues.reduce((sum, issue) => sum + issue.count, 0)
+      },
+      details: {
+        vulnerabilityScan: data.vulnerabilityScan,
+        complianceCheck: data.complianceCheck,
+        accessReview: data.accessReview,
+        configurationAudit: data.configurationAudit
+      },
+      recommendations: [
+        ...data.vulnerabilityScan.vulnerabilities.map(v => `${v.title}: ${v.remediation}`),
+        ...data.complianceCheck.frameworks
+          .filter(f => f.status !== 'compliant')
+          .map(f => `${f.name}: 解决发现的差距`),
+        ...data.accessReview.recommendations,
+        ...data.configurationAudit.recommendations
+      ],
+      nextSteps: [
+        '优先修复高严重性漏洞',
+        '解决合规差距',
+        '实施访问控制改进',
+        '修复配置问题',
+        '安排下次安全审计'
+      ]
+    };
+  }
+
+  /**
+   * 生成渗透测试报告
+   */
+  private generatePenetrationTestReport(data: PenetrationTestData): PenetrationTestResult {
+    const allVulnerabilities = [
+      ...(data.networkTest.vulnerabilities || []),
+      ...(data.applicationTest.vulnerabilities || []),
+      ...(data.apiTest.vulnerabilities || [])
+    ];
+    
+    const highSeverityVulnerabilities = allVulnerabilities.filter(v => v.severity === 'high').length;
+    const mediumSeverityVulnerabilities = allVulnerabilities.filter(v => v.severity === 'medium').length;
+    const lowSeverityVulnerabilities = allVulnerabilities.filter(v => v.severity === 'low').length;
+    
+    const overallRisk = highSeverityVulnerabilities > 0 ? 'high' : mediumSeverityVulnerabilities > 5 ? 'medium' : 'low';
+    
+    return {
+      testId: `pentest_${Date.now()}`,
+      timestamp: new Date(),
+      overallRisk,
+      duration: data.duration,
+      summary: {
+        totalVulnerabilities: allVulnerabilities.length,
+        highSeverityVulnerabilities,
+        mediumSeverityVulnerabilities,
+        lowSeverityVulnerabilities,
+        networkIssues: data.networkTest.vulnerabilities?.length || 0,
+        applicationIssues: data.applicationTest.vulnerabilities?.length || 0,
+        apiIssues: data.apiTest.vulnerabilities?.length || 0,
+        socialEngineeringSuccessRate: Math.max(
+          data.socialEngineeringTest.tests[0]?.successRate || 0,
+          data.socialEngineeringTest.tests[1]?.successRate || 0,
+          data.socialEngineeringTest.tests[2]?.successRate || 0
+        )
+      },
+      details: {
+        networkTest: data.networkTest,
+        applicationTest: data.applicationTest,
+        apiTest: data.apiTest,
+        socialEngineeringTest: data.socialEngineeringTest
+      },
+      recommendations: [
+        ...data.networkTest.vulnerabilities?.map(v => `网络: ${v.title} - ${v.description}`) || [],
+        ...data.applicationTest.vulnerabilities?.map(v => `应用: ${v.title} - ${v.description}`) || [],
+        ...data.apiTest.vulnerabilities?.map(v => `API: ${v.title} - ${v.description}`) || [],
+        ...data.socialEngineeringTest.recommendations
+      ],
+      remediationPlan: {
+        immediate: allVulnerabilities.filter(v => v.severity === 'high').map(v => v.title),
+        shortTerm: allVulnerabilities.filter(v => v.severity === 'medium').map(v => v.title),
+        longTerm: allVulnerabilities.filter(v => v.severity === 'low').map(v => v.title)
+      }
+    };
+  }
+
+  /**
+   * 通知安全审计完成
+   */
+  private async notifySecurityAuditComplete(report: SecurityAuditResult): Promise<void> {
+    // 模拟通知发送
+    console.log('📧 发送安全审计通知...');
+    console.log(`审计ID: ${report.auditId}`);
+    console.log(`状态: ${report.status}`);
+    console.log(`发现漏洞: ${report.summary.totalVulnerabilities}`);
+    console.log(`合规状态: ${report.summary.complianceStatus}`);
+    // 实际实现中，这里应该发送邮件或其他通知
+  }
+
+  /**
+   * 通知渗透测试完成
+   */
+  private async notifyPenetrationTestComplete(report: PenetrationTestResult): Promise<void> {
+    // 模拟通知发送
+    console.log('📧 发送渗透测试通知...');
+    console.log(`测试ID: ${report.testId}`);
+    console.log(`总体风险: ${report.overallRisk}`);
+    console.log(`发现漏洞: ${report.summary.totalVulnerabilities}`);
+    console.log(`高严重性漏洞: ${report.summary.highSeverityVulnerabilities}`);
+    // 实际实现中，这里应该发送邮件或其他通知
   }
 
   async getSecurityStatus(): Promise<{

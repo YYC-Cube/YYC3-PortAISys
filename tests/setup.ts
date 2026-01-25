@@ -30,6 +30,88 @@ if (typeof window === 'undefined') {
       cancelAnimationFrame: vi.fn((id) => {
         clearTimeout(id);
       }),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      scrollTo: vi.fn(),
+      scrollBy: vi.fn(),
+      dispatchEvent: vi.fn(),
+      performance: {
+        getEntriesByType: vi.fn(() => []),
+        now: vi.fn(() => Date.now())
+      }
+    },
+    writable: true,
+    configurable: true,
+  });
+}
+
+// Mock document 对象
+if (typeof document === 'undefined') {
+  Object.defineProperty(global, 'document', {
+    value: {
+      createElement: vi.fn((tagName: string) => ({
+        tagName: tagName.toUpperCase(),
+        className: '',
+        id: '',
+        innerHTML: '',
+        textContent: '',
+        style: {
+          setProperty: vi.fn(),
+          getPropertyValue: vi.fn(() => ''),
+          removeProperty: vi.fn()
+        },
+        setAttribute: vi.fn(),
+        getAttribute: vi.fn(),
+        removeAttribute: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        appendChild: vi.fn(),
+        removeChild: vi.fn(),
+        insertBefore: vi.fn(),
+        querySelector: vi.fn(),
+        querySelectorAll: vi.fn(() => []),
+        getBoundingClientRect: vi.fn(() => ({
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: 0,
+          height: 0,
+          x: 0,
+          y: 0
+        })),
+        focus: vi.fn(),
+        blur: vi.fn(),
+        scrollIntoView: vi.fn()
+      })),
+      body: {
+        insertBefore: vi.fn(),
+        appendChild: vi.fn(),
+        removeChild: vi.fn()
+      },
+      head: {
+        insertBefore: vi.fn(),
+        appendChild: vi.fn(),
+        removeChild: vi.fn()
+      },
+      documentElement: {
+        style: {
+          setProperty: vi.fn(),
+          getPropertyValue: vi.fn(() => ''),
+          removeProperty: vi.fn()
+        },
+        setAttribute: vi.fn(),
+        removeAttribute: vi.fn(),
+        classList: {
+          add: vi.fn(),
+          remove: vi.fn(),
+          contains: vi.fn()
+        }
+      },
+      querySelector: vi.fn(),
+      querySelectorAll: vi.fn(() => []),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn()
     },
     writable: true,
     configurable: true,
@@ -126,7 +208,7 @@ global.console = {
   log: vi.fn()
 };
 
-global.fetch = vi.fn((url: string, options?: RequestInit) => {
+global.fetch = vi.fn((_url: string, _options?: RequestInit) => {
   return Promise.resolve({
     ok: true,
     status: 200,

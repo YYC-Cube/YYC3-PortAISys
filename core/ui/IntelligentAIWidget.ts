@@ -60,6 +60,11 @@ export interface WidgetConfig {
   enableSync?: boolean;
   enableAccessibility?: boolean;
   enableSecurity?: boolean;
+  enableResponsive?: boolean;
+  enableFeedback?: boolean;
+  enablePerformanceOptimization?: boolean;
+  enableKeyboardShortcuts?: boolean;
+  enableToastNotifications?: boolean;
 }
 
 export interface WidgetState {
@@ -87,6 +92,8 @@ export interface WidgetMetrics {
   cacheHitRate: number;
   errorCount: number;
   warningCount: number;
+  responsiveAdjustments: number;
+  feedbackCount: number;
 }
 
 export interface WidgetPerformance {
@@ -95,6 +102,8 @@ export interface WidgetPerformance {
   responseTime: number;
   throughput: number;
   concurrency: number;
+  animationSmoothness: number;
+  responsivePerformance: number;
 }
 
 export class IntelligentAIWidget extends EventEmitter {
@@ -136,6 +145,12 @@ export class IntelligentAIWidget extends EventEmitter {
   private metrics: WidgetMetrics;
   private performance: WidgetPerformance;
 
+  // 新增系统
+  private responsiveManager: any;
+  private feedbackManager: any;
+  private toastManager: any;
+  private keyboardShortcutManager: any;
+
   constructor(config: WidgetConfig = {}) {
     super();
 
@@ -156,6 +171,11 @@ export class IntelligentAIWidget extends EventEmitter {
       enableSync: true,
       enableAccessibility: true,
       enableSecurity: true,
+      enableResponsive: true,
+      enableFeedback: true,
+      enablePerformanceOptimization: true,
+      enableKeyboardShortcuts: true,
+      enableToastNotifications: true,
       ...config,
     };
 
@@ -216,6 +236,12 @@ export class IntelligentAIWidget extends EventEmitter {
     this.permissionManager = new PermissionManager();
     this.contentSecurity = new ContentSecurity();
 
+    // 新增系统
+    this.responsiveManager = null;
+    this.feedbackManager = null;
+    this.toastManager = null;
+    this.keyboardShortcutManager = null;
+
     this.initialized = false;
     this.metrics = {
       renderTime: 0,
@@ -225,6 +251,8 @@ export class IntelligentAIWidget extends EventEmitter {
       cacheHitRate: 0,
       errorCount: 0,
       warningCount: 0,
+      responsiveAdjustments: 0,
+      feedbackCount: 0,
     };
     this.performance = {
       fps: 60,
@@ -232,6 +260,8 @@ export class IntelligentAIWidget extends EventEmitter {
       responseTime: 0,
       throughput: 0,
       concurrency: 0,
+      animationSmoothness: 1.0,
+      responsivePerformance: 1.0,
     };
   }
 
@@ -241,151 +271,376 @@ export class IntelligentAIWidget extends EventEmitter {
       return;
     }
 
-    try {
-      this.emit('initializing');
+    const initializationStartTime = Date.now();
 
-      this.uiSystem.initialize();
+    try {
+      this.emit('initializing', { startTime: initializationStartTime });
+
+      // 并行初始化核心系统以提高启动速度
+      await Promise.all([
+        this.uiSystem.initialize(),
+        this.setupPerformanceMonitoring(),
+      ]);
       
       this.chatInterface = this.uiSystem.getChatInterface()!;
       this.toolPanel = this.uiSystem.getToolboxPanel()!;
       this.insightsDashboard = this.uiSystem.getInsightsDashboard()!;
       this.workflowDesigner = this.uiSystem.getWorkflowDesigner()!;
 
-      this.setupWidgetManager();
-      this.setupDragSystem();
-      this.setupResizeSystem();
-      this.setupThemeSystem();
-      this.setupAnimationSystem();
-      this.setupPersistence();
-      this.setupSyncManager();
-      this.setupEventBus();
-      this.setupPerformanceMonitoring();
-      this.setupAccessibility();
-      this.setupSecurity();
+      // 初始化新增系统
+      if (this.config.enableResponsive) {
+        this.responsiveManager = new (await import('./widget/ResponsiveManager')).default({
+          widget: this,
+          enableAutoAdjust: true,
+          breakpoints: {
+            small: 480,
+            medium: 768,
+            large: 1024,
+            xlarge: 1200,
+          },
+        });
+      }
+
+      if (this.config.enableFeedback) {
+        this.feedbackManager = new (await import('./widget/FeedbackManager')).default({
+          widget: this,
+          enableRating: true,
+          enableComments: true,
+          enableAnalytics: true,
+        });
+      }
+
+      if (this.config.enableToastNotifications) {
+        this.toastManager = new (await import('./widget/ToastManager')).default({
+          widget: this,
+          maxToasts: 5,
+          defaultDuration: 3000,
+          enableAnimations: true,
+        });
+      }
+
+      if (this.config.enableKeyboardShortcuts) {
+        this.keyboardShortcutManager = new (await import('./widget/KeyboardShortcutManager')).default({
+          widget: this,
+          enableDefaultShortcuts: true,
+          enableCustomShortcuts: true,
+        });
+      }
+
+      // 设置各个子系统
+      const setupPromises = [
+        this.setupWidgetManager(),
+        this.setupDragSystem(),
+        this.setupResizeSystem(),
+        this.setupThemeSystem(),
+        this.setupAnimationSystem(),
+        this.setupPersistence(),
+        this.setupSyncManager(),
+        this.setupEventBus(),
+        this.setupAccessibility(),
+        this.setupSecurity(),
+        this.setupResponsiveManager(),
+        this.setupFeedbackManager(),
+        this.setupToastManager(),
+        this.setupKeyboardShortcutManager(),
+      ];
+
+      await Promise.all(setupPromises);
 
       this.initialized = true;
-      this.emit('initialized');
-      console.log('IntelligentAIWidget initialized successfully');
+      const initializationTime = Date.now() - initializationStartTime;
+      this.performance.loadTime = initializationTime;
+      
+      this.emit('initialized', { initializationTime });
+      console.log(`IntelligentAIWidget initialized successfully in ${initializationTime}ms`);
     } catch (error) {
-      console.error('Failed to initialize IntelligentAIWidget:', error);
-      this.emit('initialization:error', error);
+      const errorTime = Date.now() - initializationStartTime;
+      console.error(`Failed to initialize IntelligentAIWidget in ${errorTime}ms:`, error);
+      this.emit('initialization:error', { error, timeElapsed: errorTime });
       throw error;
     }
   }
 
-  private setupWidgetManager(): void {
-    this.widgetManager.on('state:changed', (newState: WidgetState) => {
-      this.state = newState;
-      this.emit('state:changed', newState);
-    });
+  private setupResponsiveManager(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.config.enableResponsive || !this.responsiveManager) {
+        resolve();
+        return;
+      }
 
-    this.widgetManager.on('module:activated', (moduleId: string) => {
-      this.state.activeModule = moduleId;
-      this.emit('module:activated', moduleId);
-    });
+      this.responsiveManager.on('resize:detected', (data: any) => {
+        this.emit('responsive:resize', data);
+        this.metrics.responsiveAdjustments++;
+      });
 
-    this.widgetManager.on('module:deactivated', (moduleId: string) => {
-      this.emit('module:deactivated', moduleId);
-    });
-  }
+      this.responsiveManager.on('breakpoint:changed', (data: any) => {
+        this.emit('responsive:breakpoint', data);
+        this.performance.responsivePerformance = data.performanceScore;
+      });
 
-  private setupDragSystem(): void {
-    if (!this.config.enableDrag) return;
-
-    this.dragSystem.on('drag:start', (data) => {
-      this.emit('drag:start', data);
-    });
-
-    this.dragSystem.on('drag:move', (data) => {
-      this.state.position = { x: data.x, y: data.y };
-      this.emit('drag:move', data);
-    });
-
-    this.dragSystem.on('drag:end', (data) => {
-      this.emit('drag:end', data);
-      this.persistence.save();
+      this.responsiveManager.startMonitoring();
+      resolve();
     });
   }
 
-  private setupResizeSystem(): void {
-    if (!this.config.enableResize) return;
+  private setupFeedbackManager(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.config.enableFeedback || !this.feedbackManager) {
+        resolve();
+        return;
+      }
 
-    this.resizeSystem.on('resize:start', (data) => {
-      this.emit('resize:start', data);
-    });
+      this.feedbackManager.on('feedback:submitted', (data: any) => {
+        this.emit('feedback:submitted', data);
+        this.metrics.feedbackCount++;
+      });
 
-    this.resizeSystem.on('resize:move', (data) => {
-      this.state.size = { width: data.width, height: data.height };
-      this.emit('resize:move', data);
-    });
+      this.feedbackManager.on('rating:changed', (data: any) => {
+        this.emit('feedback:rating', data);
+      });
 
-    this.resizeSystem.on('resize:end', (data) => {
-      this.emit('resize:end', data);
-      this.persistence.save();
-    });
-  }
-
-  private setupThemeSystem(): void {
-    this.themeSystem.on('theme:change', (data: any) => {
-      this.state.theme = data.theme.mode as WidgetTheme;
-      this.emit('theme:changed', data.theme);
-    });
-
-    this.themeSystem.on('auto:mode:change', (enabled: boolean) => {
-      this.state.theme = enabled ? 'auto' : this.themeSystem.getCurrentTheme().mode as WidgetTheme;
-      this.emit('auto:mode:changed', enabled);
+      resolve();
     });
   }
 
-  private setupAnimationSystem(): void {
-    this.animationSystem.on('animation:started', (animationId: string) => {
-      this.emit('animation:started', animationId);
-    });
+  private setupToastManager(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.config.enableToastNotifications || !this.toastManager) {
+        resolve();
+        return;
+      }
 
-    this.animationSystem.on('animation:completed', (animationId: string) => {
-      this.emit('animation:completed', animationId);
-    });
-  }
+      this.toastManager.on('toast:shown', (data: any) => {
+        this.emit('notification:shown', data);
+      });
 
-  private setupPersistence(): void {
-    if (!this.config.enablePersistence) return;
+      this.toastManager.on('toast:hidden', (data: any) => {
+        this.emit('notification:hidden', data);
+      });
 
-    this.persistence.on('state:saved', (state: WidgetState) => {
-      this.emit('state:saved', state);
-    });
-
-    this.persistence.on('state:loaded', (state: WidgetState) => {
-      this.state = state;
-      this.emit('state:loaded', state);
-    });
-
-    this.persistence.load();
-  }
-
-  private setupSyncManager(): void {
-    if (!this.config.enableSync) return;
-
-    this.syncManager.on('sync:started', () => {
-      this.emit('sync:started');
-    });
-
-    this.syncManager.on('sync:completed', (state: WidgetState) => {
-      this.state = state;
-      this.emit('sync:completed', state);
-    });
-
-    this.syncManager.on('sync:error', (error: Error) => {
-      this.emit('sync:error', error);
+      resolve();
     });
   }
 
-  private setupEventBus(): void {
-    this.eventBus.on('message:received', (message: any) => {
-      this.handleMessage(message);
-    });
+  private setupKeyboardShortcutManager(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.config.enableKeyboardShortcuts || !this.keyboardShortcutManager) {
+        resolve();
+        return;
+      }
 
-    this.eventBus.on('event:triggered', (event: any) => {
-      this.handleEvent(event);
+      this.keyboardShortcutManager.on('shortcut:triggered', (data: any) => {
+        this.emit('keyboard:shortcut', data);
+        this.handleKeyboardShortcut(data);
+      });
+
+      this.keyboardShortcutManager.registerDefaultShortcuts();
+      resolve();
+    });
+  }
+
+  private setupWidgetManager(): Promise<void> {
+    return new Promise((resolve) => {
+      this.widgetManager.on('state:changed', (newState: WidgetState) => {
+        this.state = newState;
+        this.emit('state:changed', newState);
+      });
+
+      this.widgetManager.on('module:activated', (moduleId: string) => {
+        this.state.activeModule = moduleId;
+        this.emit('module:activated', moduleId);
+      });
+
+      this.widgetManager.on('module:deactivated', (moduleId: string) => {
+        this.emit('module:deactivated', moduleId);
+      });
+
+      resolve();
+    });
+  }
+
+  private setupDragSystem(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.config.enableDrag) {
+        resolve();
+        return;
+      }
+
+      this.dragSystem.on('drag:start', (data) => {
+        this.emit('drag:start', data);
+      });
+
+      this.dragSystem.on('drag:move', (data) => {
+        this.state.position = { x: data.x, y: data.y };
+        this.emit('drag:move', data);
+      });
+
+      this.dragSystem.on('drag:end', (data) => {
+        this.emit('drag:end', data);
+        this.persistence.save();
+      });
+
+      resolve();
+    });
+  }
+
+  private setupResizeSystem(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.config.enableResize) {
+        resolve();
+        return;
+      }
+
+      this.resizeSystem.on('resize:start', (data) => {
+        this.emit('resize:start', data);
+      });
+
+      this.resizeSystem.on('resize:move', (data) => {
+        this.state.size = { width: data.width, height: data.height };
+        this.emit('resize:move', data);
+      });
+
+      this.resizeSystem.on('resize:end', (data) => {
+        this.emit('resize:end', data);
+        this.persistence.save();
+      });
+
+      resolve();
+    });
+  }
+
+  private setupThemeSystem(): Promise<void> {
+    return new Promise((resolve) => {
+      this.themeSystem.on('theme:change', (data: any) => {
+        this.state.theme = data.theme.mode as WidgetTheme;
+        this.emit('theme:changed', data.theme);
+      });
+
+      this.themeSystem.on('auto:mode:change', (enabled: boolean) => {
+        this.state.theme = enabled ? 'auto' : this.themeSystem.getCurrentTheme().mode as WidgetTheme;
+        this.emit('auto:mode:changed', enabled);
+      });
+
+      resolve();
+    });
+  }
+
+  private setupAnimationSystem(): Promise<void> {
+    return new Promise((resolve) => {
+      this.animationSystem.on('animation:started', (animationId: string) => {
+        this.emit('animation:started', animationId);
+      });
+
+      this.animationSystem.on('animation:completed', (animationId: string) => {
+        this.emit('animation:completed', animationId);
+      });
+
+      resolve();
+    });
+  }
+
+  private setupPersistence(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.config.enablePersistence) {
+        resolve();
+        return;
+      }
+
+      this.persistence.on('state:saved', (state: WidgetState) => {
+        this.emit('state:saved', state);
+      });
+
+      this.persistence.on('state:loaded', (state: WidgetState) => {
+        this.state = state;
+        this.emit('state:loaded', state);
+      });
+
+      this.persistence.load();
+      resolve();
+    });
+  }
+
+  private setupSyncManager(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.config.enableSync) {
+        resolve();
+        return;
+      }
+
+      this.syncManager.on('sync:started', () => {
+        this.emit('sync:started');
+      });
+
+      this.syncManager.on('sync:completed', (state: WidgetState) => {
+        this.state = state;
+        this.emit('sync:completed', state);
+      });
+
+      this.syncManager.on('sync:error', (error: Error) => {
+        this.emit('sync:error', error);
+      });
+
+      resolve();
+    });
+  }
+
+  private setupEventBus(): Promise<void> {
+    return new Promise((resolve) => {
+      this.eventBus.on('message:received', (message: any) => {
+        this.handleMessage(message);
+      });
+
+      this.eventBus.on('event:triggered', (event: any) => {
+        this.handleEvent(event);
+      });
+
+      resolve();
+    });
+  }
+
+  private setupAccessibility(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.config.enableAccessibility) {
+        resolve();
+        return;
+      }
+
+      this.a11yManager.on('a11y:enabled', () => {
+        this.emit('a11y:enabled');
+      });
+
+      this.a11yManager.on('a11y:disabled', () => {
+        this.emit('a11y:disabled');
+      });
+
+      this.keyboardNav.on('keyboard:navigation', (action: string) => {
+        this.handleKeyboardNavigation(action);
+      });
+
+      resolve();
+    });
+  }
+
+  private setupSecurity(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.config.enableSecurity) {
+        resolve();
+        return;
+      }
+
+      this.sandbox.on('sandbox:violation', (violation: any) => {
+        this.emit('security:violation', violation);
+      });
+
+      this.permissionManager.on('permission:requested', (permission: string) => {
+        this.emit('permission:requested', permission);
+      });
+
+      this.contentSecurity.on('csp:violation', (violation: any) => {
+        this.emit('security:violation', violation);
+      });
+
+      resolve();
     });
   }
 
@@ -394,38 +649,6 @@ export class IntelligentAIWidget extends EventEmitter {
       this.updateMetrics();
       this.updatePerformance();
     }, 1000);
-  }
-
-  private setupAccessibility(): void {
-    if (!this.config.enableAccessibility) return;
-
-    this.a11yManager.on('a11y:enabled', () => {
-      this.emit('a11y:enabled');
-    });
-
-    this.a11yManager.on('a11y:disabled', () => {
-      this.emit('a11y:disabled');
-    });
-
-    this.keyboardNav.on('keyboard:navigation', (action: string) => {
-      this.handleKeyboardNavigation(action);
-    });
-  }
-
-  private setupSecurity(): void {
-    if (!this.config.enableSecurity) return;
-
-    this.sandbox.on('sandbox:violation', (violation: any) => {
-      this.emit('security:violation', violation);
-    });
-
-    this.permissionManager.on('permission:requested', (permission: string) => {
-      this.emit('permission:requested', permission);
-    });
-
-    this.contentSecurity.on('csp:violation', (violation: any) => {
-      this.emit('security:violation', violation);
-    });
   }
 
   private handleMessage(message: any): void {
@@ -450,6 +673,62 @@ export class IntelligentAIWidget extends EventEmitter {
 
   private handleKeyboardNavigation(action: string): void {
     this.emit('keyboard:navigation', action);
+  }
+
+  private handleKeyboardShortcut(data: any): void {
+    switch (data.shortcut) {
+      case 'toggle-chat':
+        this.switchModule('chat');
+        break;
+      case 'toggle-tools':
+        this.switchModule('tools');
+        break;
+      case 'toggle-insights':
+        this.switchModule('insights');
+        break;
+      case 'toggle-workflow':
+        this.switchModule('workflow');
+        break;
+      case 'toggle-minimize':
+        this.state.minimized ? this.restore() : this.minimize();
+        break;
+      case 'toggle-maximize':
+        this.state.maximized ? this.restore() : this.maximize();
+        break;
+      case 'toggle-theme':
+        this.toggleTheme();
+        break;
+      case 'close':
+        this.hide();
+        break;
+      default:
+        console.log('Unhandled keyboard shortcut:', data.shortcut);
+    }
+  }
+
+  private switchModule(moduleId: string): void {
+    this.widgetManager.activateModule(moduleId);
+  }
+
+  private toggleTheme(): void {
+    const currentTheme = this.getTheme();
+    let newTheme: WidgetTheme;
+    
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark';
+        break;
+      case 'dark':
+        newTheme = 'auto';
+        break;
+      case 'auto':
+        newTheme = 'light';
+        break;
+      default:
+        newTheme = 'light';
+    }
+    
+    this.setTheme(newTheme);
   }
 
   private async handleChatMessage(data: any): Promise<void> {
@@ -497,6 +776,8 @@ export class IntelligentAIWidget extends EventEmitter {
       cacheHitRate: this.renderOptimizer.getCacheHitRate(),
       errorCount: this.metrics.errorCount,
       warningCount: this.metrics.warningCount,
+      responsiveAdjustments: this.metrics.responsiveAdjustments,
+      feedbackCount: this.metrics.feedbackCount,
     };
   }
 
@@ -507,6 +788,8 @@ export class IntelligentAIWidget extends EventEmitter {
       responseTime: this.performance.responseTime,
       throughput: this.messageQueue.getThroughput(),
       concurrency: this.messageQueue.getConcurrency(),
+      animationSmoothness: this.animationSystem.getSmoothnessScore(),
+      responsivePerformance: this.performance.responsivePerformance,
     };
   }
 
@@ -630,6 +913,21 @@ export class IntelligentAIWidget extends EventEmitter {
     this.sandbox.destroy();
     this.permissionManager.destroy();
     this.contentSecurity.destroy();
+
+    // 清理新增系统
+    if (this.responsiveManager) {
+      this.responsiveManager.destroy();
+    }
+    if (this.feedbackManager) {
+      this.feedbackManager.destroy();
+    }
+    if (this.toastManager) {
+      this.toastManager.destroy();
+    }
+    if (this.keyboardShortcutManager) {
+      this.keyboardShortcutManager.destroy();
+    }
+
     this.uiSystem.destroy();
 
     this.removeAllListeners();

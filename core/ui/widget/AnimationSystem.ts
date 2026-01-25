@@ -384,6 +384,30 @@ export class AnimationSystem extends EventEmitter {
     return { ...this.metrics };
   }
 
+  /**
+   * 获取动画平滑度评分
+   * @returns 平滑度评分 (0-1)
+   */
+  getSmoothnessScore(): number {
+    // 基于动画状态计算平滑度评分
+    const runningAnimations = this.animations.size;
+    const totalAnimations = this.metrics.totalAnimations;
+    
+    // 如果没有动画，返回满分
+    if (totalAnimations === 0) {
+      return 1.0;
+    }
+    
+    // 基于运行动画数量和完成率计算评分
+    const completionRate = this.metrics.completedAnimations / totalAnimations;
+    const concurrencyFactor = Math.max(0, 1 - runningAnimations / this.maxConcurrent);
+    
+    // 综合计算平滑度评分
+    const smoothnessScore = (completionRate * 0.6) + (concurrencyFactor * 0.4);
+    
+    return Math.min(1.0, Math.max(0, smoothnessScore));
+  }
+
   resetMetrics(): void {
     this.metrics = {
       totalAnimations: 0,

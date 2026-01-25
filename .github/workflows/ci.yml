@@ -1,0 +1,441 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # 每周日运行完整测试
+
+jobs:
+  lint-and-typecheck:
+    name: 代码质量检查
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+      
+      - name: Setup node modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: ESLint检查
+        run: pnpm run lint
+        
+      - name: TypeScript类型检查
+        run: pnpm run typecheck
+        
+      - name: 代码格式检查
+        run: pnpm run format --check
+
+  build:
+    name: 构建验证
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+      
+      - name: Setup node modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      
+      - name: Setup build cache
+        uses: actions/cache@v4
+        with:
+          path: dist
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+      
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: 构建项目
+        run: pnpm run build
+        
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist/
+          retention-days: 7
+
+  test-unit:
+    name: 单元测试
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+      
+      - name: Setup node modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: 运行单元测试
+        run: pnpm test:unit --coverage
+        
+      - name: 上传测试覆盖率
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unit
+          name: unit-tests
+          fail_ci_if_error: true
+          verbose: true
+
+  test-integration:
+    name: 集成测试
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: 运行集成测试
+        run: pnpm test:integration --coverage
+        
+      - name: 上传测试覆盖率
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: integration
+
+  test-e2e:
+    name: 端到端测试
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: 安装Playwright浏览器
+        run: npx playwright install --with-deps
+        
+      - name: 运行端到端测试
+        run: pnpm test:e2e
+        
+      - name: 上传E2E测试报告
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-report
+          path: test-reports/
+          retention-days: 7
+
+  test-performance:
+    name: 性能测试
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: 运行性能测试
+        run: pnpm test:performance
+        
+      - name: 上传性能测试报告
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-test-report
+          path: performance-report.json
+          retention-days: 7
+
+  test-security:
+    name: 安全测试
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+      
+      - name: Setup node modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+        
+      - name: 运行安全测试
+        run: pnpm test:security
+        
+      - name: 代码安全扫描
+        uses: snyk/actions/node@master
+        with:
+          command: test
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        
+      - name: 上传安全测试报告
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-test-report
+          path: |
+            security-report.json
+            snyk-report.html
+          retention-days: 7
+
+  sync-docs:
+    name: 文档同步
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: 同步文档
+        run: pnpm run sync:docs
+        
+      - name: 上传文档
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-docs
+          path: docs/
+          retention-days: 7
+
+  deploy-staging:
+    name: 部署到测试环境
+    runs-on: ubuntu-latest
+    needs: [build, test-unit, test-integration]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: 构建项目
+        run: pnpm run build
+        
+      - name: 部署到测试环境
+        run: |
+          echo "Deploying to staging environment..."
+          # 这里添加实际的部署命令
+          # 例如：ssh deploy@staging-server "cd /app && git pull && npm install && npm run build && npm restart"
+        
+      - name: 发送部署通知
+        run: |
+          echo "Deployment to staging completed successfully!"
+          # 这里可以添加通知命令，例如发送Slack消息或邮件
+
+  generate-status:
+    name: 生成状态报告
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, build, test-unit, test-integration, test-e2e, test-performance, test-security, sync-docs]
+    if: always()
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: 生成状态报告
+        run: pnpm tsx scripts/generate-ci-status.ts
+        
+      - name: 生成综合测试报告
+        run: pnpm tsx scripts/generate-test-report.ts
+        
+      - name: 上传状态报告
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-status-report
+          path: ci-status-report.json
+          
+      - name: 上传综合测试报告
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: test-report.json
+          retention-days: 14
+
+  cleanup:
+    name: 清理
+    runs-on: ubuntu-latest
+    needs: generate-status
+    if: always()
+    
+    steps:
+      - name: 清理临时文件
+        run: |
+          echo "Cleaning up temporary files..."
+          # 这里可以添加清理命令
+          
+      - name: 通知完成
+        run: |
+          echo "CI/CD pipeline completed!"
+          # 这里可以添加通知命令

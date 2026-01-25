@@ -1,9 +1,10 @@
 // workflows/intelligent-calling/RealTimeCallAssistant.ts
+import { RealTimeContext, RealTimeSuggestion, RealTimeAssistance, CallSession } from './types';
+
 export class RealTimeCallAssistant {
-  private speechRecognizer: SpeechRecognizer;
-  private sentimentAnalyzer: SentimentAnalyzer;
-  private intentClassifier: IntentClassifier;
-  private responseGenerator: ResponseGenerator;
+  private speechRecognizer: any;
+  private sentimentAnalyzer: any;
+  private intentClassifier: any;
   
   async provideRealTimeAssistance(callSession: CallSession): Promise<RealTimeAssistance> {
     // 实时语音转文本
@@ -68,5 +69,27 @@ export class RealTimeCallAssistant {
     }
     
     return suggestions;
+  }
+
+  private async analyzeConversationStage(transcript: string): Promise<string> {
+    // 简单的对话阶段分析实现
+    if (transcript.includes('价格') || transcript.includes('费用')) {
+      return 'price_discussion';
+    }
+    if (transcript.includes('如何') || transcript.includes('怎么')) {
+      return 'information_gathering';
+    }
+    if (transcript.includes('好的') || transcript.includes('可以') || transcript.includes('同意')) {
+      return 'closing_opportunity';
+    }
+    return 'initial_dialogue';
+  }
+
+  private async generateWarningAlerts(_sentiment: any, _intent: string): Promise<unknown[]> {
+    return [];
+  }
+
+  private async identifyOpportunities(_intent: string, _sentiment: any): Promise<unknown[]> {
+    return [];
   }
 }

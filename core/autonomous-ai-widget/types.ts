@@ -17,6 +17,12 @@ export interface AutonomousAIConfig {
   maxTokens: number;
   temperature: number;
   
+  // API配置
+  apiKey?: string;
+  baseURL?: string;
+  endpoint?: string;
+  timeout?: number;
+  
   // 自治能力配置
   enableLearning: boolean;
   enableMemory: boolean;
