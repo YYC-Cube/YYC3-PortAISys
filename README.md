@@ -122,8 +122,8 @@ YYC³ Portable Intelligent AI System 采用清晰的微服务架构，明确定�
 
 ```bash
 # 克隆仓库
-git clone https://github.com/YYC-Cube/yyc3-PortAISys.git
-cd yyc3-PortAISys
+git clone https://github.com/YYC-Cube/YYC3-PortAISys.git
+cd YYC3-PortAISys
 
 # 安装依赖
 pnpm install
@@ -713,8 +713,8 @@ YYC³ Portable Intelligent AI System 采用 MIT 许可证 - 详见 [LICENSE](LIC
 
 ## 📞 联系方式
 
-- **项目主页**: https://github.com/YYC-Cube/YYC3-PortAISys.git
-- **问题反馈**: https://github.com/YYC-Cube/YYC3-PortAISys.git/issues
+- **项目主页**: https://github.com/YYC-Cube/YYC3-PortAISys
+- **问题反馈**: https://github.com/YYC-Cube/YYC3-PortAISys/issues
 - **邮箱**: admin@0379.email
 
 ---
