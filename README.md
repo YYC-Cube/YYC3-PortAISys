@@ -1,7 +1,7 @@
 # YYC³ Portable Intelligent AI System
 
 <div align="center">
-  <img src="/yyc3-article-cover-02.png" alt="YYC³ Logo" style="max-width: 100%; height: auto; margin-bottom: 20px;">
+  <img src="/yyc3-article-cover-02.png" alt="YYC³ Article Cover" style="max-width: 100%; height: auto; margin-bottom: 20px;">
   
   <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0;">
     <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version">
