@@ -495,7 +495,7 @@ export class DocumentSyncManager {
       const docCodeExamples = this.extractDocCodeExamples(docContent);
       
       // 更新代码内容
-      const updatedCodeContent = this.mergeDocIntoCode(docComments, docCodeExamples, codeContent);
+      const updatedCodeContent = this.mergeDocIntoCode(docComments, docCodeExamples, codeContent, codePath);
 
       if (updatedCodeContent !== codeContent || options.force) {
         fs.writeFileSync(codePath, updatedCodeContent);
@@ -606,6 +606,11 @@ export class DocumentSyncManager {
   private extractDocComments(docContent: string): Record<string, string> {
     const comments: Record<string, string> = {};
     
+    // Handle undefined or null docContent
+    if (!docContent) {
+      return comments;
+    }
+    
     // 提取Markdown中的元数据
     const metaRegex = /---[\s\S]*?---/;
     const metaMatch = docContent.match(metaRegex);
@@ -656,6 +661,11 @@ export class DocumentSyncManager {
    * 将代码注释合并到文档中
    */
   private mergeCommentsIntoDoc(codeComments: Record<string, string>, codeStructure: Record<string, any>, docContent: string): string {
+    // Handle undefined or null docContent
+    if (!docContent) {
+      docContent = '';
+    }
+    
     // 如果文档没有元数据部分，添加一个
     if (!docContent.startsWith('---')) {
       docContent = `---\n---\n${docContent}`;
@@ -715,7 +725,7 @@ export class DocumentSyncManager {
   /**
    * 将文档内容合并到代码中
    */
-  private mergeDocIntoCode(docComments: Record<string, string>, docCodeExamples: Record<string, string>, codeContent: string): string {
+  private mergeDocIntoCode(docComments: Record<string, string>, docCodeExamples: Record<string, string>, codeContent: string, codePath: string): string {
     // 查找或创建文件头部注释
     const headerRegex = /\/\*\*[\s\S]*?\*\//;
     let updatedContent = codeContent;
@@ -739,7 +749,7 @@ export class DocumentSyncManager {
     } else {
       // 创建新的文件头部注释
       const newComment = `/**
- * @file ${path.basename(updatedContent)}
+ * @file ${path.basename(codePath)}
 ${Object.entries(docComments)
   .map(([key, value]) => ` * @${key} ${value}`)
   .join('\n')}
