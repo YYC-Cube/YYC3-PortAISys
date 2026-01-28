@@ -359,12 +359,12 @@ export class EnhancedMonitoringAlertSystem extends EventEmitter {
     switch (threshold.comparison) {
       case 'greater_than':
         if (value >= threshold.criticalThreshold) return AlertSeverity.CRITICAL;
-        if (value >= threshold.warningThreshold) return AlertSeverity.ERROR;
-        return AlertSeverity.WARNING;
+        if (value >= threshold.warningThreshold) return AlertSeverity.WARNING;
+        return AlertSeverity.INFO;
       case 'less_than':
         if (value <= threshold.criticalThreshold) return AlertSeverity.CRITICAL;
-        if (value <= threshold.warningThreshold) return AlertSeverity.ERROR;
-        return AlertSeverity.WARNING;
+        if (value <= threshold.warningThreshold) return AlertSeverity.WARNING;
+        return AlertSeverity.INFO;
       case 'equals':
         return AlertSeverity.WARNING;
       default:

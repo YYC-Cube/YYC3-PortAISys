@@ -606,6 +606,11 @@ export class DocumentSyncManager {
   private extractDocComments(docContent: string): Record<string, string> {
     const comments: Record<string, string> = {};
     
+    // Handle undefined or null docContent
+    if (!docContent) {
+      return comments;
+    }
+    
     // 提取Markdown中的元数据
     const metaRegex = /---[\s\S]*?---/;
     const metaMatch = docContent.match(metaRegex);
@@ -656,6 +661,11 @@ export class DocumentSyncManager {
    * 将代码注释合并到文档中
    */
   private mergeCommentsIntoDoc(codeComments: Record<string, string>, codeStructure: Record<string, any>, docContent: string): string {
+    // Handle undefined or null docContent
+    if (!docContent) {
+      docContent = '';
+    }
+    
     // 如果文档没有元数据部分，添加一个
     if (!docContent.startsWith('---')) {
       docContent = `---\n---\n${docContent}`;
