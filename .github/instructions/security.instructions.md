@@ -20,7 +20,7 @@ YYC³ PortAISys is a mission-critical AI system for port and logistics operation
 2. **Authorization**: RBAC (ADMIN, MODERATOR, USER, GUEST)
 3. **Encryption**: End-to-end encryption for sensitive data
 4. **Input Validation**: Zod schemas throughout
-5. **Audit Logging**: Complete operation trails (2555-day retention)
+5. **Audit Logging**: Complete operation trails (7-year retention)
 6. **Compliance**: GDPR, SOC 2 Type II, ISO 27001 monitoring
 7. **Threat Detection**: Real-time pattern analysis
 8. **Vulnerability Scanning**: Automated security scanning
@@ -207,7 +207,7 @@ await db.save({ creditCard: userInput }); // VULNERABLE!
 
 **Password Security**:
 ```typescript
-// ✅ Preferred: bcrypt hashing
+// ✅ Preferred: bcryptjs hashing
 import bcrypt from 'bcryptjs';
 
 const hashedPassword = await bcrypt.hash(password, 12); // 12+ rounds
@@ -528,7 +528,7 @@ if (failedLoginAttempts > 5) {
 **Action Items**:
 - [ ] Security events logged (auth failures, permission denials)
 - [ ] Audit logs immutable (append-only)
-- [ ] Logs retained per compliance requirements (2555 days)
+- [ ] Logs retained per compliance requirements (7 years)
 - [ ] No sensitive data in logs (passwords, tokens, PII)
 - [ ] Alerts configured for suspicious patterns
 - [ ] Log aggregation and analysis in place

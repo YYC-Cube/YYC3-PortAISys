@@ -62,7 +62,7 @@ YYC³ PortAISys implements a **Five-Dimensional Closed-Loop Architecture** desig
 ┌───────────────────────┴─────────────────────────────────────┐
 │                   Data & Integration Layer                   │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │PostgreSQL│  │Redis     │  │OpenTelm. │  │External  │   │
+│  │PostgreSQL│  │Redis     │  │OpenTel.  │  │External  │   │
 │  │(Prisma)  │  │(Cache)   │  │(Tracing) │  │AI APIs   │   │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
 └─────────────────────────────────────────────────────────────┘
