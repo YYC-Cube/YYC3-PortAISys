@@ -1,5 +1,9 @@
 name: CI/CD
 
+# Node.js version requirement: 20.19.0+
+# Prisma 7.0+ requires Node.js 20.19+, 22.12+, or 24.0+
+# See: https://github.com/prisma/prisma/releases
+
 on:
   push:
     branches: [main, develop]
@@ -20,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
           
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -66,7 +70,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
           
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -121,7 +125,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
           
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -170,7 +174,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
           
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -200,7 +204,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
           
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -234,7 +238,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
           
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -265,7 +269,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
           
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -326,7 +330,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
           
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -358,7 +362,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
           
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -394,7 +398,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.19.0'
           
       - name: Install pnpm
         uses: pnpm/action-setup@v2
