@@ -495,7 +495,7 @@ export class DocumentSyncManager {
       const docCodeExamples = this.extractDocCodeExamples(docContent);
       
       // 更新代码内容
-      const updatedCodeContent = this.mergeDocIntoCode(docComments, docCodeExamples, codeContent);
+      const updatedCodeContent = this.mergeDocIntoCode(docComments, docCodeExamples, codeContent, codePath);
 
       if (updatedCodeContent !== codeContent || options.force) {
         fs.writeFileSync(codePath, updatedCodeContent);
@@ -725,7 +725,7 @@ export class DocumentSyncManager {
   /**
    * 将文档内容合并到代码中
    */
-  private mergeDocIntoCode(docComments: Record<string, string>, docCodeExamples: Record<string, string>, codeContent: string): string {
+  private mergeDocIntoCode(docComments: Record<string, string>, docCodeExamples: Record<string, string>, codeContent: string, codePath: string): string {
     // 查找或创建文件头部注释
     const headerRegex = /\/\*\*[\s\S]*?\*\//;
     let updatedContent = codeContent;
@@ -749,7 +749,7 @@ export class DocumentSyncManager {
     } else {
       // 创建新的文件头部注释
       const newComment = `/**
- * @file ${path.basename(updatedContent)}
+ * @file ${path.basename(codePath)}
 ${Object.entries(docComments)
   .map(([key, value]) => ` * @${key} ${value}`)
   .join('\n')}
