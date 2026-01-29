@@ -21,7 +21,6 @@
       "@/*": ["./core/*"],
       "@tests/*": ["./tests/*"]
     },
-    "types": ["vitest/globals", "node"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
