@@ -1,4 +1,13 @@
 // analytics/RealTimeAIDashboard.ts
+import {
+  DataStream,
+  AlertEngine,
+  KPITracker,
+  AIDashboard,
+  AIMetrics,
+  KPIOverview
+} from './AIAnalyticsEngine';
+
 export class RealTimeAIDashboard {
   private dataStream: DataStream;
   private alertEngine: AlertEngine;

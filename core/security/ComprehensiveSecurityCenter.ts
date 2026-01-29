@@ -213,9 +213,9 @@ export class ComprehensiveSecurityCenter {
   }
 
   /**
-   * 清理输入
+   * 清理输入（基础版本）
    */
-  sanitizeInput(input: string): string {
+  sanitizeInputBasic(input: string): string {
     if (!input) return '';
     // 移除潜在的危险字符
     return input
@@ -224,9 +224,9 @@ export class ComprehensiveSecurityCenter {
   }
 
   /**
-   * 验证文件路径
+   * 验证文件路径（基础版本）
    */
-  validateFilePath(filePath: string): boolean {
+  validateFilePathBasic(filePath: string): boolean {
     if (!filePath) return false;
     // 防止路径遍历
     return !filePath.includes('..');

@@ -1,4 +1,12 @@
 // analytics/PredictiveAnalytics.ts
+import {
+  TimeSeriesForecaster,
+  PatternRecognizer,
+  ScenarioSimulator,
+  BusinessForecast,
+  ScenarioPlanning
+} from './AIAnalyticsEngine';
+
 export class PredictiveAnalytics {
   private timeSeriesForecaster: TimeSeriesForecaster;
   private patternRecognizer: PatternRecognizer;

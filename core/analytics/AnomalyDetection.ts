@@ -1,4 +1,13 @@
 // analytics/AnomalyDetection.ts
+import {
+  OutlierDetector,
+  PatternAnalyzer,
+  AlertManager,
+  AnomalyMonitoring,
+  AnomalyReport,
+  Anomaly
+} from './AIAnalyticsEngine';
+
 export class AnomalyDetection {
   private outlierDetector: OutlierDetector;
   private patternAnalyzer: PatternAnalyzer;

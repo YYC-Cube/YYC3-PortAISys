@@ -15,6 +15,149 @@ export interface InsightGenerator {
   prioritize: (insights: AnalyticsInsight[]) => Promise<AnalyticsInsight[]>;
 }
 
+export interface RecommendationEngine {
+  generateRecommendations: (data: ProcessedData) => Promise<OptimizationRecommendation[]>;
+  evaluateRecommendations: (recommendations: OptimizationRecommendation[]) => Promise<number>;
+}
+
+export interface ScenarioSimulator {
+  simulateScenario: (scenario: any) => Promise<any>;
+  evaluateScenarios: (scenarios: any[]) => Promise<any>;
+}
+
+export interface IntelligentRecommendations {
+  strategicRecommendations: {
+    marketStrategy: any;
+    productStrategy: any;
+    pricingStrategy: any;
+  };
+  operationalRecommendations: {
+    processOptimization: any;
+    resourceAllocation: any;
+    qualityImprovement: any;
+  };
+  tacticalRecommendations: {
+    campaignOptimization: any;
+    customerEngagement: any;
+    salesEffectiveness: any;
+  };
+  predictiveRecommendations: {
+    riskMitigation: any;
+    opportunityPursuit: any;
+    investmentAllocation: any;
+  };
+}
+
+export interface ScenarioAnalysis {
+  bestCaseScenario: any;
+  worstCaseScenario: any;
+  mostLikelyScenario: any;
+  sensitivityAnalysis: any;
+}
+
+export interface OutlierDetector {
+  detectOutliers: (data: any[]) => Promise<any[]>;
+  analyzeOutliers: (outliers: any[]) => Promise<any>;
+}
+
+export interface PatternAnalyzer {
+  analyzePatterns: (data: any[]) => Promise<any>;
+  detectTrends: (data: any[]) => Promise<any>;
+}
+
+export interface AlertManager {
+  createAlert: (alert: any) => Promise<void>;
+  manageAlerts: () => Promise<any[]>;
+}
+
+export interface AnomalyMonitoring {
+  monitorAnomalies: () => Promise<Anomaly[]>;
+  analyzeAnomalyTrends: (anomalies: Anomaly[]) => Promise<any>;
+}
+
+export interface AnomalyReport {
+  anomalies: Anomaly[];
+  metrics: any;
+  recommendations: string[];
+}
+
+export interface DataUnifier {
+  unifyData: (data: any[]) => Promise<any>;
+  transformData: (data: any) => Promise<any>;
+}
+
+export interface UnifiedAnalytics {
+  customerAnalytics: any;
+  campaignAnalytics: any;
+  operationalAnalytics: any;
+  marketAnalytics: any;
+}
+
+export interface RealTimeDashboard {
+  updateDashboard: (data: any) => Promise<void>;
+  getDashboardData: () => Promise<any>;
+}
+
+export interface DataStream {
+  streamData: (data: any) => void;
+  getData: () => any[];
+}
+
+export interface AlertEngine {
+  processAlerts: () => Promise<void>;
+  generateAlerts: (data: any) => Promise<any[]>;
+}
+
+export interface TimeSeriesForecaster {
+  forecast: (data: any[], horizon: number) => Promise<any>;
+  analyzeTrends: (data: any[]) => Promise<any>;
+}
+
+export interface PatternRecognizer {
+  recognizePatterns: (data: any[]) => Promise<any>;
+  classifyPatterns: (patterns: any[]) => Promise<any>;
+}
+
+export interface BusinessForecast {
+  forecast: any;
+  confidence: number;
+  timeframe: string;
+}
+
+export interface ScenarioPlanning {
+  scenarios: any[];
+  analysis: any;
+  recommendations: string[];
+}
+
+export interface KPITracker {
+  trackKPI: (kpi: any) => Promise<void>;
+  getKPITrends: () => Promise<any>;
+}
+
+export interface AIDashboard {
+  kpiOverview: any;
+  realTimeMonitoring: any;
+  aiInsights: any;
+  predictiveAnalytics: any;
+  alerts: any;
+  recommendations: any;
+}
+
+export interface AIMetrics {
+  revenue: any;
+  conversion: any;
+  satisfaction: any;
+  efficiency: any;
+}
+
+export interface KPIOverview {
+  revenue: any;
+  conversion: any;
+  customerSatisfaction: any;
+  operationalEfficiency: any;
+}
+
 export interface BusinessIntelligence {
   predictions: Prediction[];
   anomalies: Anomaly[];

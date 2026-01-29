@@ -1,4 +1,39 @@
 // architecture/EndToEndArchitecture.ts
+export interface DataHub {
+  integrateData: (data: any) => Promise<void>;
+  getData: () => Promise<any>;
+}
+
+export interface AIOrchestrator {
+  orchestrateAI: (request: any) => Promise<any>;
+  manageAgents: () => Promise<void>;
+}
+
+export interface WorkflowEngine {
+  executeWorkflow: (workflow: any) => Promise<any>;
+  manageWorkflows: () => Promise<void>;
+}
+
+export interface Ecosystem {
+  dataFoundation: any;
+  aiCapabilities: any;
+  applicationLayer: any;
+  integrationLayer: any;
+  governanceLayer: any;
+}
+
+export interface DataFoundation {
+  customerDataPlatform: any;
+  operationalData: any;
+  externalData: any;
+}
+
+export interface AICapabilities {
+  conversationalAI: any;
+  predictiveAI: any;
+  operationalAI: any;
+}
+
 export class EndToEndArchitecture {
   private dataHub: DataHub;
   private aiOrchestrator: AIOrchestrator;

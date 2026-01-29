@@ -677,7 +677,7 @@ export class AutonomousMarketingIntelligence {
 
   async analyzeCompetitors(competitorData: any[]): Promise<CompetitiveIntelligence> {
     return {
-      competitorAnalysis: await this.analyzeCompetitors(),
+      competitorAnalysis: await this.analyzeCompetitorsInternal(competitorData),
       marketPositioning: await this.analyzeMarketPositioning(),
       opportunityIdentification: await this.identifyCompetitiveOpportunities(),
       threatAssessment: await this.assessCompetitiveThreats()
@@ -1108,7 +1108,7 @@ export class AutonomousMarketingIntelligence {
     };
   }
 
-  private async analyzeCompetitors(): Promise<CompetitorAnalysis[]> {
+  private async analyzeCompetitorsInternal(competitorData: any[]): Promise<CompetitorAnalysis[]> {
     return [];
   }
 

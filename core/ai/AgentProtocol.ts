@@ -100,6 +100,9 @@ export interface AgentEvent {
 
 export interface AgentStats {
   totalMessages: number;
+  messagesReceived: number;
+  messagesProcessed: number;
+  messagesFailed: number;
   successfulCommands: number;
   failedCommands: number;
   avgResponseTime: number;

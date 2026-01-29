@@ -1,4 +1,11 @@
 // analytics/OmniChannelAnalytics.ts
+import {
+  DataUnifier,
+  InsightGenerator,
+  UnifiedAnalytics,
+  RealTimeDashboard
+} from './AIAnalyticsEngine';
+
 export class OmniChannelAnalytics {
   private dataUnifier: DataUnifier;
   private insightGenerator: InsightGenerator;

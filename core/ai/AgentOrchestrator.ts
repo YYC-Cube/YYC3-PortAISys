@@ -150,7 +150,7 @@ export class AgentOrchestrator extends EventEmitter {
    * 注册工作流
    */
   registerWorkflow(workflow: WorkflowDefinition): void {
-    this.validateWorkflow(workflow);
+    this.validateWorkflowInternal(workflow);
     this.workflows.set(workflow.id, workflow);
     this.emit('workflow:registered', { workflowId: workflow.id });
   }
@@ -163,9 +163,9 @@ export class AgentOrchestrator extends EventEmitter {
   }
 
   /**
-   * 验证工作流
+   * 验证工作流（内部方法）
    */
-  private validateWorkflow(workflow: WorkflowDefinition): void {
+  private validateWorkflowInternal(workflow: WorkflowDefinition): void {
     const hasStart = workflow.nodes.some(n => n.type === WorkflowNodeType.START);
     const hasEnd = workflow.nodes.some(n => n.type === WorkflowNodeType.END);
 
