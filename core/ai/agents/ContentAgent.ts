@@ -73,7 +73,7 @@ export class ContentAgent extends BaseAgent {
   private async handleUpdateContent(params: { content: any; cache?: boolean }): Promise<any> {
     if (!this.popup) {
       throw new YYC3ValidationError('智能体未绑定到弹窗', 'popup', {
-        additionalData: { agentId: this.id, command: 'updateContent' }
+        additionalData: { agentId: this.config.id, command: 'updateContent' }
       });
     }
 
@@ -106,7 +106,7 @@ export class ContentAgent extends BaseAgent {
   private async handleReloadContent(): Promise<any> {
     if (!this.popup) {
       throw new YYC3ValidationError('智能体未绑定到弹窗', 'popup', {
-        additionalData: { agentId: this.id, command: 'reloadContent' }
+        additionalData: { agentId: this.config.id, command: 'reloadContent' }
       });
     }
 
@@ -190,7 +190,7 @@ export class ContentAgent extends BaseAgent {
   private async handleRestoreContent(params: { historyIndex: number }): Promise<any> {
     if (!this.popup) {
       throw new YYC3ValidationError('智能体未绑定到弹窗', 'popup', {
-        additionalData: { agentId: this.id, command: 'restoreContent' }
+        additionalData: { agentId: this.config.id, command: 'restoreContent' }
       });
     }
 

@@ -294,6 +294,10 @@ export abstract class BaseAgent extends EventEmitter {
     return this.config.id;
   }
 
+  getName(): string {
+    return this.config.name || this.config.id;
+  }
+
   getCapabilities(): AgentCapability[] {
     return Array.from(this.capabilities.values());
   }

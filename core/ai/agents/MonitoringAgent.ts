@@ -10,6 +10,16 @@
 import { BaseAgent } from '../BaseAgent';
 import { AgentConfig } from '../AgentProtocol';
 
+declare global {
+  interface Performance {
+    memory?: {
+      usedJSHeapSize: number;
+      totalJSHeapSize: number;
+      jsHeapSizeLimit: number;
+    };
+  }
+}
+
 export interface PerformanceMetric {
   name: string;
   value: number;

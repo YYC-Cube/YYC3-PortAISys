@@ -71,7 +71,7 @@ export class LayoutAgent extends BaseAgent {
   private async handleMove(params: { x: number; y: number; animate?: boolean }): Promise<any> {
     if (!this.popup) {
       throw new YYC3ValidationError('智能体未绑定到弹窗', 'popup', {
-        additionalData: { agentId: this.id, command: 'move' }
+        additionalData: { agentId: this.config.id, command: 'move' }
       });
     }
 
@@ -90,7 +90,7 @@ export class LayoutAgent extends BaseAgent {
   private async handleResize(params: { width: number; height: number; animate?: boolean }): Promise<any> {
     if (!this.popup) {
       throw new YYC3ValidationError('智能体未绑定到弹窗', 'popup', {
-        additionalData: { agentId: this.id, command: 'resize' }
+        additionalData: { agentId: this.config.id, command: 'resize' }
       });
     }
 
@@ -125,7 +125,7 @@ export class LayoutAgent extends BaseAgent {
   private async handleMinimize(): Promise<any> {
     if (!this.popup) {
       throw new YYC3ValidationError('智能体未绑定到弹窗', 'popup', {
-        additionalData: { agentId: this.id, command: 'minimize' }
+        additionalData: { agentId: this.config.id, command: 'minimize' }
       });
     }
 
@@ -140,7 +140,7 @@ export class LayoutAgent extends BaseAgent {
   private async handleMaximize(): Promise<any> {
     if (!this.popup) {
       throw new YYC3ValidationError('智能体未绑定到弹窗', 'popup', {
-        additionalData: { agentId: this.id, command: 'maximize' }
+        additionalData: { agentId: this.config.id, command: 'maximize' }
       });
     }
 
@@ -155,7 +155,7 @@ export class LayoutAgent extends BaseAgent {
   private async handleRestore(): Promise<any> {
     if (!this.popup) {
       throw new YYC3ValidationError('智能体未绑定到弹窗', 'popup', {
-        additionalData: { agentId: this.id, command: 'restore' }
+        additionalData: { agentId: this.config.id, command: 'restore' }
       });
     }
 
