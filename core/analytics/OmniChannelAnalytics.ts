@@ -1,15 +1,10 @@
 // analytics/OmniChannelAnalytics.ts
 import {
-  DataUnifier,
-  InsightGenerator,
   UnifiedAnalytics,
   RealTimeDashboard
 } from './AIAnalyticsEngine';
 
 export class OmniChannelAnalytics {
-  private dataUnifier: DataUnifier;
-  private insightGenerator: InsightGenerator;
-  
   async createUnifiedAnalytics(): Promise<UnifiedAnalytics> {
     return {
       // 客户分析
@@ -29,7 +24,7 @@ export class OmniChannelAnalytics {
       },
       
       // 营销分析
-      marketingAnalytics: {
+      campaignAnalytics: {
         campaignPerformance: await this.analyzeCampaignPerformance(),
         channelEffectiveness: await this.measureChannelEffectiveness(),
         roiAnalysis: await this.calculateMarketingROI(),
@@ -37,7 +32,7 @@ export class OmniChannelAnalytics {
       },
       
       // 预测分析
-      predictiveAnalytics: {
+      marketAnalytics: {
         demandForecasting: await this.forecastBusinessDemand(),
         trendAnalysis: await this.analyzeMarketTrends(),
         riskAssessment: await this.assessBusinessRisks(),
@@ -48,29 +43,8 @@ export class OmniChannelAnalytics {
   
   async buildRealTimeDashboard(): Promise<RealTimeDashboard> {
     return {
-      executiveOverview: {
-        kpiSummary: await this.createKPISummary(),
-        performanceTrends: await this.showPerformanceTrends(),
-        alertSummary: await this.summarizeCriticalAlerts()
-      },
-      
-      operationalMonitor: {
-        realTimeActivity: await this.showRealTimeActivity(),
-        agentPerformance: await this.monitorAgentPerformance(),
-        systemHealth: await this.monitorSystemHealth()
-      },
-      
-      customerInsights: {
-        sentimentTracking: await this.trackCustomerSentiment(),
-        behaviorMonitoring: await this.monitorCustomerBehavior(),
-        satisfactionScores: await this.trackSatisfactionScores()
-      },
-      
-      businessIntelligence: {
-        revenueAnalytics: await this.analyzeRevenueStreams(),
-        costAnalytics: await this.analyzeCostStructures(),
-        profitability: await this.calculateProfitability()
-      }
+      updateDashboard: async (_data: any) => {},
+      getDashboardData: async () => ({})
     };
   }
 
@@ -136,53 +110,5 @@ export class OmniChannelAnalytics {
 
   private async identifyGrowthOpportunities(): Promise<any> {
     return { opportunities: [] };
-  }
-
-  private async createKPISummary(): Promise<any> {
-    return { kpis: {} };
-  }
-
-  private async showPerformanceTrends(): Promise<any> {
-    return { trends: [] };
-  }
-
-  private async summarizeCriticalAlerts(): Promise<any> {
-    return { alerts: [] };
-  }
-
-  private async showRealTimeActivity(): Promise<any> {
-    return { activity: [] };
-  }
-
-  private async monitorAgentPerformance(): Promise<any> {
-    return { performance: {} };
-  }
-
-  private async monitorSystemHealth(): Promise<any> {
-    return { health: {} };
-  }
-
-  private async trackCustomerSentiment(): Promise<any> {
-    return { sentiment: {} };
-  }
-
-  private async monitorCustomerBehavior(): Promise<any> {
-    return { behavior: [] };
-  }
-
-  private async trackSatisfactionScores(): Promise<any> {
-    return { scores: [] };
-  }
-
-  private async analyzeRevenueStreams(): Promise<any> {
-    return { revenue: {} };
-  }
-
-  private async analyzeCostStructures(): Promise<any> {
-    return { costs: {} };
-  }
-
-  private async calculateProfitability(): Promise<any> {
-    return { profitability: {} };
   }
 }

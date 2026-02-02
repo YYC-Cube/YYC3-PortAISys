@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { ServiceRegistry, ServiceInfo } from '../service-registry/ServiceRegistry';
+import { ServiceRegistry } from '../service-registry/ServiceRegistry';
 
 export interface AutoScalingConfig {
   serviceType: string;
@@ -378,8 +378,6 @@ export class EnhancedAutoScalingManager {
       return this.evaluatePolynomial(coefficients, predictAt);
     };
 
-    const latestMetrics = recentMetrics[recentMetrics.length - 1];
-
     return {
       serviceId: 'predicted',
       cpuUsage: Math.max(0, Math.min(100, fitPolynomial(recentMetrics.map(m => m.cpuUsage), 2))),
@@ -400,8 +398,6 @@ export class EnhancedAutoScalingManager {
   private neuralNetworkPrediction(metrics: ServiceMetrics[], predictionTime: number): ServiceMetrics {
     const sortedMetrics = metrics.sort((a, b) => a.timestamp - b.timestamp);
     const recentMetrics = sortedMetrics.slice(-30);
-
-    const latestMetrics = recentMetrics[recentMetrics.length - 1];
 
     const movingAverage = (values: number[], window: number) => {
       const result: number[] = [];
@@ -587,7 +583,7 @@ export class EnhancedAutoScalingManager {
 
   private calculatePredictionConfidence(
     metrics: ServiceMetrics[],
-    predictedMetrics: ServiceMetrics
+    _predictedMetrics: ServiceMetrics
   ): number {
     const recentMetrics = metrics.slice(-10);
     if (recentMetrics.length < 5) {
@@ -611,7 +607,7 @@ export class EnhancedAutoScalingManager {
   private determineRecommendedAction(
     recommendedInstances: number,
     currentInstances: number,
-    config: AutoScalingConfig
+    _config: AutoScalingConfig
   ): 'scale_up' | 'scale_down' | 'no_action' {
     const threshold = 0.1;
     const changeRatio = Math.abs(recommendedInstances - currentInstances) / currentInstances;
@@ -872,7 +868,7 @@ export class EnhancedAutoScalingManager {
     }
   }
 
-  private updateCostTracking(serviceType: string, metrics: ServiceMetrics): void {
+  private updateCostTracking(serviceType: string, _metrics: ServiceMetrics): void {
     const currentInstances = this.getCurrentInstanceCount(serviceType);
     const instanceCost = 0.1;
     const totalCost = currentInstances * instanceCost;

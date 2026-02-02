@@ -1,9 +1,8 @@
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   CacheEntry,
   CacheLevelStats,
   MultiLevelCacheStats,
-  CacheStrategy,
   CacheConfig
 } from './types';
 
@@ -305,26 +304,6 @@ export class MultiLevelCache extends EventEmitter {
     }
   }
 
-  private async evictFromL3(): Promise<void> {
-    const strategy = this.config.l3.strategy;
-    let keyToDelete: string | null = null;
-
-    if (strategy === 'lru') {
-      keyToDelete = this.findLRU(this.l3Cache);
-    } else if (strategy === 'lfu') {
-      keyToDelete = this.findLFU(this.l3Cache);
-    } else if (strategy === 'ttl') {
-      keyToDelete = this.findShortestTTL(this.l3Cache);
-    }
-
-    if (keyToDelete) {
-      this.l3Cache.delete(keyToDelete);
-      this.l3Stats.size--;
-      this.l3Stats.evictions++;
-      this.emit('cache:evict', { level: 'l3', key: keyToDelete });
-    }
-  }
-
   private findLRU(cache: Map<string, CacheEntry<any>>): string | null {
     let oldestKey: string | null = null;
     let oldestTime = Infinity;
@@ -376,8 +355,6 @@ export class MultiLevelCache extends EventEmitter {
   }
 
   private cleanupExpiredEntries(): void {
-    const now = Date.now();
-
     for (const [key, entry] of this.l1Cache.entries()) {
       if (this.isExpired(entry)) {
         this.l1Cache.delete(key);
@@ -402,7 +379,7 @@ export class MultiLevelCache extends EventEmitter {
     this.emit('cache:cleanup');
   }
 
-  private async fetchFromSource<T>(key: string): Promise<T | null> {
+  private async fetchFromSource<T>(_key: string): Promise<T | null> {
     return null;
   }
 

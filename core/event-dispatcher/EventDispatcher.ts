@@ -7,7 +7,7 @@
  * @created 2025-01-30
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface SystemEvent {
   id: string;
@@ -51,7 +51,6 @@ export class EventDispatcher extends EventEmitter {
   private handlers: Map<string, EventHandler[]> = new Map();
   private eventHistory: SystemEvent[] = [];
   private metrics: EventMetrics;
-  private processingQueue: Map<string, Promise<void>> = new Map();
 
   constructor(config: EventDispatcherConfig = {}) {
     super();
@@ -141,30 +140,14 @@ export class EventDispatcher extends EventEmitter {
     return handlerId;
   }
 
-  on(
-    eventType: string,
-    handler: (...args: any[]) => void,
-    options?: {
-      filter?: (event: SystemEvent) => boolean;
-      priority?: number;
-      once?: boolean;
-    }
-  ): this {
-    return super.on(eventType, handler);
-  }
-
   onceEvent(
     eventType: string,
-    handler: (event: SystemEvent) => Promise<void> | void,
-    options: {
-      filter?: (event: SystemEvent) => boolean;
-      priority?: number;
-    } = {}
+    handler: (event: SystemEvent) => Promise<void> | void
   ): string {
-    return this.onEvent(eventType, handler, { ...options, once: true });
+    return this.onEvent(eventType, handler, { once: true });
   }
 
-  off(handlerId: string): void {
+  offEvent(handlerId: string): void {
     for (const [eventType, handlers] of this.handlers.entries()) {
       const index = handlers.findIndex(h => h.id === handlerId);
       if (index !== -1) {

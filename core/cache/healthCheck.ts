@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   HealthCheckConfig,
   HealthCheckResult,
@@ -116,7 +116,6 @@ export class HealthChecker extends EventEmitter {
       }
 
       if (result.status === 'pass') {
-        const failures = this.consecutiveFailures.get(serverId) || 0;
         this.consecutiveFailures.set(serverId, 0);
 
         const successes = (this.consecutiveSuccesses.get(serverId) || 0) + 1;
@@ -126,7 +125,6 @@ export class HealthChecker extends EventEmitter {
           this.emit('server:healthy', { serverId, result });
         }
       } else {
-        const successes = this.consecutiveSuccesses.get(serverId) || 0;
         this.consecutiveSuccesses.set(serverId, 0);
 
         const failures = (this.consecutiveFailures.get(serverId) || 0) + 1;

@@ -10,7 +10,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface ExecutionConfig {
   enabled?: boolean;
@@ -131,7 +131,7 @@ export class ExecutionSystem extends EventEmitter {
 
     this.config = {
       enabled: true,
-      maxConcurrentTasks: 5,
+      maxConcurrentTasks: 10,
       taskTimeout: 30000,
       enableRetry: true,
       maxRetries: 3,
@@ -140,9 +140,6 @@ export class ExecutionSystem extends EventEmitter {
       enableTaskDependencies: true,
       enableWorkflow: true,
       enableResourceManagement: true,
-      onTaskComplete: undefined,
-      onTaskFailed: undefined,
-      onWorkflowComplete: undefined,
       ...config,
     };
 

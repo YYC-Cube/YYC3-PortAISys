@@ -13,7 +13,6 @@ import { AgentConfig } from '../AgentProtocol';
 export class AssistantAgent extends BaseAgent {
   private conversationHistory: any[] = [];
   private contextMemory: Map<string, any> = new Map();
-  private suggestions: string[] = [];
 
   constructor(config: AgentConfig) {
     super(config);

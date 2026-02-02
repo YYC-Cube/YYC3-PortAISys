@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { ServiceRegistry, ServiceInfo } from '../service-registry/ServiceRegistry';
+import { ServiceRegistry } from '../service-registry/ServiceRegistry';
 
 export interface AutoScalingConfig {
   serviceType: string;

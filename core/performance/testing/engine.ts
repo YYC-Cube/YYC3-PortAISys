@@ -7,7 +7,7 @@
  * @created 2026-01-07
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   PerformanceTestConfig,
   PerformanceTestResult,
@@ -267,7 +267,7 @@ class PerformanceTestRunnerImpl implements PerformanceTestRunner {
     this.logger.info(`测试执行完成`);
   }
 
-  private async executeRequests(concurrency: number, duration: number): Promise<void> {
+  private async executeRequests(concurrency: number, _duration: number): Promise<void> {
     const promises: Promise<void>[] = [];
 
     for (let i = 0; i < concurrency; i++) {
@@ -285,7 +285,7 @@ class PerformanceTestRunnerImpl implements PerformanceTestRunner {
     const startTime = Date.now();
 
     try {
-      const result = await this.mockRequest();
+      await this.mockRequest();
       const endTime = Date.now();
       const responseTime = endTime - startTime;
 

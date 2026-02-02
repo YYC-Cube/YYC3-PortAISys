@@ -8,6 +8,7 @@
  */
 
 import { ModelAdapter, ModelAdapterConfig, IModelAdapter } from './ModelAdapter';
+import { logger } from '../utils/logger';
 import {
   ModelProvider,
   ChatRequest,
@@ -57,7 +58,7 @@ interface AnthropicMessageResponse {
  * 5. 完整的日志和监控
  */
 export class AnthropicAdapter extends ModelAdapter implements IModelAdapter {
-  private config: AnthropicConfig;
+  protected config: AnthropicConfig;
   private defaultModel: string = 'claude-3-opus-20240229';
 
   constructor(config: AnthropicConfig) {

@@ -185,7 +185,7 @@ export class ServiceRegistry {
           }
         } catch (error) {
           service.status = 'unhealthy';
-          this.emit('serviceHealthCheckFailed', { serviceId, error: error.message });
+          this.emit('serviceHealthCheckFailed', { serviceId, error: error instanceof Error ? error.message : String(error) });
         }
 
         this.services.set(serviceId, service);

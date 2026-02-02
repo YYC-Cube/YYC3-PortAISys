@@ -1,0 +1,207 @@
+# OWASP ZAP Rules Configuration
+# This file defines the rules for OWASP ZAP security scanning
+
+# Rule ID	Rule Name	Enabled	Level	Strength
+
+# Information Disclosure
+0	Information Disclosure: Referrer Header	TRUE	LOW	LOW
+10021	Information Disclosure: In Script	TRUE	MEDIUM	MEDIUM
+10024	Information Disclosure: Suspicious Comments	TRUE	LOW	LOW
+10027	Information Disclosure: Debug Error Messages	TRUE	MEDIUM	MEDIUM
+10029	Information Disclosure: Username Hash Found	TRUE	LOW	LOW
+10033	Information Disclosure: Cacheable	TRUE	LOW	LOW
+10035	Information Disclosure: Cookies	TRUE	LOW	LOW
+10036	Information Disclosure: HTTP Response Header	TRUE	LOW	LOW
+10037	Information Disclosure: Strict-Transport-Security	TRUE	MEDIUM	MEDIUM
+10038	Information Disclosure: X-Content-Type-Options	TRUE	LOW	LOW
+10039	Information Disclosure: X-Frame-Options	TRUE	MEDIUM	MEDIUM
+10041	Information Disclosure: Content Security Policy (CSP)	TRUE	MEDIUM	MEDIUM
+10044	Information Disclosure: Cross-Domain JavaScript Source File Inclusion	TRUE	LOW	LOW
+10048	Information Disclosure: Reflected Cross Site Scripting (XSS)	TRUE	MEDIUM	MEDIUM
+10049	Information Disclosure: X-AspNet-Version Response Header	TRUE	LOW	LOW
+10050	Information Disclosure: X-Powered-By	TRUE	LOW	LOW
+10054	Information Disclosure: Timestamp Disclosure	TRUE	LOW	LOW
+10055	Information Disclosure: Charset Mismatch	TRUE	LOW	LOW
+10056	Information Disclosure: Permissions Policy Header	TRUE	LOW	LOW
+10057	Information Disclosure: Server Leaks Information via "X-Powered-By" HTTP Response Header Field(s)	TRUE	LOW	LOW
+10061	Information Disclosure: In URL	TRUE	LOW	LOW
+10062	Information Disclosure: Query String in POST Request	TRUE	LOW	LOW
+10096	Information Disclosure: Comments	TRUE	LOW	LOW
+10097	Information Disclosure: Debug Error Message	TRUE	MEDIUM	MEDIUM
+10098	Information Disclosure: Source Code	TRUE	HIGH	HIGH
+10104	Information Disclosure: Suspicious Comments	TRUE	LOW	LOW
+10105	Information Disclosure: HTTP Parameter Pollution (HPP)	TRUE	MEDIUM	MEDIUM
+10108	Information Disclosure: Private IP Disclosure	TRUE	LOW	LOW
+10109	Information Disclosure: Script File Inclusion	TRUE	LOW	LOW
+10115	Information Disclosure: Cookie Without SameSite Attribute	TRUE	LOW	LOW
+10116	Information Disclosure: Cookie Without Secure Attribute	TRUE	MEDIUM	MEDIUM
+10117	Information Disclosure: Cookie Without HttpOnly Attribute	TRUE	MEDIUM	MEDIUM
+
+# Injection
+10033	Injection	TRUE	HIGH	HIGH
+10045	SQL Injection	TRUE	HIGH	HIGH
+10062	SQL Injection - MySQL	TRUE	HIGH	HIGH
+10063	SQL Injection - Oracle	TRUE	HIGH	HIGH
+10064	SQL Injection - PostgreSQL	TRUE	HIGH	HIGH
+10065	SQL Injection - SQL Server	TRUE	HIGH	HIGH
+10066	SQL Injection - H2	TRUE	HIGH	HIGH
+10067	SQL Injection - SQLite	TRUE	HIGH	HIGH
+10068	SQL Injection - Generic	TRUE	HIGH	HIGH
+10096	SQL Injection - Time Based	TRUE	HIGH	HIGH
+10097	SQL Injection - Boolean Based	TRUE	HIGH	HIGH
+10098	SQL Injection - Error Based	TRUE	HIGH	HIGH
+10109	SQL Injection - Stacked Queries	TRUE	HIGH	HIGH
+10110	SQL Injection - Union Based	TRUE	HIGH	HIGH
+10111	SQL Injection - Blind	TRUE	HIGH	HIGH
+10112	SQL Injection - Out-of-Band	TRUE	HIGH	HIGH
+10113	SQL Injection - Second Order	TRUE	HIGH	HIGH
+10114	SQL Injection - NoSQL	TRUE	HIGH	HIGH
+10115	SQL Injection - LDAP	TRUE	HIGH	HIGH
+10116	SQL Injection - XPath	TRUE	HIGH	HIGH
+10117	SQL Injection - XML	TRUE	HIGH	HIGH
+10118	SQL Injection - Command Injection	TRUE	HIGH	HIGH
+10119	SQL Injection - Code Injection	TRUE	HIGH	HIGH
+10120	SQL Injection - Template Injection	TRUE	HIGH	HIGH
+10121	SQL Injection - Expression Language Injection	TRUE	HIGH	HIGH
+10122	SQL Injection - OGNL Injection	TRUE	HIGH	HIGH
+10123	SQL Injection - SpEL Injection	TRUE	HIGH	HIGH
+10124	SQL Injection - EL Injection	TRUE	HIGH	HIGH
+10125	SQL Injection - SSTI	TRUE	HIGH	HIGH
+10126	SQL Injection - RCE	TRUE	HIGH	HIGH
+10127	SQL Injection - XXE	TRUE	HIGH	HIGH
+10128	SQL Injection - SSRF	TRUE	HIGH	HIGH
+10129	SQL Injection - File Inclusion	TRUE	HIGH	HIGH
+10130	SQL Injection - File Upload	TRUE	HIGH	HIGH
+10131	SQL Injection - Path Traversal	TRUE	HIGH	HIGH
+10132	SQL Injection - Open Redirect	TRUE	HIGH	HIGH
+10133	SQL Injection - CSRF	TRUE	HIGH	HIGH
+10134	SQL Injection - XSS	TRUE	HIGH	HIGH
+10135	SQL Injection - HTML Injection	TRUE	HIGH	HIGH
+10136	SQL Injection - JavaScript Injection	TRUE	HIGH	HIGH
+10137	SQL Injection - CSS Injection	TRUE	HIGH	HIGH
+10138	SQL Injection - URL Injection	TRUE	HIGH	HIGH
+10139	SQL Injection - Header Injection	TRUE	HIGH	HIGH
+10140	SQL Injection - Cookie Injection	TRUE	HIGH	HIGH
+10141	SQL Injection - Form Injection	TRUE	HIGH	HIGH
+10142	SQL Injection - JSON Injection	TRUE	HIGH	HIGH
+10143	SQL Injection - XML Injection	TRUE	HIGH	HIGH
+10144	SQL Injection - YAML Injection	TRUE	HIGH	HIGH
+10145	SQL Injection - CSV Injection	TRUE	HIGH	HIGH
+10146	SQL Injection - PDF Injection	TRUE	HIGH	HIGH
+10147	SQL Injection - Image Injection	TRUE	HIGH	HIGH
+10148	SQL Injection - Video Injection	TRUE	HIGH	HIGH
+10149	SQL Injection - Audio Injection	TRUE	HIGH	HIGH
+10150	SQL Injection - Archive Injection	TRUE	HIGH	HIGH
+
+# Cross-Site Scripting (XSS)
+10041	Cross Site Scripting (Reflected)	TRUE	HIGH	HIGH
+10042	Cross Site Scripting (Stored)	TRUE	HIGH	HIGH
+10043	Cross Site Scripting (DOM Based)	TRUE	HIGH	HIGH
+10044	Cross Site Scripting (Generic)	TRUE	HIGH	HIGH
+10045	Cross Site Scripting (HTML Injection)	TRUE	HIGH	HIGH
+10046	Cross Site Scripting (JavaScript Injection)	TRUE	HIGH	HIGH
+10047	Cross Site Scripting (CSS Injection)	TRUE	HIGH	HIGH
+10048	Cross Site Scripting (URL Injection)	TRUE	HIGH	HIGH
+10049	Cross Site Scripting (Header Injection)	TRUE	HIGH	HIGH
+10050	Cross Site Scripting (Cookie Injection)	TRUE	HIGH	HIGH
+10051	Cross Site Scripting (Form Injection)	TRUE	HIGH	HIGH
+10052	Cross Site Scripting (JSON Injection)	TRUE	HIGH	HIGH
+10053	Cross Site Scripting (XML Injection)	TRUE	HIGH	HIGH
+10054	Cross Site Scripting (YAML Injection)	TRUE	HIGH	HIGH
+10055	Cross Site Scripting (CSV Injection)	TRUE	HIGH	HIGH
+10056	Cross Site Scripting (PDF Injection)	TRUE	HIGH	HIGH
+10057	Cross Site Scripting (Image Injection)	TRUE	HIGH	HIGH
+10058	Cross Site Scripting (Video Injection)	TRUE	HIGH	HIGH
+10059	Cross Site Scripting (Audio Injection)	TRUE	HIGH	HIGH
+10060	Cross Site Scripting (Archive Injection)	TRUE	HIGH	HIGH
+
+# Broken Authentication
+10020	Broken Access Control	TRUE	HIGH	HIGH
+10021	Directory Listing	TRUE	MEDIUM	MEDIUM
+10022	Broken Authentication	TRUE	HIGH	HIGH
+10023	Session Management	TRUE	HIGH	HIGH
+10024	Session Fixation	TRUE	HIGH	HIGH
+10025	Session Hijacking	TRUE	HIGH	HIGH
+10026	Privilege Escalation	TRUE	HIGH	HIGH
+10027	Authorization Bypass	TRUE	HIGH	HIGH
+10028	Authentication Bypass	TRUE	HIGH	HIGH
+10029	Access Control	TRUE	HIGH	HIGH
+10030	Privilege Escalation	TRUE	HIGH	HIGH
+10031	Authorization Bypass	TRUE	HIGH	HIGH
+10032	Authentication Bypass	TRUE	HIGH	HIGH
+10033	Access Control	TRUE	HIGH	HIGH
+10034	Privilege Escalation	TRUE	HIGH	HIGH
+10035	Authorization Bypass	TRUE	HIGH	HIGH
+10036	Authentication Bypass	TRUE	HIGH	HIGH
+10037	Access Control	TRUE	HIGH	HIGH
+10038	Privilege Escalation	TRUE	HIGH	HIGH
+10039	Authorization Bypass	TRUE	HIGH	HIGH
+10040	Authentication Bypass	TRUE	HIGH	HIGH
+
+# Security Misconfiguration
+10000	Anti-CSRF Tokens Check	TRUE	MEDIUM	MEDIUM
+10002	Content Security Policy (CSP) Header Not Set	TRUE	MEDIUM	MEDIUM
+10003	Cross-Domain JavaScript Source File Inclusion	TRUE	LOW	LOW
+10004	Content-Type Header Missing	TRUE	LOW	LOW
+10005	Directory Browsing	TRUE	MEDIUM	MEDIUM
+10006	Heartbleed OpenSSL Vulnerability	TRUE	HIGH	HIGH
+10007	HTTP Server Header Field	TRUE	LOW	LOW
+10008	HTTP to HTTPS Insecure Transition in Form Post	TRUE	MEDIUM	MEDIUM
+10009	HTTPS Content Available via HTTP	TRUE	MEDIUM	MEDIUM
+10010	HTTPoxy	TRUE	HIGH	HIGH
+10011	HTTP Parameter Pollution	TRUE	MEDIUM	MEDIUM
+10012	HTTP Response Splitting	TRUE	MEDIUM	MEDIUM
+10013	HTTP Strict Transport Security (HSTS) Header Not Set	TRUE	MEDIUM	MEDIUM
+10014	HTTP to HTTPS Insecure Transition in Hyperlink	TRUE	MEDIUM	MEDIUM
+10015	HTTP to HTTPS Insecure Transition in CSS	TRUE	MEDIUM	MEDIUM
+10016	HTTP to HTTPS Insecure Transition in JavaScript	TRUE	MEDIUM	MEDIUM
+10017	HTTP to HTTPS Insecure Transition in Image	TRUE	MEDIUM	MEDIUM
+10018	HTTP to HTTPS Insecure Transition in Form	TRUE	MEDIUM	MEDIUM
+10019	HTTP to HTTPS Insecure Transition in Frame	TRUE	MEDIUM	MEDIUM
+10020	HTTP to HTTPS Insecure Transition in Object	TRUE	MEDIUM	MEDIUM
+10021	HTTP to HTTPS Insecure Transition in Embed	TRUE	MEDIUM	MEDIUM
+10022	HTTP to HTTPS Insecure Transition in Link	TRUE	MEDIUM	MEDIUM
+10023	HTTP to HTTPS Insecure Transition in Script	TRUE	MEDIUM	MIGH
+10024	HTTP to HTTPS Insecure Transition in Style	TRUE	MEDIUM	MEDIUM
+10025	HTTP to HTTPS Insecure Transition in Iframe	TRUE	MEDIUM	MEDIUM
+10026	HTTP to HTTPS Insecure Transition in Video	TRUE	MEDIUM	MEDIUM
+10027	HTTP to HTTPS Insecure Transition in Audio	TRUE	MEDIUM	MEDIUM
+10028	HTTP to HTTPS Insecure Transition in Source	TRUE	MEDIUM	MEDIUM
+10029	HTTP to HTTPS Insecure Transition in Track	TRUE	MEDIUM	MEDIUM
+10030	HTTP to HTTPS Insecure Transition in Input	TRUE	MEDIUM	MEDIUM
+10031	HTTP to HTTPS Insecure Transition in Button	TRUE	MEDIUM	MEDIUM
+10032	HTTP to HTTPS Insecure Transition in Select	TRUE	MEDIUM	MEDIUM
+10033	HTTP to HTTPS Insecure Transition in Textarea	TRUE	MEDIUM	MEDIUM
+10034	HTTP to HTTPS Insecure Transition in Keygen	TRUE	MEDIUM	MEDIUM
+10035	HTTP to HTTPS Insecure Transition in Label	TRUE	MEDIUM	MEDIUM
+10036	HTTP to HTTPS Insecure Transition in Fieldset	TRUE	MEDIUM	MEDIUM
+10037	HTTP to HTTPS Insecure Transition in Legend	TRUE	MEDIUM	MEDIUM
+10038	HTTP to HTTPS Insecure Transition in Datalist	TRUE	MEDIUM	MEDIUM
+10039	HTTP to HTTPS Insecure Transition in Optgroup	TRUE	MEDIUM	MEDIUM
+10040	HTTP to HTTPS Insecure Transition in Option	TRUE	MEDIUM	MEDIUM
+10041	HTTP to HTTPS Insecure Transition in Progress	TRUE	MEDIUM	MEDIUM
+10042	HTTP to HTTPS Insecure Transition in Meter	TRUE	MEDIUM	MEDIUM
+10043	HTTP to HTTPS Insecure Transition in Output	TRUE	MEDIUM	MEDIUM
+10044	HTTP to HTTPS Insecure Transition in Details	TRUE	MEDIUM	MEDIUM
+10045	HTTP to HTTPS Insecure Transition in Summary	TRUE	MEDIUM	MEDIUM
+10046	HTTP to HTTPS Insecure Transition in Command	TRUE	MEDIUM	MEDIUM
+10047	HTTP to HTTPS Insecure Transition in Menu	TRUE	MEDIUM	MEDIUM
+10048	HTTP to HTTPS Insecure Transition in Menuitem	TRUE	MEDIUM	MEDIUM
+10049	HTTP to HTTPS Insecure Transition in Dialog	TRUE	MEDIUM	MEDIUM
+10050	HTTP to HTTPS Insecure Transition in Script	TRUE	MEDIUM	MEDIUM
+10051	HTTP to HTTPS Insecure Transition in Noframes	TRUE	MEDIUM	MEDIUM
+10052	HTTP to HTTPS Insecure Transition in Iframe	TRUE	MEDIUM	MEDIUM
+10053	HTTP to HTTPS Insecure Transition in Frameset	TRUE	MEDIUM	MEDIUM
+10054	HTTP to HTTPS Insecure Transition in Frame	TRUE	MEDIUM	MEDIUM
+10055	HTTP to HTTPS Insecure Transition in Object	TRUE	MEDIUM	MEDIUM
+10056	HTTP to HTTPS Insecure Transition in Embed	TRUE	MEDIUM	MEDIUM
+10057	HTTP to HTTPS Insecure Transition in Applet	TRUE	MEDIUM	MEDIUM
+10058	HTTP to HTTPS Insecure Transition in Param	TRUE	MEDIUM	MEDIUM
+10059	HTTP to HTTPS Insecure Transition in Source	TRUE	MEDIUM	MEDIUM
+10060	HTTP to HTTPS Insecure Transition in Track	TRUE	MEDIUM	MEDIUM
+10061	HTTP to HTTPS Insecure Transition in Wbr	TRUE	MEDIUM	MEDIUM
+10062	HTTP to HTTPS Insecure Transition in Area	TRUE	MEDIUM	MEDIUM
+10063	HTTP to HTTPS Insecure Transition in Map	TRUE	MEDIUM	MEDIUM
+10064	HTTP to HTTPS Insecure Transition in Canvas	TRUE	MEDIUM	MEDIUM
+10065	HTTP to HTTPS Insecure Transition in Audio	TRUE	MEDIUM	MEDIUM
+10066	HTTP to HTTPS Insecure Transition in Video	TRUE	MEDIUM	MEDIUM

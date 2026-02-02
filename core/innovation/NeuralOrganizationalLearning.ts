@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface NeuralOrganizationalLearningConfig {
   maxNetworkNodes: number;
@@ -312,15 +312,13 @@ export interface EmergentIntelligenceOptimization {
 }
 
 export class NeuralOrganizationalLearning extends EventEmitter {
-  private config: NeuralOrganizationalLearningConfig;
   private organizationalNetwork: Map<string, any>;
   private collectiveMemory: Map<string, any>;
   private emergentIntelligence: Map<string, any>;
   private learningHistory: Map<string, any>;
 
-  constructor(config: NeuralOrganizationalLearningConfig) {
+  constructor(_config: NeuralOrganizationalLearningConfig) {
     super();
-    this.config = config;
     this.organizationalNetwork = new Map();
     this.collectiveMemory = new Map();
     this.emergentIntelligence = new Map();
@@ -892,7 +890,7 @@ export class NeuralOrganizationalLearning extends EventEmitter {
     });
   }
 
-  private generateLearningKey(item: any): string {
+  private generateLearningKey(_item: any): string {
     return `learning-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 

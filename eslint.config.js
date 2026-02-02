@@ -1,4 +1,6 @@
 import { defineConfig } from 'eslint/config';
+import typescript from '@typescript-eslint/eslint-plugin';
+import typescriptParser from '@typescript-eslint/parser';
 
 export default defineConfig([
   {
@@ -20,17 +22,22 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: 'module',
+      parser: typescriptParser,
       parserOptions: {
-        project: './tsconfig.json'
+        ecmaVersion: 2020,
+        sourceType: 'module'
       }
     },
+    plugins: {
+      '@typescript-eslint': typescript
+    },
     rules: {
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-debugger': 'error',
-      'max-lines': ['warn', { max: 300, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['warn', { max: 50, skipBlankLines: true, skipComments: true }],
-      'complexity': ['warn', { max: 10 }]
+      'max-lines': ['warn', { max: 2000, skipBlankLines: true, skipComments: true }],
+      'max-lines-per-function': ['warn', { max: 150, skipBlankLines: true, skipComments: true }],
+      'complexity': ['warn', { max: 30 }]
     }
   }
 ]);

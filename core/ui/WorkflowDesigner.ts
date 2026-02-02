@@ -7,7 +7,7 @@
  * @created 2025-01-30
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   IWorkflowDesigner,
   Workflow,
@@ -142,7 +142,7 @@ export class WorkflowDesigner extends EventEmitter implements IWorkflowDesigner 
     }
 
     if (workflow.nodes.find(n => n.id === node.id)) {
-      throw new ConflictError('Node with this id already exists', 'node', {
+      throw new ConflictError('Node with this id already exists', {
         additionalData: { nodeId: node.id, existingNodes: workflow.nodes.map(n => n.id) }
       });
     }
@@ -204,7 +204,7 @@ export class WorkflowDesigner extends EventEmitter implements IWorkflowDesigner 
     }
 
     if (workflow.edges.find(e => e.id === edge.id)) {
-      throw new ConflictError('Edge with this id already exists', 'edge', {
+      throw new ConflictError('Edge with this id already exists', {
         additionalData: { edgeId: edge.id, existingEdges: workflow.edges.map(e => e.id) }
       });
     }
@@ -411,7 +411,7 @@ export class WorkflowDesigner extends EventEmitter implements IWorkflowDesigner 
         level: 'info',
       });
 
-      const nodeOutput = await this.executeNode(currentNode, workflow.variables);
+      const nodeOutput = await this.executeNode(currentNode, workflow.variables || {});
       outputs[currentNode.id] = nodeOutput;
 
       const outgoingEdges = workflow.edges.filter(e => e.sourceNodeId === currentNode.id);
@@ -427,7 +427,7 @@ export class WorkflowDesigner extends EventEmitter implements IWorkflowDesigner 
     return outputs;
   }
 
-  private async executeNode(node: WorkflowNode, variables: Record<string, any>): Promise<any> {
+  private async executeNode(node: WorkflowNode, _variables: Record<string, any>): Promise<any> {
     await new Promise(resolve => setTimeout(resolve, 100));
     
     switch (node.type) {

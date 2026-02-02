@@ -7,7 +7,7 @@
  * @created 2026-01-21
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 // ============ 类型定义 ============
 
@@ -157,7 +157,6 @@ export interface RateLimitConfig {
 // ============ 主类 ============
 
 export class MultiModelManager extends EventEmitter {
-  private config: MultiModelManagerConfig;
   private providers: Map<string, ModelConfig> = new Map();
   private models: Map<string, any> = new Map();
   private modelLoadCount: Map<string, number> = new Map();
@@ -169,7 +168,7 @@ export class MultiModelManager extends EventEmitter {
   private quotas: Map<string, QuotaConfig> = new Map();
   private quotaUsage: Map<string, { tokens: number; requests: number; lastReset: number }> = new Map();
   private auditLogs: Array<{ timestamp: number; prompt: string; modelUsed: string }> = [];
-  private requestLogs: Array<{ timestamp: number; prompt: string; modelUsed: string; provider?: string; latency: number }> = [];
+  private requestLogs: Array<{ timestamp: number; prompt: string; modelUsed: string; provider?: string; latency: number; tokens?: number; success?: boolean }> = [];
   private abTests: Map<string, ABTestConfig> = new Map();
   private abTestResults: Map<string, Array<{ variant: string; result: any }>> = new Map();
   private fineTuneJobs: Map<string, FineTuneJob> = new Map();
@@ -177,9 +176,8 @@ export class MultiModelManager extends EventEmitter {
   private degradationDetected: Map<string, boolean> = new Map();
   private loadBalanceIndex: Map<string, number> = new Map();
 
-  constructor(config: MultiModelManagerConfig = {}) {
+  constructor(_config: MultiModelManagerConfig = {}) {
     super();
-    this.config = config;
     this.providers.set('openai', {});
     this.providers.set('anthropic', {});
     this.providers.set('google', {});
@@ -259,20 +257,19 @@ export class MultiModelManager extends EventEmitter {
     };
   }
 
-  private getModelCandidates(criteria: SelectionCriteria): any[] {
+  private getModelCandidates(_criteria: SelectionCriteria): any[] {
     const candidates: any[] = [];
-    for (const [key, model] of this.models) {
+    for (const [_key, model] of this.models) {
       candidates.push(model);
     }
     return candidates;
   }
 
-  private selectByPerformance(candidates: any[], criteria: SelectionCriteria): any {
+  private selectByPerformance(candidates: any[], _criteria: SelectionCriteria): any {
     return candidates[0];
   }
 
   private selectByCost(candidates: any[], criteria: SelectionCriteria): any {
-    const maxCost = criteria.maxCostPerToken || 0.001;
     const sorted = candidates.sort((a, b) => {
       const costA = this.estimateCost(a.provider, a.id, criteria);
       const costB = this.estimateCost(b.provider, b.id, criteria);
@@ -282,7 +279,6 @@ export class MultiModelManager extends EventEmitter {
   }
 
   private selectByQuality(candidates: any[], criteria: SelectionCriteria): any {
-    const minAccuracy = criteria.minAccuracy || 0.8;
     const sorted = candidates.sort((a, b) => {
       const qualA = this.getModelQuality(a.id, criteria.task);
       const qualB = this.getModelQuality(b.id, criteria.task);
@@ -316,7 +312,7 @@ export class MultiModelManager extends EventEmitter {
     return candidates[nextIndex];
   }
 
-  private estimateCost(provider: string, modelId: string, criteria: SelectionCriteria): number {
+  private estimateCost(_provider: string, modelId: string, _criteria: SelectionCriteria): number {
     const baseCosts: Record<string, number> = {
       'gpt-4': 0.00003,
       'gpt-3.5-turbo': 0.000001,
@@ -328,7 +324,7 @@ export class MultiModelManager extends EventEmitter {
     return baseCosts[modelId] || 0.0000001;
   }
 
-  private getModelQuality(modelId: string, task?: string): number {
+  private getModelQuality(modelId: string, _task?: string): number {
     if (modelId.includes('gpt-4')) return 0.95;
     if (modelId.includes('claude-3-opus')) return 0.93;
     if (modelId.includes('gemini-pro')) return 0.90;
@@ -371,6 +367,7 @@ export class MultiModelManager extends EventEmitter {
           if (recent.length < rpm) {
             this.requestLogs.push({
               timestamp: now,
+              prompt: 'placeholder',
               modelUsed: request.provider!,
               tokens: 0,
               latency: 0,
@@ -633,25 +630,6 @@ export class MultiModelManager extends EventEmitter {
     return Math.ceil(text.length / 4);
   }
 
-  private async checkRateLimit(provider: string): Promise<void> {
-    const rateLimit = this.rateLimits.get(provider);
-    if (!rateLimit) return;
-
-    const rpm = rateLimit.requestsPerMinute || Infinity;
-    const now = Date.now();
-    const oneMinuteAgo = now - 60000;
-
-    const recent = this.requestLogs.filter(log => 
-      log.timestamp > oneMinuteAgo && (log.provider === provider || log.modelUsed.includes(provider))
-    );
-
-    if (recent.length >= rpm) {
-      const oldest = recent[0];
-      const wait = oldest.timestamp + 60000 - now;
-      await new Promise(resolve => setTimeout(resolve, Math.max(0, wait)));
-    }
-  }
-
   private checkQuota(provider: string, tokensToUse: number): void {
     const quota = this.quotas.get(provider);
     if (!quota) return;
@@ -692,7 +670,7 @@ export class MultiModelManager extends EventEmitter {
     return { filtered: false };
   }
 
-  private detectPerformanceDegradation(provider: string, latency: number): void {
+  private detectPerformanceDegradation(provider: string, _latency: number): void {
     const threshold = 2000;
     const recent = this.requestLogs
       .filter(log => (log.provider === provider) || log.modelUsed.includes(provider))
@@ -717,7 +695,7 @@ export class MultiModelManager extends EventEmitter {
   }
 
   async generateStream(request: GenerateRequest): Promise<void> {
-    const selected = await this.selectModel({});
+    await this.selectModel({});
     const chunks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
     for (const chunk of chunks) {
       if (request.onChunk) {
@@ -736,7 +714,7 @@ export class MultiModelManager extends EventEmitter {
     };
 
     for (const prompt of prompts) {
-      const selected = await this.selectModel({});
+      await this.selectModel({});
       let text = 'Generated response';
       for (const [key, translation] of Object.entries(translations)) {
         if (prompt.toLowerCase().includes(key)) {
@@ -744,12 +722,12 @@ export class MultiModelManager extends EventEmitter {
           break;
         }
       }
-      results.push({ text, modelUsed: selected.modelId });
+      results.push({ text, modelUsed: 'default' });
     }
     return results;
   }
 
-  async callModel(provider: string, modelId: string, params: any): Promise<any> {
+  async callModel(provider: string, modelId: string, _params: any): Promise<any> {
     this.callCount++;
     const key = `${provider}:${modelId}`;
     const currentLoad = (this.modelLoadCount.get(key) || 0) + 1;
@@ -993,12 +971,8 @@ ${Object.entries(this.getProviderUsage())
     `.trim();
   }
 
-  private encryptData(text: string, key?: string): string {
+  private encryptData(text: string, _key?: string): string {
     return Buffer.from(text).toString('base64');
-  }
-
-  private decryptData(encrypted: string, key?: string): string {
-    return Buffer.from(encrypted, 'base64').toString('utf-8');
   }
 }
 

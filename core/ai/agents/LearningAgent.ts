@@ -100,9 +100,6 @@ export class LearningAgent extends BaseAgent {
   private modelWeights: Map<string, number> = new Map()
   private featureImportance: Map<string, number> = new Map()
   private confidenceThreshold: number = 0.7
-  private maxRetries: number = 3
-  private learningRateDecay: number = 0.95
-  private minLearningRate: number = 0.001
 
   constructor(idOrConfig: string | LearningAgentConfig, legacyConfig?: LearningAgentConfig) {
     let finalConfig: LearningAgentConfig
@@ -124,9 +121,11 @@ export class LearningAgent extends BaseAgent {
       name: finalConfig.name || 'Learning Agent',
       description: `Learning Agent: ${finalConfig.name || 'Unnamed'}`,
       capabilities: (finalConfig.capabilities || []).map((capName: string) => ({
+        id: capName,
         name: capName,
         description: `Capability: ${capName}`,
         version: '1.0.0',
+        enabled: true,
       })),
       policies: {
         maxConcurrentRequests: 5,
@@ -154,19 +153,25 @@ export class LearningAgent extends BaseAgent {
    */
   protected setupCapabilities(): void {
     this.capabilities.set('learn', {
+      id: 'learn',
       name: 'learn',
       description: 'Machine learning capability',
       version: '1.0.0',
+      enabled: true,
     })
     this.capabilities.set('knowledge', {
+      id: 'knowledge',
       name: 'knowledge',
       description: 'Knowledge base management',
       version: '1.0.0',
+      enabled: true,
     })
     this.capabilities.set('adapt', {
+      id: 'adapt',
       name: 'adapt',
       description: 'Adaptive learning capability',
       version: '1.0.0',
+      enabled: true,
     })
   }
 
@@ -178,7 +183,7 @@ export class LearningAgent extends BaseAgent {
       this.addSample(params.sample)
       return { success: true }
     })
-    this.commandHandlers.set('learn', async params => {
+    this.commandHandlers.set('learn', async _params => {
       const result = await this.learn()
       return result
     })
@@ -617,28 +622,6 @@ export class LearningAgent extends BaseAgent {
   }
 
   /**
-   * 记录学习历史
-   */
-  private recordLearningHistory(
-    mode: LearningMode,
-    success: boolean,
-    samplesProcessed: number,
-    knowledgeAdded: number
-  ): void {
-    this.learningHistory.push({
-      timestamp: Date.now(),
-      mode,
-      success,
-      samplesProcessed,
-      knowledgeAdded,
-    })
-
-    if (this.learningHistory.length > 1000) {
-      this.learningHistory.shift()
-    }
-  }
-
-  /**
    * 获取学习历史
    */
   getLearningHistory(limit: number = 100): Array<{
@@ -718,29 +701,6 @@ export class LearningAgent extends BaseAgent {
   }
 
   /**
-   * 调整学习率
-   */
-  private adjustLearningRate(): void {
-    const trends = this.analyzeLearningTrends()
-
-    if (trends.trend === 'improving') {
-      this.strategy.learningRate *= 1.05
-    } else if (trends.trend === 'declining') {
-      this.strategy.learningRate *= this.learningRateDecay
-    }
-
-    this.strategy.learningRate = Math.max(
-      this.minLearningRate,
-      Math.min(0.1, this.strategy.learningRate)
-    )
-
-    this.emit('learningRate:adjusted', {
-      newRate: this.strategy.learningRate,
-      trend: trends.trend,
-    })
-  }
-
-  /**
    * 获取模型权重
    */
   getModelWeights(): Map<string, number> {
@@ -760,45 +720,6 @@ export class LearningAgent extends BaseAgent {
    */
   getFeatureImportance(): Map<string, number> {
     return new Map(this.featureImportance)
-  }
-
-  /**
-   * 计算特征重要性
-   */
-  private calculateFeatureImportance(): void {
-    const importance: Map<string, number> = new Map()
-
-    for (const knowledge of this.knowledgeBase.values()) {
-      const features = this.extractFeatures(knowledge)
-      for (const [feature, value] of Object.entries(features)) {
-        const current = importance.get(feature) || 0
-        importance.set(feature, current + value)
-      }
-    }
-
-    const maxImportance = Math.max(...Array.from(importance.values()))
-    for (const [feature, value] of importance) {
-      importance.set(feature, value / maxImportance)
-    }
-
-    this.featureImportance = importance
-    this.emit('features:calculated', { importance: Array.from(this.featureImportance) })
-  }
-
-  /**
-   * 提取特征
-   */
-  private extractFeatures(knowledge: KnowledgeEntry): Record<string, number> {
-    const features: Record<string, number> = {}
-
-    features.confidence = knowledge.confidence
-    features.exampleCount = knowledge.examples.length
-    features.age = (Date.now() - knowledge.createdAt.getTime()) / (1000 * 60 * 60 * 24)
-    features.updateFrequency =
-      (knowledge.updatedAt.getTime() - knowledge.createdAt.getTime()) /
-      (1000 * 60 * 60 * 24)
-
-    return features
   }
 
   /**
@@ -829,22 +750,6 @@ export class LearningAgent extends BaseAgent {
   }
 
   /**
-   * 记录性能指标
-   */
-  private recordPerformanceMetric(concept: string, accuracy: number): void {
-    if (!this.performanceMetrics.has(concept)) {
-      this.performanceMetrics.set(concept, [])
-    }
-
-    const metrics = this.performanceMetrics.get(concept)!
-    metrics.push(accuracy)
-
-    if (metrics.length > 100) {
-      metrics.shift()
-    }
-  }
-
-  /**
    * 批量学习
    */
   async batchLearn(samples: LearningSample[]): Promise<{
@@ -854,7 +759,6 @@ export class LearningAgent extends BaseAgent {
   }> {
     let successful = 0
     let failed = 0
-    let knowledgeAdded = 0
 
     for (const sample of samples) {
       try {

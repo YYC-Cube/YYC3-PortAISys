@@ -10,7 +10,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 /**
  * 模态类型
@@ -428,8 +428,7 @@ export class MultiModalProcessor extends EventEmitter {
   /**
    * 生成嵌入向量
    */
-  private generateEmbeddings(input: string): number[] {
-    // 模拟生成768维嵌入向量
+  private generateEmbeddings(_input: string): number[] {
     return Array.from({ length: 768 }, () => Math.random() * 2 - 1);
   }
 
@@ -506,31 +505,6 @@ export class MultiModalProcessor extends EventEmitter {
   }
 
   /**
-   * 添加到处理队列
-   */
-  private async queueProcessing(
-    input: MultiModalInput,
-    priority: number = 0
-  ): Promise<ProcessingResult> {
-    return new Promise((resolve, reject) => {
-      const id = `queue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      this.processingQueue.push({
-        id,
-        input,
-        priority,
-        resolve,
-        reject
-      });
-
-      this.processingQueue.sort((a, b) => b.priority - a.priority);
-
-      if (!this.isProcessing) {
-        this.processQueue();
-      }
-    });
-  }
-
-  /**
    * 处理队列
    */
   private async processQueue(): Promise<void> {
@@ -552,22 +526,6 @@ export class MultiModalProcessor extends EventEmitter {
     }
 
     this.isProcessing = false;
-  }
-
-  /**
-   * 记录性能指标
-   */
-  private recordPerformance(modality: ModalityType, latency: number): void {
-    if (!this.performanceMetrics.has(modality)) {
-      this.performanceMetrics.set(modality, []);
-    }
-
-    const metrics = this.performanceMetrics.get(modality)!;
-    metrics.push(latency);
-
-    if (metrics.length > 100) {
-      metrics.shift();
-    }
   }
 
   /**
@@ -609,13 +567,13 @@ export class MultiModalProcessor extends EventEmitter {
   ): Promise<ProcessingResult[]> {
     if (this.config.enableParallelProcessing) {
       return Promise.all(
-        inputs.map(({ input, priority }) =>
+        inputs.map(({ input }) =>
           this.processModality(input)
         )
       );
     } else {
       const results: ProcessingResult[] = [];
-      for (const { input, priority } of inputs) {
+      for (const { input } of inputs) {
         const result = await this.processModality(input);
         results.push(result);
       }
@@ -727,7 +685,6 @@ export class MultiModalProcessor extends EventEmitter {
     latency: number;
     success: boolean;
   }> {
-    const history: Array<any> = [];
     const allMetrics: Array<{ modality: ModalityType; latency: number }> = [];
 
     for (const [modality, metrics] of this.performanceMetrics) {

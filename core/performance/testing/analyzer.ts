@@ -7,7 +7,7 @@
  * @created 2026-01-07
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   PerformanceTestResult,
   AnalysisReport,

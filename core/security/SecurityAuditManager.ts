@@ -913,7 +913,7 @@ export class SecurityAuditManager {
    */
   private notifyIssues(result: AuditResult): void {
     if (result.summary.totalIssues > 0) {
-      logger.warning('安全审计发现问题', 'SecurityAudit', {
+      logger.warn('安全审计发现问题', 'SecurityAudit', {
         totalIssues: result.summary.totalIssues,
         criticalIssues: result.summary.criticalIssues,
         highIssues: result.summary.highIssues,

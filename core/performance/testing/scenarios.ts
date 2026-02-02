@@ -9,10 +9,8 @@
 
 import {
   PerformanceTestConfig,
-  PerformanceThreshold,
   TestScenario,
-  TestType,
-  MetricType
+  TestType
 } from './types';
 
 export class PredefinedScenarios {

@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export enum PerformanceDomain {
   CPU = 'cpu',

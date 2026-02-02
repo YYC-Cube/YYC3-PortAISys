@@ -32,6 +32,27 @@ async function main() {
   const engineConfig: EngineConfig = {
     version: '1.0.0',
     environment: 'development',
+    messageConfig: {
+      maxQueueSize: 1000,
+      retryPolicy: {
+        maxRetries: 3,
+        backoffFactor: 2
+      }
+    },
+    taskConfig: {
+      maxConcurrentTasks: 10,
+      timeoutMs: 30000,
+      priorityLevels: 3
+    },
+    stateConfig: {
+      autoPersist: true,
+      persistInterval: 60000,
+      maxHistory: 1000
+    },
+    logConfig: {
+      level: 'info',
+      format: 'text'
+    }
   };
 
   const engine = new AutonomousAIEngine(engineConfig);
@@ -53,7 +74,7 @@ async function main() {
 
     await withSpan('app.process_messages', async () => {
       // 注册一个简单的消息处理器
-      engine.registerMessageHandler(MessageType.USER_INPUT, async (message: any) => {
+      engine.registerMessageHandler(MessageType.USER_MESSAGE, async (message: any) => {
         return {
           success: true,
           content: `处理消息: ${message.content}`,
@@ -65,9 +86,9 @@ async function main() {
 
       // 发送测试消息
       const testMessages = [
-        { id: '1', type: MessageType.USER_INPUT, content: '你好，YYC³！', timestamp: new Date() },
-        { id: '2', type: MessageType.USER_INPUT, content: '介绍一下五维闭环系统', timestamp: new Date() },
-        { id: '3', type: MessageType.USER_INPUT, content: '展示AI能力', timestamp: new Date() },
+        { id: '1', type: MessageType.USER_MESSAGE, content: '你好，YYC³！', timestamp: new Date() },
+        { id: '2', type: MessageType.USER_MESSAGE, content: '介绍一下五维闭环系统', timestamp: new Date() },
+        { id: '3', type: MessageType.USER_MESSAGE, content: '展示AI能力', timestamp: new Date() },
       ];
 
       for (const message of testMessages) {

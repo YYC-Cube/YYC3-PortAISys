@@ -7,7 +7,7 @@
  * @created 2025-01-30
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   NotFoundError,
   ConflictError,
@@ -359,7 +359,7 @@ export class TaskScheduler extends EventEmitter {
   private async executeWithTimeout(task: Task): Promise<any> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new TimeoutError(`Task timeout: ${task.id}`, { taskId: task.id, timeout: task.timeout }));
+        reject(new TimeoutError(`Task timeout: ${task.id}`, task.timeout, { taskId: task.id }));
       }, task.timeout);
 
       task.execute()

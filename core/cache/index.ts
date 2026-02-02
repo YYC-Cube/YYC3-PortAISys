@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import { MultiLevelCache } from './cache';
 import { LoadBalancer } from './loadBalancer';
 import { HealthChecker, CircuitBreaker } from './healthCheck';
@@ -7,7 +7,6 @@ import {
   LoadBalancerConfig,
   Server,
   ServerMetrics,
-  CacheEntry,
   MultiLevelCacheStats,
   LoadBalancingStats,
   HealthCheckResult,
@@ -210,3 +209,5 @@ export * from './types';
 export { MultiLevelCache } from './cache';
 export { LoadBalancer } from './loadBalancer';
 export { HealthChecker, CircuitBreaker } from './healthCheck';
+export { IntelligentCacheLayer } from './CacheLayer';
+export { CacheSharding } from './CacheSharding';

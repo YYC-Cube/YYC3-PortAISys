@@ -7,7 +7,7 @@
  * @created 2025-12-30
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   IModelAdapter,
   ModelConfig,
@@ -30,7 +30,6 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
   version: string;
   private config: ModelConfig;
   private isInitialized: boolean = false;
-  private requestQueue: Map<string, Promise<ModelResponse>> = new Map();
   private capabilities: ModelCapabilities;
   private errorHandler: ErrorHandler;
   private retryAttempts: Map<string, number> = new Map();
@@ -438,7 +437,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
       case 'azure':
         return `https://${this.config.endpoint}.openai.azure.com/openai/deployments/${this.config.name}/chat/completions?api-version=2023-05-15`;
       default:
-        throw new ValidationError(`Unknown provider: ${this.config.provider}`, { provider: this.config.provider });
+        throw new ValidationError(`Unknown provider: ${this.config.provider}`, 'provider', { provider: this.config.provider });
     }
   }
 

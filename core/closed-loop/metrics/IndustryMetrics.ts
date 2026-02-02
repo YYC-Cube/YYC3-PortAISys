@@ -1,4 +1,17 @@
 // metrics/IndustryMetrics.ts
+
+interface BusinessMetrics {
+  strategic_alignment: any;
+  operational_efficiency: any;
+  financial_performance: any;
+}
+
+interface OperationsMetrics {
+  system_reliability: any;
+  performance_efficiency: any;
+  cost_effectiveness: any;
+}
+
 export class IndustryMetrics {
   static getBusinessManagementMetrics(): BusinessMetrics {
     return {

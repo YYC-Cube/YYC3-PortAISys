@@ -7,7 +7,7 @@
  * @created 2026-01-21
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -360,7 +360,7 @@ export class MobileAppCore extends EventEmitter {
    * 监听位置变化
    */
   watchLocation(
-    options: Location.LocationOptions,
+    _options: Location.LocationOptions,
     callback: (location: LocationData) => void
   ): () => void {
     this.locationWatchers.push(callback);
@@ -702,7 +702,7 @@ export class MobileAppCore extends EventEmitter {
   /**
    * 分享内容
    */
-  async share(content: {
+  async share(_content: {
     message?: string;
     url?: string;
     title?: string;
@@ -718,7 +718,7 @@ export class MobileAppCore extends EventEmitter {
   /**
    * 拍照
    */
-  async takePicture(options?: {
+  async takePicture(_options?: {
     quality?: number;
     allowsEditing?: boolean;
     cameraType?: 'front' | 'back';
@@ -739,7 +739,7 @@ export class MobileAppCore extends EventEmitter {
   /**
    * 选择图片
    */
-  async pickImage(options?: {
+  async pickImage(_options?: {
     quality?: number;
     allowsEditing?: boolean;
     allowsMultipleSelection?: boolean;

@@ -239,28 +239,6 @@ export interface ContentGenerator {
 }
 
 export class AICampaignManager {
-  private campaignOptimizer: CampaignOptimizer;
-  private audienceSelector: AudienceSelector;
-  private contentGenerator: ContentGenerator;
-
-  constructor() {
-    this.campaignOptimizer = {
-      optimize: async (campaign: AICampaign, performance: CampaignPerformance) => {
-        return await this.optimizeCampaignInRealTime(campaign, performance);
-      }
-    };
-    this.audienceSelector = {
-      selectAudience: async (brief: CampaignBrief) => {
-        return await this.selectOptimalAudience(brief);
-      }
-    };
-    this.contentGenerator = {
-      generateContent: async (brief: CampaignBrief, audience: TargetAudience) => {
-        return await this.generateCampaignContent(brief, audience);
-      }
-    };
-  }
-
   async createAICampaign(campaignBrief: CampaignBrief): Promise<AICampaign> {
     const targetAudience = await this.selectOptimalAudience(campaignBrief);
     const campaignContent = await this.generateCampaignContent(campaignBrief, targetAudience);
@@ -309,7 +287,7 @@ export class AICampaignManager {
     };
   }
 
-  private async optimizeDeliveryStrategy(brief: CampaignBrief, audience: TargetAudience): Promise<DeliveryStrategy> {
+  private async optimizeDeliveryStrategy(brief: CampaignBrief, _audience: TargetAudience): Promise<DeliveryStrategy> {
     const channels: ChannelStrategy[] = brief.channels.map((channel, index) => ({
       channel,
       priority: brief.channels.length - index,
@@ -367,7 +345,7 @@ export class AICampaignManager {
     };
   }
 
-  private async predictCampaignPerformance(brief: CampaignBrief, audience: TargetAudience): Promise<PerformancePredictions> {
+  private async predictCampaignPerformance(brief: CampaignBrief, _audience: TargetAudience): Promise<PerformancePredictions> {
     const expectedImpressions = Math.floor(Math.random() * 500000) + 100000;
     const expectedCTR = Math.random() * 0.1 + 0.01;
     const expectedClicks = Math.floor(expectedImpressions * expectedCTR);
@@ -566,7 +544,7 @@ export class AICampaignManager {
     ];
   }
 
-  private async performAISegmentation(customerData: any[], objectives: string[]): Promise<any> {
+  private async performAISegmentation(customerData: any[], _objectives: string[]): Promise<any> {
     const primarySegments: AudienceSegment[] = customerData.map((customer, index) => ({
       id: `segment-${index}`,
       name: `受众段 ${index + 1}`,
@@ -584,7 +562,7 @@ export class AICampaignManager {
     };
   }
 
-  private async defineExclusionCriteria(brief: CampaignBrief, segmentation: any): Promise<ExclusionCriteria[]> {
+  private async defineExclusionCriteria(_brief: CampaignBrief, _segmentation: any): Promise<ExclusionCriteria[]> {
     return [
       {
         criteria: 'exclude_inactive_users',
@@ -599,16 +577,16 @@ export class AICampaignManager {
     ];
   }
 
-  private async prioritizeSegments(segmentation: any, budget: number): Promise<Prioritization[]> {
+  private async prioritizeSegments(segmentation: any, _budget: number): Promise<Prioritization[]> {
     return segmentation.primarySegments.map((segment: AudienceSegment) => ({
       segmentId: segment.id,
       priority: Math.floor(Math.random() * 10) + 1,
-      budgetAllocation: budget / segmentation.primarySegments.length,
+      budgetAllocation: _budget / segmentation.primarySegments.length,
       expectedROI: Math.random() * 3 + 1
     }));
   }
 
-  private async determinePersonalizationLevel(segmentation: any): Promise<'low' | 'medium' | 'high'> {
+  private async determinePersonalizationLevel(_segmentation: any): Promise<'low' | 'medium' | 'high'> {
     return 'high';
   }
 
@@ -651,7 +629,7 @@ export class AICampaignManager {
     ];
   }
 
-  private async generateValueProps(brief: CampaignBrief, audience: TargetAudience): Promise<ValueProposition[]> {
+  private async generateValueProps(_brief: CampaignBrief, audience: TargetAudience): Promise<ValueProposition[]> {
     return [
       {
         id: 'value-001',
@@ -663,7 +641,7 @@ export class AICampaignManager {
     ];
   }
 
-  private async generateObjectionResponses(brief: CampaignBrief, audience: TargetAudience): Promise<ObjectionResponse[]> {
+  private async generateObjectionResponses(_brief: CampaignBrief, audience: TargetAudience): Promise<ObjectionResponse[]> {
     return [
       {
         id: 'objection-001',

@@ -7,7 +7,7 @@
  * @created 2026-01-21
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 /**
  * 查询统计
@@ -225,7 +225,7 @@ export class DatabaseOptimizer extends EventEmitter {
     }
 
     // 检测SELECT *
-    for (const [query, stats] of this.queryStats) {
+    for (const [query, _stats] of this.queryStats) {
       if (query.includes('SELECT *')) {
         suggestions.push({
           type: 'query',

@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 
 export interface DeploymentConfig {
   environment: 'development' | 'staging' | 'production';
@@ -455,7 +455,7 @@ export class AutomatedDeploymentManager extends EventEmitter {
     };
   }
 
-  private async buildStage(stage: PipelineStage, config: DeploymentConfig): Promise<void> {
+  private async buildStage(stage: PipelineStage, _config: DeploymentConfig): Promise<void> {
     stage.logs.push('Starting build process...');
     await new Promise(resolve => setTimeout(resolve, 1000));
     stage.logs.push('Building application...');
@@ -464,7 +464,7 @@ export class AutomatedDeploymentManager extends EventEmitter {
     stage.artifacts = ['app.tar.gz', 'docker-image.tar'];
   }
 
-  private async testStage(stage: PipelineStage, config: DeploymentConfig): Promise<void> {
+  private async testStage(stage: PipelineStage, _config: DeploymentConfig): Promise<void> {
     stage.logs.push('Running tests...');
     await new Promise(resolve => setTimeout(resolve, 1500));
     stage.logs.push('Unit tests passed');
@@ -494,7 +494,7 @@ export class AutomatedDeploymentManager extends EventEmitter {
     stage.logs.push('Health checks passed');
   }
 
-  private async rollbackStage(stage: PipelineStage, config: DeploymentConfig): Promise<void> {
+  private async rollbackStage(stage: PipelineStage, _config: DeploymentConfig): Promise<void> {
     stage.logs.push('Rolling back deployment...');
     await new Promise(resolve => setTimeout(resolve, 1500));
     stage.logs.push('Rollback completed');
@@ -521,7 +521,7 @@ export class AutomatedDeploymentManager extends EventEmitter {
     return result;
   }
 
-  private async performRollback(version: string, environment: DeploymentConfig['environment']): Promise<void> {
+  private async performRollback(_version: string, _environment: DeploymentConfig['environment']): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 

@@ -10,12 +10,11 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import { AgentSystem } from '../ai/index';
-import { AgentConfig, AgentMessage, AgentCapability } from '../ai/AgentProtocol';
+import { AgentMessage } from '../ai/AgentProtocol';
 import { AutonomousAIEngine } from '../pluggable/AutonomousAIEngine';
 import { UISystem } from '../ui/UISystem';
-import { PopupInstance } from '../pluggable/types';
 
 export interface AgentSystemIntegrationConfig {
   enableAutoAgents?: boolean;
@@ -154,7 +153,6 @@ export class AgentSystemIntegration extends EventEmitter {
         id: `layout-${popupId}`,
         name: `布局智能体-${popupId}`,
         description: '管理弹窗布局和位置',
-        version: '1.0.0',
         enabled: true
       });
 
@@ -169,7 +167,6 @@ export class AgentSystemIntegration extends EventEmitter {
         id: `behavior-${popupId}`,
         name: `行为智能体-${popupId}`,
         description: '管理弹窗行为和交互',
-        version: '1.0.0',
         enabled: true
       });
 
@@ -184,7 +181,6 @@ export class AgentSystemIntegration extends EventEmitter {
         id: `content-${popupId}`,
         name: `内容智能体-${popupId}`,
         description: '管理弹窗内容和更新',
-        version: '1.0.0',
         enabled: true
       });
 
@@ -226,28 +222,28 @@ export class AgentSystemIntegration extends EventEmitter {
   }
 
   private setupLayoutAgentEvents(agent: any): void {
-    agent.on('layout:moved', (data) => {
+    agent.on('layout:moved', (data: any) => {
       this.emit('popup:layout:moved', data);
       if (this.uiSystem) {
         this.uiSystem.emit('popup:layout:moved', data);
       }
     });
 
-    agent.on('layout:resized', (data) => {
+    agent.on('layout:resized', (data: any) => {
       this.emit('popup:layout:resized', data);
       if (this.uiSystem) {
         this.uiSystem.emit('popup:layout:resized', data);
       }
     });
 
-    agent.on('layout:minimized', (data) => {
+    agent.on('layout:minimized', (data: any) => {
       this.emit('popup:layout:minimized', data);
       if (this.uiSystem) {
         this.uiSystem.emit('popup:layout:minimized', data);
       }
     });
 
-    agent.on('layout:maximized', (data) => {
+    agent.on('layout:maximized', (data: any) => {
       this.emit('popup:layout:maximized', data);
       if (this.uiSystem) {
         this.uiSystem.emit('popup:layout:maximized', data);
@@ -256,21 +252,21 @@ export class AgentSystemIntegration extends EventEmitter {
   }
 
   private setupBehaviorAgentEvents(agent: any): void {
-    agent.on('behavior:changed', (data) => {
+    agent.on('behavior:changed', (data: any) => {
       this.emit('popup:behavior:changed', data);
       if (this.uiSystem) {
         this.uiSystem.emit('popup:behavior:changed', data);
       }
     });
 
-    agent.on('behavior:enabled', (data) => {
+    agent.on('behavior:enabled', (data: any) => {
       this.emit('popup:behavior:enabled', data);
       if (this.uiSystem) {
         this.uiSystem.emit('popup:behavior:enabled', data);
       }
     });
 
-    agent.on('behavior:disabled', (data) => {
+    agent.on('behavior:disabled', (data: any) => {
       this.emit('popup:behavior:disabled', data);
       if (this.uiSystem) {
         this.uiSystem.emit('popup:behavior:disabled', data);
@@ -279,21 +275,21 @@ export class AgentSystemIntegration extends EventEmitter {
   }
 
   private setupContentAgentEvents(agent: any): void {
-    agent.on('content:updated', (data) => {
+    agent.on('content:updated', (data: any) => {
       this.emit('popup:content:updated', data);
       if (this.uiSystem) {
         this.uiSystem.emit('popup:content:updated', data);
       }
     });
 
-    agent.on('content:reloaded', (data) => {
+    agent.on('content:reloaded', (data: any) => {
       this.emit('popup:content:reloaded', data);
       if (this.uiSystem) {
         this.uiSystem.emit('popup:content:reloaded', data);
       }
     });
 
-    agent.on('content:validated', (data) => {
+    agent.on('content:validated', (data: any) => {
       this.emit('popup:content:validated', data);
       if (this.uiSystem) {
         this.uiSystem.emit('popup:content:validated', data);
@@ -302,21 +298,21 @@ export class AgentSystemIntegration extends EventEmitter {
   }
 
   private setupAssistantAgentEvents(agent: any): void {
-    agent.on('assistant:message:sent', (data) => {
+    agent.on('assistant:message:sent', (data: any) => {
       this.emit('assistant:message:sent', data);
       if (this.uiSystem) {
         this.uiSystem.emit('assistant:message:sent', data);
       }
     });
 
-    agent.on('assistant:suggestion:generated', (data) => {
+    agent.on('assistant:suggestion:generated', (data: any) => {
       this.emit('assistant:suggestion:generated', data);
       if (this.uiSystem) {
         this.uiSystem.emit('assistant:suggestion:generated', data);
       }
     });
 
-    agent.on('assistant:context:updated', (data) => {
+    agent.on('assistant:context:updated', (data: any) => {
       this.emit('assistant:context:updated', data);
       if (this.uiSystem) {
         this.uiSystem.emit('assistant:context:updated', data);
@@ -325,21 +321,21 @@ export class AgentSystemIntegration extends EventEmitter {
   }
 
   private setupMonitoringAgentEvents(agent: any): void {
-    agent.on('monitoring:metric-recorded', (data) => {
+    agent.on('monitoring:metric-recorded', (data: any) => {
       this.emit('monitoring:metric-recorded', data);
       if (this.engine) {
         this.engine.emit('monitoring:metric-recorded', data);
       }
     });
 
-    agent.on('monitoring:alert-triggered', (data) => {
+    agent.on('monitoring:alert-triggered', (data: any) => {
       this.emit('monitoring:alert-triggered', data);
       if (this.uiSystem) {
         this.uiSystem.emit('monitoring:alert-triggered', data);
       }
     });
 
-    agent.on('monitoring:report-generated', (data) => {
+    agent.on('monitoring:report-generated', (data: any) => {
       this.emit('monitoring:report-generated', data);
       if (this.engine) {
         this.engine.emit('monitoring:report-generated', data);
@@ -348,15 +344,15 @@ export class AgentSystemIntegration extends EventEmitter {
   }
 
   private setupAgentSystemEvents(): void {
-    this.agentSystem.on('agent:registered', (data) => {
+    this.agentSystem.on('agent:registered', (data: any) => {
       this.emit('agent:registered', data);
     });
 
-    this.agentSystem.on('message:sent', (data) => {
+    this.agentSystem.on('message:sent', (data: any) => {
       this.emit('agent:message:sent', data);
     });
 
-    this.agentSystem.on('message:failed', (data) => {
+    this.agentSystem.on('message:failed', (data: any) => {
       this.emit('agent:message:failed', data);
     });
 

@@ -10,7 +10,7 @@
 import { logger } from './utils/logger';
 import { metrics } from './utils/metrics';
 import { MessageBus } from './MessageBus';
-import { withSpan, setSpanAttribute, recordSpanException } from './tracing';
+import { withSpan, setSpanAttribute, recordSpanException } from './tracing/TracingUtils';
 import {
   EngineConfig,
   EngineStatus,
@@ -59,6 +59,7 @@ export class AutonomousAIEngine {
   constructor(config: EngineConfig) {
     // 合并默认配置
     this.config = {
+      ...config,
       version: '1.0.0',
       environment: 'development',
       messageConfig: {
@@ -81,8 +82,7 @@ export class AutonomousAIEngine {
       logConfig: {
         level: 'info',
         format: 'json'
-      },
-      ...config
+      }
     };
 
     this.messageBus = new MessageBus(this.config.messageConfig);
@@ -96,7 +96,7 @@ export class AutonomousAIEngine {
   // ================= 生命周期管理 =================
 
   async initialize(config?: EngineConfig): Promise<void> {
-    return withSpan('AutonomousAIEngine.initialize', async (span) => {
+    return withSpan('AutonomousAIEngine.initialize', async (_span) => {
       logger.info('引擎初始化中...', 'AutonomousAIEngine');
       this.status = EngineStatus.INITIALIZING;
 
@@ -135,7 +135,7 @@ export class AutonomousAIEngine {
   }
 
   async start(): Promise<void> {
-    return withSpan('AutonomousAIEngine.start', async (span) => {
+    return withSpan('AutonomousAIEngine.start', async (_span) => {
       logger.info('启动引擎...', 'AutonomousAIEngine');
       this.status = EngineStatus.STARTING;
 
@@ -208,7 +208,7 @@ export class AutonomousAIEngine {
   }
 
   async processMessage(input: AgentMessage): Promise<AgentResponse> {
-    return withSpan('AutonomousAIEngine.processMessage', async (span) => {
+    return withSpan('AutonomousAIEngine.processMessage', async (_span) => {
       if (this.status !== EngineStatus.RUNNING) {
         throw new Error(`引擎状态错误：${this.status}，无法处理消息`);
       }
@@ -334,12 +334,12 @@ export class AutonomousAIEngine {
       subsystems: Array.from(this.subsystems.keys()),
       metrics: {
         messageThroughput: uptime > 0
-          ? (this.performanceStats.messageCount / (uptime / 1000)).toFixed(2)
-          : '0',
-        averageResponseTime: avgProcessingTime.toFixed(2),
+          ? parseFloat((this.performanceStats.messageCount / (uptime / 1000)).toFixed(2))
+          : 0,
+        averageResponseTime: parseFloat(avgProcessingTime.toFixed(2)),
         errorRate: this.performanceStats.messageCount > 0
-          ? ((this.performanceStats.errorCount / this.performanceStats.messageCount) * 100).toFixed(2)
-          : '0'
+          ? parseFloat(((this.performanceStats.errorCount / this.performanceStats.messageCount) * 100).toFixed(2))
+          : 0
       }
     };
   }
@@ -515,7 +515,7 @@ export class AutonomousAIEngine {
     });
 
     // 默认的系统启动处理器
-    this.registerMessageHandler(MessageType.SYSTEM_START, async (message: AgentMessage) => {
+    this.registerMessageHandler(MessageType.SYSTEM_START, async (_message: AgentMessage) => {
       return {
         success: true,
         content: '系统已启动',

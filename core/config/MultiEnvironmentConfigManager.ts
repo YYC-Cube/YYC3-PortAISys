@@ -8,7 +8,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 import * as fs from 'fs';
 import * as path from 'path';
 

@@ -15,10 +15,9 @@ import {
   AgentContext,
   AgentCapability
 } from './AgentProtocol';
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
-  InternalError,
-  ValidationError
+  InternalError
 } from '../error-handler/ErrorTypes';
 
 export interface PopupInstance {
@@ -78,7 +77,7 @@ export abstract class BaseAgent extends EventEmitter {
       timestamp: Date.now()
     });
 
-    console.log(`智能体 ${this.config.id} 已绑定到弹窗 ${popup.id}`);
+    console.warn(`智能体 ${this.config.id} 已绑定到弹窗 ${popup.id}`);
   }
 
   async handleMessage(message: AgentMessage): Promise<AgentResponse> {
@@ -173,7 +172,7 @@ export abstract class BaseAgent extends EventEmitter {
     }
   }
 
-  protected async handleQuery(payload: any): Promise<AgentResponse> {
+  protected async handleQuery(_payload: any): Promise<AgentResponse> {
     return {
       success: false,
       error: {
@@ -228,10 +227,10 @@ export abstract class BaseAgent extends EventEmitter {
   protected handlePopupUpdate(data: any): void {
     if (!this.popup || this.popup.id !== data.popupId) return;
 
-    this.popup = { ...this.popup, ...data.popup };
+    this.popup = this.popup ? { ...this.popup, ...data.popup } : data.popup;
 
     this.emit('popup:updated', {
-      popupId: this.popup.id,
+      popupId: this.popup!.id,
       changes: data.changes,
       timestamp: Date.now()
     });

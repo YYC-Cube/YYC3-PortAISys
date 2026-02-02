@@ -8,6 +8,7 @@
  */
 
 import { ModelAdapter, ModelAdapterConfig, IModelAdapter } from './ModelAdapter';
+import { logger } from '../utils/logger';
 import {
   ModelProvider,
   ChatRequest,
@@ -40,7 +41,7 @@ interface LocalModelConfig extends ModelAdapterConfig {
  * 5. 完整的日志和监控
  */
 export class LocalModelAdapter extends ModelAdapter implements IModelAdapter {
-  private config: LocalModelConfig;
+  protected config: LocalModelConfig;
   private baseUrl: string;
 
   constructor(config: LocalModelConfig) {

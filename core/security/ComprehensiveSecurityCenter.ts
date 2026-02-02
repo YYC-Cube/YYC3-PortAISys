@@ -2,10 +2,6 @@ import {
   ThreatDetector,
   ComplianceManager,
   EnterpriseSecurity,
-  DataSecurity,
-  ApplicationSecurity,
-  Compliance,
-  BusinessContinuity,
   EncryptionImplementation,
   AccessControlImplementation,
   DataMaskingImplementation,
@@ -22,7 +18,18 @@ import {
   BackupStrategy,
   HighAvailability,
   IncidentResponse,
-  ComprehensiveSecurityCenterConfig
+  ComprehensiveSecurityCenterConfig,
+  SecurityAuditResult,
+  PenetrationTestResult,
+  VulnerabilityScanResult,
+  ComplianceCheckResult,
+  AccessReviewResult,
+  ConfigurationAuditResult,
+  NetworkTestResult,
+  ApplicationTestResult,
+  APITestResult,
+  SocialEngineeringTestResult,
+  SecurityAuditData
 } from './types';
 import { ThreatDetector as ThreatDetectorImpl } from './ThreatDetector';
 import { ComplianceManager as ComplianceManagerImpl } from './ComplianceManager';
@@ -656,7 +663,7 @@ export class ComprehensiveSecurityCenter {
   /**
    * 获取审计日志
    */
-  async getAuditLogs(config?: { startDate?: Date; endDate?: Date }): Promise<any[]> {
+  async getAuditLogs(_config?: { startDate?: Date; endDate?: Date }): Promise<any[]> {
     // 返回审计日志列表
     return [];
   }
@@ -690,7 +697,7 @@ export class ComprehensiveSecurityCenter {
   /**
    * 启用速率限制
    */
-  async enableRateLimit(userId: string, limit: number, window: number): Promise<void> {
+  async enableRateLimit(_userId: string, _limit: number, _window: number): Promise<void> {
     // 速率限制实现
   }
 
@@ -1341,32 +1348,35 @@ export class ComprehensiveSecurityCenter {
             authority: 'technical'
           }
         ],
-        escalation: [
-          {
-            level: 1,
-            severity: 'low',
-            contacts: ['team-lead@company.com'],
-            responseTime: 60
-          },
-          {
-            level: 2,
-            severity: 'medium',
-            contacts: ['manager@company.com'],
-            responseTime: 30
-          },
-          {
-            level: 3,
-            severity: 'high',
-            contacts: ['director@company.com'],
-            responseTime: 15
-          },
-          {
-            level: 4,
-            severity: 'critical',
-            contacts: ['ceo@company.com', 'ciso@company.com'],
-            responseTime: 5
-          }
-        ]
+        escalation: {
+          levels: [
+            {
+              level: 1,
+              severity: 'low',
+              contacts: ['team-lead@company.com'],
+              responseTime: 60
+            },
+            {
+              level: 2,
+              severity: 'medium',
+              contacts: ['manager@company.com'],
+              responseTime: 30
+            },
+            {
+              level: 3,
+              severity: 'high',
+              contacts: ['director@company.com'],
+              responseTime: 15
+            },
+            {
+              level: 4,
+              severity: 'critical',
+              contacts: ['ceo@company.com', 'ciso@company.com'],
+              responseTime: 5
+            }
+          ],
+          notifications: []
+        }
       },
       workflow: {
         detection: {

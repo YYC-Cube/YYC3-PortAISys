@@ -7,7 +7,7 @@
  * @created 2025-01-03
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface ManagementConfig {
   enabled?: boolean;
@@ -196,9 +196,6 @@ export class ManagementSystem extends EventEmitter {
         memory: 85,
         errorRate: 10,
       },
-      onSystemHealthChange: undefined,
-      onResourceAlert: undefined,
-      onPolicyViolation: undefined,
       ...config,
     };
 

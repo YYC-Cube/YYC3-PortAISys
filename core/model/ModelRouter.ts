@@ -167,7 +167,7 @@ export class ModelRouter {
       // 更新统计
       this.updateStats(adapterKey, true, processingTime);
 
-      metrics.increment('model_router.success', {
+      metrics.increment('model_router.success', 1, {
         provider: selectedRoute.provider,
         model: selectedRoute.model
       });
@@ -185,7 +185,7 @@ export class ModelRouter {
       // 更新统计
       this.updateStats(adapterKey, false, processingTime);
 
-      metrics.increment('model_router.error', {
+      metrics.increment('model_router.error', 1, {
         provider: selectedRoute.provider,
         model: selectedRoute.model
       });
@@ -232,7 +232,7 @@ export class ModelRouter {
 
     const response = await adapter.chat(request);
 
-    metrics.increment('model_router.fallback', {
+    metrics.increment('model_router.fallback', 1, {
       fromProvider: this.getProviderFromKey(failedAdapterKey),
       toProvider: fallbackRoute.provider
     });

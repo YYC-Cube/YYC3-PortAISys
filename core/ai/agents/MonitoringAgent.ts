@@ -42,7 +42,7 @@ export class MonitoringAgent extends BaseAgent {
   private metrics: Map<string, PerformanceMetric[]> = new Map();
   private alerts: Alert[] = [];
   private thresholds: Map<string, number> = new Map();
-  private monitoringInterval: number | null = null;
+  private monitoringInterval: any = null;
 
   constructor(config: AgentConfig) {
     super(config);
@@ -232,7 +232,7 @@ export class MonitoringAgent extends BaseAgent {
     return { success: true, analysis };
   }
 
-  private async handleGenerateReport(params?: { format?: 'json' | 'text' }): Promise<any> {
+  private async handleGenerateReport(_params?: { format?: 'json' | 'text' }): Promise<any> {
     const analysis = await this.handleAnalyze();
     const alerts = await this.handleGetAlerts();
 

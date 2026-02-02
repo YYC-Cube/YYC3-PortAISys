@@ -29,6 +29,7 @@ import {
 import { ErrorHandler } from '../error-handler/ErrorHandler';
 import { ErrorBoundary } from '../error-handler/ErrorBoundary';
 import { isRetryable } from '../error-handler/ErrorTypes';
+import { Logger, LogLevel } from '../utils/logger';
 import { AutonomousAIConfig } from './types';
 
 export interface EngineConfig {
@@ -143,6 +144,7 @@ export class AutonomousAIEngine {
 
   private errorHandler!: ErrorHandler;
   private errorBoundary!: ErrorBoundary;
+  private logger: Logger;
 
   private messageHandlers: Map<string, (message: Message) => Promise<any>> = new Map();
   private eventHandlers: Map<string, string[]> = new Map();
@@ -152,6 +154,7 @@ export class AutonomousAIEngine {
 
   constructor(config: EngineConfig) {
     this.config = config;
+    this.logger = new Logger({ level: LogLevel.INFO, format: 'text', console: true });
     this.initializeSubsystems();
     this.setupEventHandlers();
   }
@@ -201,23 +204,23 @@ export class AutonomousAIEngine {
       }
     );
 
-    this.errorBoundary.on('error', async ({ error, errorInfo }) => {
-      if (errorInfo.context?.operation) {
-        await this.handleRecovery(error, errorInfo.context);
+    this.errorBoundary.on('error', async (data: { error: YYC3Error; errorInfo: any }) => {
+      if (data.errorInfo.context?.operation) {
+        await this.handleRecovery(data.error, data.errorInfo.context);
       }
     });
   }
 
   private setupEventHandlers(): void {
-    this.eventDispatcher.on('task_completed', async (event: SystemEvent) => {
+    this.eventDispatcher.onEvent('task_completed', async (event: SystemEvent) => {
       await this.handleTaskCompleted(event);
     });
 
-    this.eventDispatcher.on('task_failed', async (event: SystemEvent) => {
+    this.eventDispatcher.onEvent('task_failed', async (event: SystemEvent) => {
       await this.handleTaskFailed(event);
     });
 
-    this.eventDispatcher.on('learning_pattern_detected', async (event: SystemEvent) => {
+    this.eventDispatcher.onEvent('learning_pattern_detected', async (event: SystemEvent) => {
       await this.handlePatternDetected(event);
     });
 
@@ -263,11 +266,11 @@ export class AutonomousAIEngine {
 
   async initialize(config?: EngineConfig): Promise<void> {
     if (this.isInitialized) {
-      console.warn('Engine already initialized');
+      this.logger.warn('Engine already initialized', 'AutonomousAIEngine');
       return;
     }
 
-    console.log('Initializing AutonomousAIEngine...');
+    this.logger.info('Initializing AutonomousAIEngine...', 'AutonomousAIEngine');
 
     this.modelAdapter = this.createModelAdapter();
     this.taskScheduler.start();
@@ -286,11 +289,11 @@ export class AutonomousAIEngine {
     }
 
     if (this.isRunning) {
-      console.warn('Engine already running');
+      this.logger.warn('Engine already running', 'AutonomousAIEngine');
       return;
     }
 
-    console.log('Starting AutonomousAIEngine...');
+    this.logger.info('Starting AutonomousAIEngine...', 'AutonomousAIEngine');
     this.isRunning = true;
     this.startTime = Date.now();
 
@@ -303,11 +306,11 @@ export class AutonomousAIEngine {
 
   async pause(): Promise<void> {
     if (!this.isRunning) {
-      console.warn('Engine is not running');
+      this.logger.warn('Engine is not running', 'AutonomousAIEngine');
       return;
     }
 
-    console.log('Pausing AutonomousAIEngine...');
+    this.logger.info('Pausing AutonomousAIEngine...', 'AutonomousAIEngine');
     this.isRunning = false;
     this.taskScheduler.stop();
 
@@ -319,7 +322,7 @@ export class AutonomousAIEngine {
   }
 
   async shutdown(): Promise<void> {
-    console.log('Shutting down AutonomousAIEngine...');
+    this.logger.info('Shutting down AutonomousAIEngine...', 'AutonomousAIEngine');
 
     this.isRunning = false;
     this.taskScheduler.stop();
@@ -515,11 +518,11 @@ export class AutonomousAIEngine {
   }
 
   registerSubsystem(subsystem: any): void {
-    console.log(`Registering subsystem: ${subsystem.name}`);
+    this.logger.info(`Registering subsystem: ${subsystem.name}`, 'AutonomousAIEngine');
   }
 
   unregisterSubsystem(name: string): void {
-    console.log(`Unregistering subsystem: ${name}`);
+    this.logger.info(`Unregistering subsystem: ${name}`, 'AutonomousAIEngine');
   }
 
   getSubsystem(name: string): any {
@@ -578,12 +581,12 @@ export class AutonomousAIEngine {
 
   async restoreState(snapshot: EngineSnapshot): Promise<void> {
     this.stateManager.restoreSnapshot(snapshot.id);
-    console.log('State restored from snapshot:', snapshot.id);
+    this.logger.info('State restored from snapshot:', 'AutonomousAIEngine', { snapshotId: snapshot.id });
   }
 
   async resetState(): Promise<void> {
     this.stateManager.resetState();
-    console.log('State reset to initial state');
+    this.logger.info('State reset to initial state', 'AutonomousAIEngine');
   }
 
   getMetrics(): EngineMetrics {
@@ -629,11 +632,11 @@ export class AutonomousAIEngine {
   }
 
   enableDebugMode(): void {
-    console.log('Debug mode enabled');
+    this.logger.info('Debug mode enabled', 'AutonomousAIEngine');
   }
 
   disableDebugMode(): void {
-    console.log('Debug mode disabled');
+    this.logger.info('Debug mode disabled', 'AutonomousAIEngine');
   }
 
   private async preprocessMessage(input: AgentMessage): Promise<AgentMessage> {
@@ -660,7 +663,7 @@ export class AutonomousAIEngine {
         pageContext,
         availableTools: this.toolRegistry.getAvailableTools() || [],
       };
-    } catch (error) {
+    } catch {
       // 返回最小化的有效上下文
       return {
         timestamp: new Date(),
@@ -734,15 +737,15 @@ export class AutonomousAIEngine {
   }
 
   private async handleTaskCompleted(event: SystemEvent): Promise<void> {
-    console.log('Task completed:', event.payload);
+    this.logger.info('Task completed:', 'AutonomousAIEngine', { payload: event.payload });
   }
 
   private async handleTaskFailed(event: SystemEvent): Promise<void> {
-    console.log('Task failed:', event.payload);
+    this.logger.info('Task failed:', 'AutonomousAIEngine', { payload: event.payload });
   }
 
   private async handlePatternDetected(event: SystemEvent): Promise<void> {
-    console.log('Pattern detected:', event.payload);
+    this.logger.info('Pattern detected:', 'AutonomousAIEngine', { payload: event.payload });
   }
 
   private getCurrentPhase(): string {
@@ -850,7 +853,7 @@ export class AutonomousAIEngine {
   }
 
   private async handleValidationError(error: ValidationError, context: Record<string, any>): Promise<void> {
-    console.warn(`Validation error in ${context.operation}:`, error.message);
+    this.logger.warn(`Validation error in ${context.operation}:`, 'AutonomousAIEngine', { error: error.message });
 
     if (error.field) {
       await this.memory.saveErrorLog({
@@ -864,7 +867,7 @@ export class AutonomousAIEngine {
   }
 
   private async handleNetworkError(error: NetworkError, context: Record<string, any>): Promise<void> {
-    console.warn(`Network error in ${context.operation}:`, error.message);
+    this.logger.warn(`Network error in ${context.operation}:`, 'AutonomousAIEngine', { error: error.message });
 
     if (error.statusCode !== undefined && error.statusCode >= 500) {
       await this.eventDispatcher.dispatch({
@@ -881,7 +884,7 @@ export class AutonomousAIEngine {
   }
 
   private async handleTimeoutError(error: TimeoutError, context: Record<string, any>): Promise<void> {
-    console.warn(`Timeout error in ${context.operation}:`, error.message);
+    this.logger.warn(`Timeout error in ${context.operation}:`, 'AutonomousAIEngine', { error: error.message });
 
     await this.eventDispatcher.dispatch({
       type: 'timeout_occurred',
@@ -895,7 +898,7 @@ export class AutonomousAIEngine {
   }
 
   private async handleInternalError(error: InternalError, context: Record<string, any>): Promise<void> {
-    console.error(`Internal error in ${context.operation}:`, error.message);
+    this.logger.error(`Internal error in ${context.operation}:`, 'AutonomousAIEngine', { error: error.message }, error);
 
     await this.eventDispatcher.dispatch({
       type: 'internal_error_occurred',

@@ -43,7 +43,7 @@ export interface ModelAdapterConfig {
  */
 export abstract class ModelAdapter implements IModelAdapter {
   protected config: ModelAdapterConfig;
-  protected provider: ModelProvider;
+  public provider: ModelProvider;
   protected initialized: boolean = false;
 
   constructor(provider: ModelProvider, config: ModelAdapterConfig = {}) {
@@ -104,7 +104,7 @@ export abstract class ModelAdapter implements IModelAdapter {
         const result = await operation();
         const processingTime = Date.now() - startTime;
 
-        metrics.increment('model_adapter.success', { provider: this.provider });
+        metrics.increment('model_adapter.success', 1, { provider: this.provider });
         metrics.histogram('model_adapter.latency', processingTime, { provider: this.provider });
 
         logger.debug('模型调用成功', 'ModelAdapter', {
@@ -126,7 +126,7 @@ export abstract class ModelAdapter implements IModelAdapter {
           error: lastError.message
         });
 
-        metrics.increment('model_adapter.retry', { provider: this.provider });
+        metrics.increment('model_adapter.retry', 1, { provider: this.provider });
 
         if (attempt < maxRetries) {
           // 指数退避
@@ -136,7 +136,7 @@ export abstract class ModelAdapter implements IModelAdapter {
       }
     }
 
-    metrics.increment('model_adapter.error', { provider: this.provider });
+    metrics.increment('model_adapter.error', 1, { provider: this.provider });
 
     throw new Error(
       `模型调用失败（${operationName}），已重试 ${maxRetries} 次：${lastError?.message}`

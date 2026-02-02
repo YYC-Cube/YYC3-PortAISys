@@ -608,7 +608,7 @@ export class DynamicCognitiveNeurograph {
       alternativeOptions: [
         {
           optionId: 'alt1',
-          attributes: new Map([
+          attributes: new Map<string, any>([
             ['price', 'competitive'],
             ['quality', 'premium'],
             ['brand', 'well-known']
@@ -754,7 +754,7 @@ export class DynamicCognitiveNeurograph {
           nodeType: 'customer',
           name: 'Customer',
           influenceScore: 0.75,
-          attributes: new Map([
+          attributes: new Map<string, any>([
             ['connections', 45],
             ['activity', 'high']
           ])
@@ -764,7 +764,7 @@ export class DynamicCognitiveNeurograph {
           nodeType: 'friend',
           name: 'Friend 1',
           influenceScore: 0.65,
-          attributes: new Map([
+          attributes: new Map<string, any>([
             ['connections', 32],
             ['activity', 'medium']
           ])
@@ -991,7 +991,7 @@ export class DynamicCognitiveNeurograph {
       },
       idealSelfAlignment: {
         currentSelf: {
-          attributes: new Map([
+          attributes: new Map<string, any>([
             ['experience', '5_years'],
             ['skills', ['technical', 'management']],
             ['achievements', ['project_success', 'team_leadership']],
@@ -1002,7 +1002,7 @@ export class DynamicCognitiveNeurograph {
           values: ['growth', 'excellence', 'innovation']
         },
         idealSelf: {
-          attributes: new Map([
+          attributes: new Map<string, any>([
             ['experience', '10+_years'],
             ['skills', ['technical', 'management', 'strategic']],
             ['achievements', ['industry_recognition', 'thought_leadership']],
@@ -1102,7 +1102,7 @@ export class DynamicCognitiveNeurograph {
     };
   }
 
-  private async getDecisionHistory(customerId: string): Promise<DecisionNode[]> {
+  private async getDecisionHistory(_customerId: string): Promise<DecisionNode[]> {
     return [
       {
         nodeId: 'dec1',
@@ -1132,7 +1132,7 @@ export class DynamicCognitiveNeurograph {
     ];
   }
 
-  private async buildDecisionTree(customerId: string): Promise<DecisionTree> {
+  private async buildDecisionTree(_customerId: string): Promise<DecisionTree> {
     return {
       rootNode: 'root',
       nodes: new Map([
@@ -1164,7 +1164,7 @@ export class DynamicCognitiveNeurograph {
     };
   }
 
-  private async identifyDecisionFactors(customerId: string): Promise<DecisionFactor[]> {
+  private async identifyDecisionFactors(_customerId: string): Promise<DecisionFactor[]> {
     return [
       {
         factorId: 'factor1',
@@ -1190,7 +1190,7 @@ export class DynamicCognitiveNeurograph {
     ];
   }
 
-  private async analyzeDecisionOutcomes(customerId: string): Promise<DecisionOutcome[]> {
+  private async analyzeDecisionOutcomes(_customerId: string): Promise<DecisionOutcome[]> {
     return [
       {
         outcomeId: 'out1',

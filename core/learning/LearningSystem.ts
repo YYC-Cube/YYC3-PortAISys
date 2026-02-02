@@ -138,15 +138,15 @@ export class LearningSystem {
     }
 
     // 计算准确率
-    const accurateResponses = recentRecords.filter(record => record.accuracy >= 0.8).length;
+    const accurateResponses = recentRecords.filter(record => (record.accuracy ?? 0) >= 0.8).length;
     const accuracy = accurateResponses / recentRecords.length;
 
     // 计算平均响应时间
-    const totalResponseTime = recentRecords.reduce((sum, record) => sum + (record.responseTime || 0), 0);
+    const totalResponseTime = recentRecords.reduce((sum, record) => sum + (record.responseTime ?? 0), 0);
     const responseTime = totalResponseTime / recentRecords.length;
 
     // 计算用户满意度
-    const satisfiedUsers = recentRecords.filter(record => record.userSatisfaction >= 3).length;
+    const satisfiedUsers = recentRecords.filter(record => (record.userSatisfaction ?? 0) >= 3).length;
     const userSatisfaction = satisfiedUsers / recentRecords.length;
 
     // 计算工具使用效果
@@ -203,8 +203,8 @@ export class LearningSystem {
     // 根据识别到的模式调整系统行为
     for (const pattern of latestPatterns) {
       if (pattern.type === 'common_questions') {
-        // 缓存常见问题的答案
-        await this.cacheCommonQuestions(pattern.patterns);
+        const commonQuestions = pattern.patterns as Array<{ question: string; frequency: number }>;
+        await this.cacheCommonQuestions(commonQuestions);
       }
     }
   }

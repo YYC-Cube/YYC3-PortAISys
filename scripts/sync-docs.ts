@@ -39,7 +39,7 @@ async function main() {
   });
 
   try {
-    const result = await syncManager.sync();
+    await syncManager.sync();
     console.log('🎉 文档同步任务完成');
   } catch (error) {
     console.error('❌ 同步过程中发生错误:', error);

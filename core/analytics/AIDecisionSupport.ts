@@ -1,15 +1,10 @@
 // analytics/AIDecisionSupport.ts
 import {
-  RecommendationEngine,
-  ScenarioSimulator,
   IntelligentRecommendations,
   ScenarioAnalysis
 } from './AIAnalyticsEngine';
 
 export class AIDecisionSupport {
-  private recommendationEngine: RecommendationEngine;
-  private scenarioSimulator: ScenarioSimulator;
-  
   async provideIntelligentRecommendations(): Promise<IntelligentRecommendations> {
     return {
       strategicRecommendations: {

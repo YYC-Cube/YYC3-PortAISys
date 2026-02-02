@@ -277,68 +277,7 @@ export interface CallAnalysis {
 }
 
 export class AICoachingSystem {
-  private skillAssessor: SkillAssessor;
-  private learningPathGenerator: LearningPathGenerator;
-  private performancePredictor: PerformancePredictor;
-
   constructor() {
-    this.skillAssessor = {
-      assessSkills: async (agent: Agent) => {
-        return await this.assessAgentSkills(agent);
-      },
-      assessCommunication: async (recordings: any[]) => {
-        return await this.assessCommunication(recordings);
-      },
-      assessProductKnowledge: async (agent: Agent) => {
-        return await this.assessProductKnowledge(agent);
-      },
-      assessObjectionHandling: async (recordings: any[]) => {
-        return await this.assessObjectionHandling(recordings);
-      },
-      assessClosingAbility: async (performanceData: any) => {
-        return await this.assessClosingAbility(performanceData);
-      },
-      assessEmotionalIntelligence: async (recordings: any[]) => {
-        return await this.assessEmotionalIntelligence(recordings);
-      },
-      calculateOverallLevel: async (agent: Agent) => {
-        return await this.calculateOverallLevel(agent);
-      },
-      identifySkillGaps: async (agent: Agent, performanceData: any) => {
-        return await this.identifySkillGaps(agent, performanceData);
-      }
-    };
-    this.learningPathGenerator = {
-      generatePath: async (assessment: SkillAssessment, agent: Agent) => {
-        return await this.generateLearningPath(assessment, agent);
-      },
-      prioritizeSkills: async (gaps: SkillGap[], role: string) => {
-        return await this.prioritizeSkills(gaps, role);
-      },
-      selectModules: async (skills: SkillGap[]) => {
-        return await this.selectLearningModules(skills);
-      },
-      createTimeline: async (modules: LearningModule[], availability: string[]) => {
-        return await this.createLearningTimeline(modules, availability);
-      },
-      defineMilestones: async (modules: LearningModule[]) => {
-        return await this.defineLearningMilestones(modules);
-      },
-      scheduleAssessments: async (modules: LearningModule[]) => {
-        return await this.scheduleAssessments(modules);
-      }
-    };
-    this.performancePredictor = {
-      predictImprovement: async (plan: TrainingPlan) => {
-        return await this.predictPerformanceImprovement(plan);
-      },
-      calculateSuccessProbability: async (agent: Agent, plan: TrainingPlan) => {
-        return await this.calculateSuccessProbability(agent, plan);
-      },
-      estimateTimeToGoal: async (agent: Agent, goal: SkillGoal) => {
-        return await this.estimateTimeToGoal(agent, goal);
-      }
-    };
   }
 
   async createPersonalizedCoaching(agent: Agent): Promise<AgentCoachingPlan> {
@@ -368,7 +307,9 @@ export class AICoachingSystem {
       closingAbility: await this.assessClosingAbility(performanceData),
       emotionalIntelligence: await this.assessEmotionalIntelligence(callRecordings),
       overallLevel: await this.calculateOverallLevel(agent),
-      gaps: await this.identifySkillGaps(agent, performanceData)
+      gaps: await this.identifySkillGaps(agent, performanceData),
+      strengths: [],
+      recommendations: []
     };
   }
 
@@ -461,14 +402,14 @@ export class AICoachingSystem {
     return avgSentiment;
   }
 
-  private async calculateOverallLevel(agent: Agent): Promise<number> {
-    const performanceData = await this.getPerformanceData(agent.id);
+  private async calculateOverallLevel(_agent: Agent): Promise<number> {
+    const performanceData = await this.getPerformanceData(_agent.id);
     const metrics = performanceData.metrics || {};
-    const scores = Object.values(metrics);
-    return scores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0.5;
+    const scores = Object.values(metrics) as number[];
+    return scores.length > 0 ? scores.reduce((sum: number, score: number) => sum + score, 0) / scores.length : 0.5;
   }
 
-  private async identifySkillGaps(agent: Agent, performanceData: any): Promise<SkillGap[]> {
+  private async identifySkillGaps(_agent: Agent, performanceData: any): Promise<SkillGap[]> {
     const metrics = performanceData.metrics || {};
     const gaps: SkillGap[] = [];
 
@@ -623,7 +564,7 @@ export class AICoachingSystem {
     return modules;
   }
 
-  private async createLearningTimeline(modules: LearningModule[], availability: string[]): Promise<Timeline> {
+  private async createLearningTimeline(modules: LearningModule[], _availability: string[]): Promise<Timeline> {
     const startDate = new Date();
     const totalDuration = modules.reduce((sum, m) => sum + m.duration, 0);
     const endDate = new Date(startDate.getTime() + totalDuration * 60 * 1000);
@@ -760,7 +701,7 @@ export class AICoachingSystem {
     };
   }
 
-  private async predictPerformanceImprovement(plan: TrainingPlan): Promise<PerformancePrediction> {
+  private async predictPerformanceImprovement(_plan: TrainingPlan): Promise<PerformancePrediction> {
     const expectedImprovement: Record<string, number> = {
       communicationSkills: 0.15,
       productKnowledge: 0.12,
@@ -793,7 +734,7 @@ export class AICoachingSystem {
     };
   }
 
-  private async defineSuccessMetrics(agent: Agent, plan: TrainingPlan): Promise<SuccessMetric[]> {
+  private async defineSuccessMetrics(_agent: Agent, _plan: TrainingPlan): Promise<SuccessMetric[]> {
     return [
       {
         id: 'metric-001',
@@ -826,20 +767,6 @@ export class AICoachingSystem {
         status: 'on-track'
       }
     ];
-  }
-
-  private async calculateSuccessProbability(agent: Agent, plan: TrainingPlan): Promise<number> {
-    const baseProbability = 0.7;
-    const experienceBonus = Math.min(agent.experience * 0.03, 0.15);
-    const skillBonus = Math.min(agent.skills.length * 0.02, 0.1);
-    return Math.min(1, baseProbability + experienceBonus + skillBonus);
-  }
-
-  private async estimateTimeToGoal(agent: Agent, goal: SkillGoal): Promise<number> {
-    const baseTime = 30;
-    const experienceReduction = Math.min(agent.experience, 10) * 2;
-    const priorityMultiplier = goal.priority === 'high' ? 0.8 : goal.priority === 'medium' ? 1 : 1.2;
-    return Math.max(7, Math.floor((baseTime - experienceReduction) * priorityMultiplier));
   }
 
   private async analyzeCallInProgress(callSession: CallSession): Promise<CallAnalysis> {

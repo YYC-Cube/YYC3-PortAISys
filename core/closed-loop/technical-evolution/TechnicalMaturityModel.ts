@@ -5,7 +5,7 @@
  */
 
 import type { AutonomousAIConfig } from '../../autonomous-ai-widget/types';
-import type { ClosedLoopMetrics } from '../types';
+import { Logger } from '../../utils/logger';
 
 /**
  * 技术成熟度级别
@@ -33,11 +33,11 @@ interface TechnicalDomain {
 }
 
 export class TechnicalMaturityModel {
-  private config: AutonomousAIConfig;
   private domains: TechnicalDomain[] = [];
+  private logger: Logger;
 
-  constructor(config: AutonomousAIConfig) {
-    this.config = config;
+  constructor(_config: AutonomousAIConfig) {
+    this.logger = new Logger({ level: 'INFO', format: 'text', console: true });
     this.initializeDomains();
   }
 
@@ -94,7 +94,7 @@ export class TechnicalMaturityModel {
    * 评估技术成熟度
    * @param metrics 闭环系统指标数据
    */
-  async assessMaturity(metrics: ClosedLoopMetrics): Promise<void> {
+  async assessMaturity(metrics: any): Promise<void> {
     // 评估每个技术领域的成熟度
     this.domains = this.domains.map(domain => {
       const maturityScore = this.calculateMaturityScore(domain, metrics);
@@ -110,13 +110,13 @@ export class TechnicalMaturityModel {
     });
 
     // 记录成熟度评估结果
-    console.log('TechnicalMaturityModel: Maturity assessed:', this.domains);
+    this.logger.info('Maturity assessed:', 'TechnicalMaturityModel', { domains: this.domains });
   }
 
   /**
    * 计算技术领域的成熟度分数
    */
-  private calculateMaturityScore(domain: TechnicalDomain, metrics: ClosedLoopMetrics): number {
+  private calculateMaturityScore(domain: TechnicalDomain, metrics: any): number {
     // 根据领域指标计算成熟度分数
     let totalScore = 0;
     let validMetrics = 0;
@@ -152,7 +152,7 @@ export class TechnicalMaturityModel {
   /**
    * 识别改进领域
    */
-  private identifyImprovementAreas(domain: TechnicalDomain, metrics: ClosedLoopMetrics): string[] {
+  private identifyImprovementAreas(domain: TechnicalDomain, metrics: any): string[] {
     const improvementAreas: string[] = [];
 
     // 根据指标值识别需要改进的方面

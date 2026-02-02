@@ -5,7 +5,7 @@ import {
   ThreatReport,
   ThreatDetector as IThreatDetector
 } from './types';
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export class ThreatDetector extends EventEmitter implements IThreatDetector {
   private threatDatabase: Map<string, Threat>;

@@ -16,7 +16,7 @@ export interface PluginManifest {
   version: string;
   description: string;
   author: string;
-  main: string;
+  main?: string;
   homepage?: string;
   repository?: string;
   keywords?: string[];
@@ -45,6 +45,8 @@ export interface Plugin {
   enabled: boolean;
   instance?: PluginInstance;
   config?: Record<string, any>;
+  status?: PluginStatus;
+  plugin?: PluginInstance;
   
   onInstall?(): Promise<void>;
   onUninstall?(): Promise<void>;

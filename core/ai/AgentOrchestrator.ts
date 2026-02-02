@@ -10,7 +10,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import { BaseAgent } from './BaseAgent';
 
 
@@ -324,9 +324,9 @@ export class AgentOrchestrator extends EventEmitter {
    * 执行开始节点
    */
   private async executeStartNode(
-    workflow: WorkflowDefinition,
-    context: WorkflowContext,
-    node: WorkflowNode
+    _workflow: WorkflowDefinition,
+    _context: WorkflowContext,
+    _node: WorkflowNode
   ): Promise<void> {
     // 开始节点只是一个起点，不执行任何操作
   }
@@ -335,7 +335,7 @@ export class AgentOrchestrator extends EventEmitter {
    * 执行Agent节点
    */
   private async executeAgentNode(
-    workflow: WorkflowDefinition,
+    _workflow: WorkflowDefinition,
     context: WorkflowContext,
     node: WorkflowNode
   ): Promise<void> {
@@ -362,9 +362,9 @@ export class AgentOrchestrator extends EventEmitter {
    * 执行决策节点
    */
   private async executeDecisionNode(
-    workflow: WorkflowDefinition,
-    context: WorkflowContext,
-    node: WorkflowNode
+    _workflow: WorkflowDefinition,
+    _context: WorkflowContext,
+    _node: WorkflowNode
   ): Promise<void> {
     // 决策逻辑可以在这里实现，但由于使用edges，决策结果应该在主循环中处理
     // 对于简单实现，我们假设第一条边是默认路径
@@ -374,9 +374,9 @@ export class AgentOrchestrator extends EventEmitter {
    * 执行并行节点
    */
   private async executeParallelNode(
-    workflow: WorkflowDefinition,
-    context: WorkflowContext,
-    node: WorkflowNode
+    _workflow: WorkflowDefinition,
+    _context: WorkflowContext,
+    _node: WorkflowNode
   ): Promise<void> {
     // 并行执行由主循环处理，这里只是标记为并行节点
   }
@@ -385,9 +385,9 @@ export class AgentOrchestrator extends EventEmitter {
    * 执行合并节点
    */
   private async executeMergeNode(
-    workflow: WorkflowDefinition,
-    context: WorkflowContext,
-    node: WorkflowNode
+    _workflow: WorkflowDefinition,
+    _context: WorkflowContext,
+    _node: WorkflowNode
   ): Promise<void> {
     // 合并节点用于同步并行分支的结果
     // 在简单实现中，这里不需要做任何事情
@@ -638,7 +638,7 @@ export class AgentOrchestrator extends EventEmitter {
 
     history.push({
       timestamp: context.startTime,
-      status: context.status || 'completed',
+      status: (context.status === 'running') ? 'completed' : (context.status || 'completed'),
       duration,
       nodesExecuted: context.visitedNodes.length,
       error: context.error,

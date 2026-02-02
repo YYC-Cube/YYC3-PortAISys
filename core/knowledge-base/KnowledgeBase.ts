@@ -9,7 +9,6 @@
 
 import {
   NotFoundError,
-  ValidationError,
   InternalError
 } from '../error-handler/ErrorTypes';
 

@@ -1,7 +1,6 @@
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import * as os from 'os';
 import * as fs from 'fs';
-import * as path from 'path';
 import {
   MonitoringSystem,
   MonitoringConfig,
@@ -152,7 +151,6 @@ export class MonitoringSystemImpl extends EventEmitter implements MonitoringSyst
     const metrics: Metric[] = [];
     const timestamp = new Date();
 
-    const cpus = os.cpus();
     const cpuUsage = await this.getCpuUsage();
     metrics.push({
       name: 'cpu.usage.percent',
@@ -394,7 +392,7 @@ export class MonitoringSystemImpl extends EventEmitter implements MonitoringSyst
     }
   }
 
-  private aggregateMetrics(metrics: Metric[], aggregation: string, interval?: number): Metric[] {
+  private aggregateMetrics(metrics: Metric[], aggregation: string, _interval?: number): Metric[] {
     if (metrics.length === 0) {
       return [];
     }

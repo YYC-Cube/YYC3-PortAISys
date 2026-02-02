@@ -531,14 +531,12 @@ export class CausalInferenceEngine {
   private causalModels: Map<string, any>;
   private simulationHistory: Map<string, any>;
   private interventionRegistry: Map<string, any>;
-  private systemModel: Map<string, any>;
 
   constructor(config: CausalInferenceEngineConfig) {
     this.config = config;
     this.causalModels = new Map();
     this.simulationHistory = new Map();
     this.interventionRegistry = new Map();
-    this.systemModel = new Map();
   }
 
   async counterfactualSimulation(): Promise<CounterfactualSimulation> {

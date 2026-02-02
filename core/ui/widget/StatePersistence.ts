@@ -7,7 +7,7 @@
  * @created 2025-01-05
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import { WidgetState } from '../IntelligentAIWidget';
 
 export class StatePersistence extends EventEmitter {

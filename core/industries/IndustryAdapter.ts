@@ -1,4 +1,17 @@
-import { NotFoundError, ValidationError } from '../error-handler/ErrorTypes';
+import { NotFoundError } from '../error-handler/ErrorTypes';
+import type { AIWidgetInstance } from '../autonomous-ai-widget/types';
+import { createAIWidget } from '../index';
+
+interface IndustryConfiguration {
+  id: string;
+  name: string;
+  description: string;
+  personas: string[];
+  capabilities: string[];
+  tools: any[];
+  dataSources: any[];
+  successMetrics: any[];
+}
 
 export class IndustryAdapter {
   private industryConfigs: Map<string, IndustryConfiguration> = new Map();
@@ -41,22 +54,48 @@ export class IndustryAdapter {
       });
     }
 
-    const personaConfig = await this.getPersonaConfiguration(userPersona, config);
+    await this.getPersonaConfiguration(userPersona, config);
 
-    return createAutonomousAIWidget({
+    return createAIWidget({
       apiType: 'internal',
       modelName: 'yyc3-industry-specialized',
+      maxTokens: 2000,
+      temperature: 0.7,
       enableLearning: true,
       enableMemory: true,
-      businessContext: {
-        industry: config.id,
-        userRole: userPersona,
-        domainKnowledge: config.capabilities,
-        operationalConstraints: await this.getOperationalConstraints(industry)
-      },
-      customTools: config.tools,
-      dataSources: config.dataSources,
-      uiConfig: await this.getIndustryUIConfig(industry, userPersona)
+      enableToolUse: true,
+      enableContextAwareness: true,
+      position: 'bottom-right',
+      theme: 'auto',
+      language: 'zh-CN'
     });
+  }
+
+  private async getPersonaConfiguration(_userPersona: string, _config: IndustryConfiguration): Promise<any> {
+    return {};
+  }
+
+  private getManagementTools(): any[] {
+    return [];
+  }
+
+  private getManagementDataSources(): any[] {
+    return [];
+  }
+
+  private getManagementMetrics(): any[] {
+    return [];
+  }
+
+  private getOperationsTools(): any[] {
+    return [];
+  }
+
+  private getOperationsDataSources(): any[] {
+    return [];
+  }
+
+  private getOperationsMetrics(): any[] {
+    return [];
   }
 }

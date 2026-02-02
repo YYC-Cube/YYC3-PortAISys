@@ -11,7 +11,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { EventEmitter } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 
 export interface VulnerabilitySeverity {
   level: 'critical' | 'high' | 'medium' | 'low' | 'info';

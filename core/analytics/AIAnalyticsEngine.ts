@@ -101,6 +101,7 @@ export interface RealTimeDashboard {
 export interface DataStream {
   streamData: (data: any) => void;
   getData: () => any[];
+  getRealTimeData: () => Promise<any>;
 }
 
 export interface AlertEngine {
@@ -152,10 +153,30 @@ export interface AIMetrics {
 }
 
 export interface KPIOverview {
-  revenue: any;
-  conversion: any;
-  customerSatisfaction: any;
-  operationalEfficiency: any;
+  revenue: {
+    current: number;
+    target: number;
+    trend: any;
+    prediction: any;
+  };
+  conversion: {
+    rate: number;
+    trend: string;
+    breakdown: any;
+    optimization: any;
+  };
+  customerSatisfaction: {
+    score: number;
+    trend: string;
+    drivers: any;
+    improvement: any;
+  };
+  operationalEfficiency: {
+    callsPerHour: number;
+    averageTalkTime: number;
+    agentUtilization: number;
+    optimization: any;
+  };
 }
 
 export interface BusinessIntelligence {
@@ -282,41 +303,7 @@ export interface ReportSection {
 }
 
 export class AIAnalyticsEngine {
-  private predictiveModel: PredictiveModel;
-  private anomalyDetector: AnomalyDetector;
-  private insightGenerator: InsightGenerator;
-
   constructor() {
-    this.predictiveModel = {
-      predict: async (data: ProcessedData) => {
-        return await this.generatePredictions(data);
-      },
-      train: async (data: any[]) => {
-        console.log('训练预测模型');
-      },
-      evaluate: async (data: any[]) => {
-        return 0.85;
-      }
-    };
-    this.anomalyDetector = {
-      detect: async (data: ProcessedData) => {
-        return await this.detectAnomalies(data);
-      },
-      train: async (data: any[]) => {
-        console.log('训练异常检测模型');
-      },
-      evaluate: async (data: any[]) => {
-        return 0.88;
-      }
-    };
-    this.insightGenerator = {
-      generate: async (data: ProcessedData) => {
-        return await this.generateAIInsights(data);
-      },
-      prioritize: async (insights: AnalyticsInsight[]) => {
-        return await this.prioritizeInsights(insights);
-      }
-    };
   }
 
   async generateBusinessIntelligence(): Promise<BusinessIntelligence> {
@@ -384,7 +371,7 @@ export class AIAnalyticsEngine {
     };
   }
 
-  private async generatePredictions(data: ProcessedData): Promise<Prediction[]> {
+  private async generatePredictions(_data: ProcessedData): Promise<Prediction[]> {
     return [
       {
         id: 'pred-001',
@@ -434,7 +421,7 @@ export class AIAnalyticsEngine {
     ];
   }
 
-  private async detectAnomalies(data: ProcessedData): Promise<Anomaly[]> {
+  private async detectAnomalies(_data: ProcessedData): Promise<Anomaly[]> {
     return [
       {
         id: 'anom-001',
@@ -742,7 +729,7 @@ export class AIAnalyticsEngine {
     });
   }
 
-  private async predictOpportunities(data: ProcessedData): Promise<any[]> {
+  private async predictOpportunities(_data: ProcessedData): Promise<any[]> {
     return [
       {
         id: 'opp-001',
@@ -786,7 +773,7 @@ export class AIAnalyticsEngine {
     }));
   }
 
-  private async identifyBottlenecks(data: ProcessedData): Promise<any[]> {
+  private async identifyBottlenecks(_data: ProcessedData): Promise<any[]> {
     return [
       {
         id: 'bottleneck-001',
@@ -833,7 +820,7 @@ export class AIAnalyticsEngine {
     }));
   }
 
-  private async analyzeABTestResults(data: ProcessedData): Promise<any[]> {
+  private async analyzeABTestResults(_data: ProcessedData): Promise<any[]> {
     return [
       {
         id: 'test-001',

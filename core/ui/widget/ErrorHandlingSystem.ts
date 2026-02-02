@@ -10,7 +10,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface ErrorHandlingConfig {
   enabled?: boolean;
@@ -171,9 +171,6 @@ export class ErrorHandlingSystem extends EventEmitter {
       errorRetentionDays: 30,
       recoveryAttempts: 3,
       recoveryDelay: 1000,
-      onCriticalError: undefined,
-      onErrorRecovered: undefined,
-      onErrorLogged: undefined,
       ...config,
     };
 

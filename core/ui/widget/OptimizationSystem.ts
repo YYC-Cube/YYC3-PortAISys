@@ -10,7 +10,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface OptimizationConfig {
   enabled?: boolean;
@@ -135,6 +135,7 @@ export class OptimizationSystem extends EventEmitter {
   private enabled: boolean;
   private autoOptimizationEnabled: boolean;
   private optimizationInterval: number;
+  private optimizationThreshold: number;
   private optimizationIntervalId: NodeJS.Timeout | null;
   private maxOptimizationHistory: number;
   private optimizationStrategies: Map<string, OptimizationStrategy[]>;

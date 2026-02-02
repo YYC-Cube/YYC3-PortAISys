@@ -8,7 +8,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 
 export interface IntegrationManifest {
   id: string;
@@ -305,7 +305,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
     this.integrations.set(manifest.id, instance);
     this.metrics.totalIntegrations++;
 
-    this.emit('integration:registered', manifest);
+    this.emitEvent('integration:registered', manifest);
   }
 
   unregisterIntegration(integrationId: string): void {
@@ -318,14 +318,14 @@ export class EcosystemIntegrationSystem extends EventEmitter {
       this.disableIntegration(integrationId);
     }
 
-    instance.connections.forEach((connection, connectionId) => {
+    instance.connections.forEach((_connection, connectionId) => {
       this.disconnect(connectionId);
     });
 
     this.integrations.delete(integrationId);
     this.metrics.totalIntegrations--;
 
-    this.emit('integration:unregistered', integrationId);
+    this.emitEvent('integration:unregistered', integrationId);
   }
 
   async enableIntegration(integrationId: string, config: Record<string, any> = {}): Promise<void> {
@@ -339,7 +339,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
     instance.metadata.enabledAt = new Date();
     this.metrics.activeIntegrations++;
 
-    this.emit('integration:enabled', { integrationId, config });
+    this.emitEvent('integration:enabled', { integrationId, config });
 
     await this.startHealthCheck(integrationId);
   }
@@ -355,7 +355,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
 
     this.stopHealthCheck(integrationId);
 
-    this.emit('integration:disabled', integrationId);
+    this.emitEvent('integration:disabled', integrationId);
   }
 
   async connect(
@@ -393,7 +393,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
     instance.connections.set(connectionId, connection);
     this.metrics.totalConnections++;
 
-    this.emit('connection:created', { integrationId, connectionId, connection });
+    this.emitEvent('connection:created', { integrationId, connectionId, connection });
 
     await this.establishConnection(connection);
 
@@ -405,12 +405,12 @@ export class EcosystemIntegrationSystem extends EventEmitter {
       connection.status = ConnectionStatus.CONNECTED;
       this.metrics.activeConnections++;
 
-      this.emit('connection:established', connection);
+      this.emitEvent('connection:established', connection);
     } catch (error) {
       connection.status = ConnectionStatus.ERROR;
       connection.metrics.errors++;
 
-      this.emit('connection:error', { connection, error });
+      this.emitEvent('connection:error', { connection, error });
       throw error;
     }
   }
@@ -426,7 +426,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
 
     this.connections.delete(connectionId);
 
-    this.emit('connection:closed', connectionId);
+    this.emitEvent('connection:closed', connectionId);
   }
 
   async executeRequest<T = any>(
@@ -454,7 +454,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
       const responseTime = Date.now() - startTime;
       this.updateConnectionMetrics(instance, responseTime, true);
 
-      this.emit('request:success', { integrationId, endpoint, responseTime });
+      this.emitEvent('request:success', { integrationId, endpoint, responseTime });
 
       return response;
     } catch (error) {
@@ -462,7 +462,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
       this.metrics.totalErrors++;
       this.updateConnectionMetrics(instance, responseTime, false);
 
-      this.emit('request:error', { integrationId, endpoint, error, responseTime });
+      this.emitEvent('request:error', { integrationId, endpoint, error, responseTime });
 
       throw error;
     }
@@ -517,27 +517,13 @@ export class EcosystemIntegrationSystem extends EventEmitter {
     this.updateGlobalMetrics(responseTime, success);
   }
 
-  private updateGlobalMetrics(responseTime: number, success: boolean): void {
+  private updateGlobalMetrics(responseTime: number, _success: boolean): void {
     const totalResponseTime = this.metrics.averageResponseTime * (this.metrics.totalRequests - 1) + responseTime;
     this.metrics.averageResponseTime = totalResponseTime / this.metrics.totalRequests;
     this.metrics.successRate = ((this.metrics.totalRequests - this.metrics.totalErrors) / this.metrics.totalRequests) * 100;
   }
 
-  on(event: string, handler: Function): void {
-    if (!this.eventHandlers.has(event)) {
-      this.eventHandlers.set(event, new Set());
-    }
-    this.eventHandlers.get(event)!.add(handler);
-  }
-
-  off(event: string, handler: Function): void {
-    const handlers = this.eventHandlers.get(event);
-    if (handlers) {
-      handlers.delete(handler);
-    }
-  }
-
-  emit(event: string, data?: any): void {
+  emitEvent(event: string, data?: any): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.forEach(handler => {
@@ -557,7 +543,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
 
     const checkHealth = async () => {
       const health = await this.checkIntegrationHealth(integrationId);
-      this.emit('health:check', { integrationId, health });
+      this.emitEvent('health:check', { integrationId, health });
     };
 
     await checkHealth();
@@ -683,7 +669,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
       }
     });
 
-    this.emit('metrics:reset');
+    this.emitEvent('metrics:reset');
   }
 
   async syncIntegration(integrationId: string): Promise<void> {
@@ -692,15 +678,15 @@ export class EcosystemIntegrationSystem extends EventEmitter {
       throw new Error(`Integration not found: ${integrationId}`);
     }
 
-    this.emit('sync:started', integrationId);
+    this.emitEvent('sync:started', integrationId);
 
     try {
       await this.performSync(instance);
       instance.metadata.lastSync = new Date();
 
-      this.emit('sync:completed', integrationId);
+      this.emitEvent('sync:completed', integrationId);
     } catch (error) {
-      this.emit('sync:error', { integrationId, error });
+      this.emitEvent('sync:error', { integrationId, error });
       throw error;
     }
   }
@@ -716,7 +702,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
   }
 
   private async syncConnection(connection: Connection): Promise<void> {
-    this.emit('connection:sync', connection.id);
+    this.emitEvent('connection:sync', connection.id);
   }
 
   destroy(): void {

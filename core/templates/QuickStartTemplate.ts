@@ -57,4 +57,32 @@ export class QuickStartTemplate {
         });
     }
   }
+
+  static async getPersonaConfig(userRole: string): Promise<any> {
+    const personaConfigs: Record<string, any> = {
+      developer: {
+        businessContext: {
+          primaryGoals: ['代码质量提升', '开发效率优化', '技术债务管理'],
+          keyMetrics: ['代码覆盖率', '构建时间', 'Bug率'],
+          communicationStyle: '技术导向'
+        }
+      },
+      manager: {
+        businessContext: {
+          primaryGoals: ['项目进度跟踪', '资源优化', '团队协作'],
+          keyMetrics: ['任务完成率', '团队效率', '项目健康度'],
+          communicationStyle: '管理导向'
+        }
+      },
+      analyst: {
+        businessContext: {
+          primaryGoals: ['数据分析', '洞察发现', '趋势预测'],
+          keyMetrics: ['数据准确性', '分析速度', '洞察质量'],
+          communicationStyle: '分析导向'
+        }
+      }
+    };
+
+    return personaConfigs[userRole] || personaConfigs.developer;
+  }
 }

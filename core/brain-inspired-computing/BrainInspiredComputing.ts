@@ -7,7 +7,7 @@
  * @created 2024-10-15
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface NeuralNetworkConfig {
   numNeurons: number;
@@ -280,7 +280,7 @@ export class BrainInspiredComputing extends EventEmitter {
       const timingWindows = new Map<string, number[]>();
 
       for (const neuron of neurons) {
-        for (const [targetId, weight] of neuron.weights) {
+        for (const [targetId, _weight] of neuron.weights) {
           const targetNeuron = this.neurons.get(targetId);
           if (!targetNeuron) continue;
 
@@ -562,7 +562,7 @@ export class BrainInspiredComputing extends EventEmitter {
       const weightChanges = new Map<string, number>();
 
       for (const neuron of neurons) {
-        for (const [targetId, weight] of neuron.weights) {
+        for (const [targetId, _weight] of neuron.weights) {
           const targetNeuron = this.neurons.get(targetId);
           if (!targetNeuron) continue;
 

@@ -195,12 +195,14 @@ export interface ComplianceStatus {
   compliant: boolean;
   frameworks: FrameworkStatus[];
   gaps: ComplianceGap[];
+  score: number;
 }
 
 export interface FrameworkStatus {
   name: string;
   status: 'compliant' | 'non-compliant' | 'partial';
   score: number;
+  gaps: ComplianceGap[];
 }
 
 export interface ComplianceGap {
@@ -768,4 +770,177 @@ export interface ComprehensiveSecurityCenterConfig {
     severity: 'low' | 'medium' | 'high' | 'critical';
     responseTime: number;
   };
+  encryptionKey?: string;
+  enableSecurityAudit?: boolean;
+  enablePenetrationTesting?: boolean;
+  securityAuditSchedule?: string;
+  penetrationTestingSchedule?: string;
+}
+
+export interface SecurityAuditResult {
+  auditId: string;
+  timestamp: Date;
+  status: 'pass' | 'fail';
+  summary: {
+    totalVulnerabilities: number;
+    criticalVulnerabilities: number;
+    highVulnerabilities: number;
+    mediumVulnerabilities: number;
+    lowVulnerabilities: number;
+    complianceScore: number;
+  };
+  details: {
+    vulnerabilityScan: any;
+    complianceCheck: any;
+    accessReview: any;
+    configurationAudit: any;
+  };
+  recommendations: string[];
+}
+
+export interface PenetrationTestResult {
+  testId: string;
+  timestamp: Date;
+  status: 'pass' | 'fail';
+  summary: {
+    totalTests: number;
+    passedTests: number;
+    failedTests: number;
+    criticalIssues: number;
+  };
+  details: {
+    networkTests: any;
+    applicationTests: any;
+    apiTests: any;
+    socialEngineeringTests: any;
+  };
+  recommendations: string[];
+}
+
+export interface VulnerabilityScanResult {
+  scanId: string;
+  timestamp: Date;
+  vulnerabilities: Array<{
+    id: string;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    description: string;
+    affectedComponents: string[];
+    remediation: string;
+  }>;
+}
+
+export interface ComplianceCheckResult {
+  checkId: string;
+  timestamp: Date;
+  overallStatus: 'compliant' | 'non-compliant' | 'partial';
+  frameworks: Array<{
+    name: string;
+    status: 'compliant' | 'non-compliant' | 'partial';
+    score: number;
+    gaps: string[];
+  }>;
+}
+
+export interface AccessReviewResult {
+  reviewId: string;
+  timestamp: Date;
+  status: 'pass' | 'fail';
+  summary: {
+    totalUsers: number;
+    totalRoles: number;
+    excessivePrivileges: number;
+    orphanedAccounts: number;
+  };
+  details: Array<{
+    userId: string;
+    issues: string[];
+  }>;
+}
+
+export interface ConfigurationAuditResult {
+  auditId: string;
+  timestamp: Date;
+  status: 'pass' | 'fail';
+  summary: {
+    totalConfigurations: number;
+    compliantConfigurations: number;
+    nonCompliantConfigurations: number;
+  };
+  details: Array<{
+    configuration: string;
+    status: 'compliant' | 'non-compliant';
+    issues: string[];
+  }>;
+}
+
+export interface NetworkTestResult {
+  testId: string;
+  timestamp: Date;
+  status: 'pass' | 'fail';
+  summary: {
+    totalTests: number;
+    passedTests: number;
+    failedTests: number;
+  };
+  details: Array<{
+    testName: string;
+    status: 'pass' | 'fail';
+    details: string;
+  }>;
+}
+
+export interface ApplicationTestResult {
+  testId: string;
+  timestamp: Date;
+  status: 'pass' | 'fail';
+  summary: {
+    totalTests: number;
+    passedTests: number;
+    failedTests: number;
+  };
+  details: Array<{
+    testName: string;
+    status: 'pass' | 'fail';
+    details: string;
+  }>;
+}
+
+export interface APITestResult {
+  testId: string;
+  timestamp: Date;
+  status: 'pass' | 'fail';
+  summary: {
+    totalTests: number;
+    passedTests: number;
+    failedTests: number;
+  };
+  details: Array<{
+    endpoint: string;
+    status: 'pass' | 'fail';
+    issues: string[];
+  }>;
+}
+
+export interface SocialEngineeringTestResult {
+  testId: string;
+  timestamp: Date;
+  status: 'pass' | 'fail';
+  summary: {
+    totalTests: number;
+    passedTests: number;
+    failedTests: number;
+  };
+  details: Array<{
+    testName: string;
+    status: 'pass' | 'fail';
+    details: string;
+  }>;
+}
+
+export interface SecurityAuditData {
+  vulnerabilityScan: VulnerabilityScanResult;
+  complianceCheck: ComplianceCheckResult;
+  accessReview: AccessReviewResult;
+  configurationAudit: ConfigurationAuditResult;
+  duration: number;
 }

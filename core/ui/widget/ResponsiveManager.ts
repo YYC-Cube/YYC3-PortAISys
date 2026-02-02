@@ -7,7 +7,7 @@
  * @created 2025-01-30
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 interface ResponsiveManagerConfig {
   widget: any;

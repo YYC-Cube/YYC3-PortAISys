@@ -8,7 +8,6 @@
  */
 
 import { BaseAgent } from '../BaseAgent';
-import { EventEmitter } from 'events';
 import { AgentConfig } from '../AgentProtocol';
 
 /**
@@ -102,9 +101,11 @@ export class CollaborativeAgent extends BaseAgent {
       name: finalConfig.name || 'Collaborative Agent',
       description: `Collaborative Agent: ${finalConfig.name || 'Unnamed'}`,
       capabilities: (finalConfig.capabilities || []).map((capName: string) => ({
+        id: capName,
         name: capName,
         description: `Capability: ${capName}`,
-        version: '1.0.0'
+        version: '1.0.0',
+        enabled: true
       })),
       policies: {
         maxConcurrentRequests: 10,
@@ -124,19 +125,25 @@ export class CollaborativeAgent extends BaseAgent {
    */
   protected setupCapabilities(): void {
     this.capabilities.set('collaborate', {
+      id: 'collaborate',
       name: 'collaborate',
       description: 'Multi-agent collaboration capability',
-      version: '1.0.0'
+      version: '1.0.0',
+      enabled: true
     });
     this.capabilities.set('broadcast', {
+      id: 'broadcast',
       name: 'broadcast',
       description: 'Broadcast messages to all collaborators',
-      version: '1.0.0'
+      version: '1.0.0',
+      enabled: true
     });
     this.capabilities.set('consensus', {
+      id: 'consensus',
       name: 'consensus',
       description: 'Reach consensus with collaborators',
-      version: '1.0.0'
+      version: '1.0.0',
+      enabled: true
     });
   }
 
@@ -156,7 +163,7 @@ export class CollaborativeAgent extends BaseAgent {
       return await this.sendToCollaborator(params.targetId, params.message);
     });
     this.commandHandlers.set('broadcast-message', async (params) => {
-      return await this.broadcastMessage(params.message);
+      return await this.broadcast(params.message);
     });
   }
 
@@ -248,7 +255,7 @@ export class CollaborativeAgent extends BaseAgent {
         await this.handleRequest(message);
         break;
       case CollaborationMessageType.QUERY:
-        await this.handleQuery(message);
+        await this.handleCollaborationQuery(message);
         break;
       case CollaborationMessageType.BROADCAST:
         await this.handleBroadcast(message);
@@ -278,9 +285,9 @@ export class CollaborativeAgent extends BaseAgent {
   }
 
   /**
-   * 处理查询
+   * 处理协作查询
    */
-  private async handleQuery(message: CollaborationMessage): Promise<void> {
+  private async handleCollaborationQuery(message: CollaborationMessage): Promise<void> {
     const response = {
       capabilities: Array.from(this.capabilities),
       status: this.getStatus(),
@@ -558,7 +565,7 @@ export class CollaborativeAgent extends BaseAgent {
   /**
    * 处理请求
    */
-  private async processRequest(content: any): Promise<any> {
+  private async processRequest(_content: any): Promise<any> {
     // 模拟处理请求
     await new Promise(resolve => setTimeout(resolve, 100));
     return { success: true, result: 'Processed' };

@@ -610,7 +610,7 @@ export class DebounceThrottleUtils {
   static throttle<T extends (...args: any[]) => any>(
     func: T,
     limit: number,
-    key: string = 'default'
+    _key: string = 'default'
   ): (...args: Parameters<T>) => void {
     let inThrottle = false;
     return (...args: Parameters<T>) => {

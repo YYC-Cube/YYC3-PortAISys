@@ -7,7 +7,7 @@
  * @created 2026-01-21
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 /**
  * 指标类型

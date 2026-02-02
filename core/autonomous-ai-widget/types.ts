@@ -16,6 +16,7 @@ export interface AutonomousAIConfig {
   modelName: string;
   maxTokens: number;
   temperature: number;
+  preferredLanguage?: string;
   
   // API配置
   apiKey?: string;
@@ -47,6 +48,8 @@ export interface AIWidgetInstance {
   capabilities: AICapabilities;
   destroy: () => void;
   updateConfig: (config: Partial<AutonomousAIConfig>) => void;
+  sendMessage: (message: UserMessage | any) => Promise<AIResponse>;
+  registerTool: (tool: AITool) => Promise<void>;
 }
 
 // 辅助接口定义
@@ -112,6 +115,8 @@ export interface AIResponse {
   model?: string;
   responseTime?: number;
   data?: any;
+  immediate_action_required?: boolean;
+  recommended_actions?: any[];
 }
 
 export interface AIContext {

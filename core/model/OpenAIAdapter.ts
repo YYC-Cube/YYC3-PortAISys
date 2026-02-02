@@ -8,13 +8,13 @@
  */
 
 import { ModelAdapter, ModelAdapterConfig, IModelAdapter } from './ModelAdapter';
+import { logger } from '../utils/logger';
 import {
   ModelProvider,
   ChatRequest,
   ChatResponse,
   CompletionRequest,
-  CompletionResponse,
-  ChatMessage
+  CompletionResponse
 } from '../types/model.types';
 
 /**
@@ -63,7 +63,7 @@ interface OpenAIChatResponse {
  * 5. 完整的日志和监控
  */
 export class OpenAIAdapter extends ModelAdapter implements IModelAdapter {
-  private config: OpenAIConfig;
+  protected config: OpenAIConfig;
   private defaultModel: string = 'gpt-4-turbo-preview';
 
   constructor(config: OpenAIConfig) {

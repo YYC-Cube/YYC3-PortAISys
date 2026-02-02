@@ -614,7 +614,7 @@ export class MLOpsPipeline {
     };
   }
 
-  private async ensureReproducibility(): Promise<Reprocibility> {
+  private async ensureReproducibility(): Promise<Reproducibility> {
     const environmentSnapshot = 'env_snapshot_v1.0';
     const codeVersion = 'git_commit_abc123';
     const dataVersion = 'dataset_v2.1';

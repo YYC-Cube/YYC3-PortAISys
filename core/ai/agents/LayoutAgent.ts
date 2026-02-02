@@ -7,8 +7,8 @@
  * @created 2025-01-30
  */
 
-import { BaseAgent, PopupInstance } from '../BaseAgent';
-import { AgentConfig, AgentCapability } from '../AgentProtocol';
+import { BaseAgent } from '../BaseAgent';
+import { AgentConfig } from '../AgentProtocol';
 import { ValidationError as YYC3ValidationError } from '../../error-handler/ErrorTypes';
 
 export class LayoutAgent extends BaseAgent {

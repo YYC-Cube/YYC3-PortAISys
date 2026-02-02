@@ -16,6 +16,7 @@ export enum CacheStrategy {
 }
 
 export interface CacheConfig {
+  strategy?: CacheStrategy;
   l1Size?: number;
   l1TTL?: number;
   l2Size?: string;
@@ -113,6 +114,7 @@ export class IntelligentCacheLayer {
 
   constructor(config: CacheConfig = {}) {
     this.config = {
+      strategy: config.strategy ?? CacheStrategy.LRU,
       l1Size: config.l1Size ?? 1000,
       l1TTL: config.l1TTL ?? 60000,
       l2Size: config.l2Size ?? '1gb',
@@ -358,7 +360,7 @@ export class IntelligentCacheLayer {
   private async getFromCache<T>(
     cache: Map<string, CacheEntry<any>>,
     key: string,
-    level: CacheLevel
+    _level: CacheLevel
   ): Promise<CacheEntry<T> | null> {
     const entry = cache.get(key);
 
@@ -487,7 +489,7 @@ export class IntelligentCacheLayer {
     metrics.errors++;
   }
 
-  private updateMetrics(level: CacheLevel, operation: 'get' | 'set' | 'delete'): void {
+  private updateMetrics(level: CacheLevel, _operation: 'get' | 'set' | 'delete'): void {
     const metrics = this.metrics.get(level)!;
     metrics.size = this.currentSize.get(level) ?? 0;
     metrics.entries = this.getCacheSize(level);

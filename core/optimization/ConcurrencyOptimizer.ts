@@ -7,8 +7,7 @@
  * @created 2026-01-21
  */
 
-import { EventEmitter } from 'events'
-import { Worker } from 'worker_threads'
+import EventEmitter from 'eventemitter3'
 
 /**
  * 任务优先级
@@ -98,7 +97,6 @@ export class ConcurrencyOptimizer extends EventEmitter {
   private taskQueue: Array<{ task: Task; resolve: Function; reject: Function }> = []
   private runningTasks: Set<string> = new Set()
   private completedTasks: Map<string, TaskResult> = new Map()
-  private workers: Worker[] = []
   private backpressure: BackpressureState
   private metrics = {
     tasksProcessed: 0,
@@ -382,5 +380,9 @@ export class ConcurrencyOptimizer extends EventEmitter {
     }
 
     return TaskStatus.PENDING
+  }
+
+  private async delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms))
   }
 }

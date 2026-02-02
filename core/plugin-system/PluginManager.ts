@@ -7,7 +7,7 @@
  * @created 2026-01-21
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import type { Plugin, PluginManifest, InstallOptions, UpdateInfo } from './types';
 import { PluginMarketplace } from './PluginMarketplace';
 
@@ -234,14 +234,18 @@ export class PluginManager extends EventEmitter {
       }
 
       // 如果指定了版本，使用指定的版本
-      const manifest = { ...marketplacePlugin.metadata };
+      const manifest: any = { ...marketplacePlugin.metadata };
       if (options.version) {
         manifest.version = options.version;
       }
 
+      if (!manifest.main) {
+        manifest.main = 'index.js';
+      }
+
       const plugin: Plugin = {
         id: pluginId,
-        manifest,
+        manifest: manifest as any,
         enabled: false
       };
       

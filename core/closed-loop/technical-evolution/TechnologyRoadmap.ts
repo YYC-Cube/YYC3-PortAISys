@@ -5,7 +5,7 @@
  */
 
 import type { AutonomousAIConfig } from '../../autonomous-ai-widget/types';
-import type { ClosedLoopMetrics } from '../types';
+import { Logger } from '../../utils/logger';
 
 /**
  * 技术里程碑接口
@@ -34,12 +34,12 @@ enum RoadmapPhase {
 }
 
 export class TechnologyRoadmap {
-  private config: AutonomousAIConfig;
   private milestones: TechnologyMilestone[] = [];
   private currentPhase: RoadmapPhase;
+  private logger: Logger;
 
-  constructor(config: AutonomousAIConfig) {
-    this.config = config;
+  constructor(_config: AutonomousAIConfig) {
+    this.logger = new Logger({ level: 'INFO', format: 'text', console: true });
     this.currentPhase = RoadmapPhase.FOUNDATION;
     this.initializeMilestones();
   }
@@ -105,7 +105,7 @@ export class TechnologyRoadmap {
    * 更新技术路线图
    * @param metrics 闭环系统指标数据
    */
-  async updateRoadmap(metrics: ClosedLoopMetrics): Promise<void> {
+  async updateRoadmap(metrics: any): Promise<void> {
     // 根据最新的指标数据更新技术路线图
     this.milestones = this.milestones.map(milestone => {
       // 更新里程碑的完成百分比
@@ -123,14 +123,14 @@ export class TechnologyRoadmap {
     this.updateCurrentPhase();
 
     // 记录技术路线图更新结果
-    console.log('TechnologyRoadmap: Roadmap updated:', this.milestones);
-    console.log('TechnologyRoadmap: Current phase:', this.currentPhase);
+    this.logger.info('Roadmap updated:', 'TechnologyRoadmap', { milestones: this.milestones });
+    this.logger.info('Current phase:', 'TechnologyRoadmap', { phase: this.currentPhase });
   }
 
   /**
    * 计算里程碑的完成百分比
    */
-  private calculateCompletionPercentage(milestone: TechnologyMilestone, metrics: ClosedLoopMetrics): number {
+  private calculateCompletionPercentage(milestone: TechnologyMilestone, _metrics: any): number {
     // 根据里程碑相关的指标计算完成百分比
     // 这里可以根据实际情况实现更复杂的计算逻辑
     // 简单示例：基于时间进度计算

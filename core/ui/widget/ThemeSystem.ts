@@ -10,7 +10,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface ThemeColors {
   primary: string;
@@ -152,7 +152,6 @@ export class ThemeSystem extends EventEmitter {
       enablePersistence: true,
       persistenceKey: 'yyc3-widget-theme',
       customThemes: [],
-      onThemeChange: undefined,
       ...config,
     };
 

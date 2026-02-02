@@ -241,7 +241,7 @@ export class MetricsCollector {
       this.lastNetworkIO = usage.network;
       
     } catch (error) {
-      logger.error('收集系统资源失败', 'Metrics', { error: error.message });
+      logger.error('收集系统资源失败', 'Metrics', { error: (error as Error).message });
     }
   }
 
@@ -301,7 +301,7 @@ export class MetricsCollector {
       if (process.env.NODE_ENV === 'production') {
         try {
           const fs = require('fs');
-          const stats = fs.statSync('/');
+          fs.statSync('/');
           usage.disk = {
             total: 100 * 1024 * 1024 * 1024, // 默认100GB
             used: 30 * 1024 * 1024 * 1024, // 默认30GB使用

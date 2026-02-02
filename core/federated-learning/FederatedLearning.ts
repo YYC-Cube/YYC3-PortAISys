@@ -7,7 +7,7 @@
  * @created 2024-10-15
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface FederatedConfig {
   numClients: number;
@@ -273,7 +273,7 @@ export class FederatedLearning extends EventEmitter {
 
       this.emit('controlVariatesComputed', {
         numClients: controlVariates.size,
-        cvSize: controlVariates.size > 0 ? controlVariates.values().next().value.length : 0
+        cvSize: controlVariates.size > 0 ? controlVariates.values().next().value?.length || 0 : 0
       });
     };
   }
@@ -358,10 +358,10 @@ export class FederatedLearning extends EventEmitter {
     return async () => {
       const clientUpdates = Array.from(this.clientUpdates.values());
       const numShares = 3;
-      const shares = new Map<string, Buffer[][]>();
+      const shares = new Map<string, Buffer[]>();
 
       for (const update of clientUpdates) {
-        const clientShares: Buffer[][] = [];
+        const clientShares: Buffer[] = [];
         for (let i = 0; i < numShares; i++) {
           const share = update.modelWeights.map(w => w + Math.random() * 0.1);
           clientShares.push(Buffer.from(JSON.stringify(share)));
@@ -714,11 +714,6 @@ export class FederatedLearning extends EventEmitter {
         const score = 1.0 - update.metrics.loss;
         qualityScores.set(update.clientId, Math.max(0, Math.min(1, score)));
       }
-
-      const weightedUpdates = clientUpdates.map(update => ({
-        ...update,
-        qualityWeight: qualityScores.get(update.clientId) || 0.5
-      }));
 
       this.emit('qualityAssessed', {
         avgQuality: Array.from(qualityScores.values())

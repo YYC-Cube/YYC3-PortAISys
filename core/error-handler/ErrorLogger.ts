@@ -1,6 +1,7 @@
-import { EventEmitter } from 'eventemitter3'
+import EventEmitter from 'eventemitter3'
 import { YYC3Error, ErrorSeverity, ErrorCategory } from './ErrorTypes'
 import { ErrorReport } from './ErrorHandler'
+import { Logger, LogLevel } from '../utils/logger'
 
 export interface LogEntry {
   id: string
@@ -90,9 +91,11 @@ export class ErrorLogger extends EventEmitter {
       window: number
     }
   > = new Map()
+  private logger: Logger
 
   constructor(config: Partial<ErrorLoggerConfig> = {}) {
     super()
+    this.logger = new Logger({ level: LogLevel.INFO, format: 'text', console: true })
     this.config = {
       enableConsoleLogging: config.enableConsoleLogging ?? true,
       enableFileLogging: config.enableFileLogging ?? false,
@@ -100,7 +103,7 @@ export class ErrorLogger extends EventEmitter {
       enableTrendAnalysis: config.enableTrendAnalysis ?? true,
       enableAlerts: config.enableAlerts ?? true,
       aggregationWindow: config.aggregationWindow ?? 300000,
-      aggregationThreshold: config.aggregationThreshold,
+      aggregationThreshold: config.aggregationThreshold ?? 10,
       maxAggregatedSamples: config.maxAggregatedSamples ?? 10,
       logLevel: config.logLevel ?? ErrorSeverity.LOW,
       logFilePath: config.logFilePath ?? './logs/errors.log',
@@ -191,23 +194,23 @@ export class ErrorLogger extends EventEmitter {
     logMethod(formattedMessage)
   }
 
-  private getLogMethod(severity: ErrorSeverity): (...args: any[]) => void {
+  private getLogMethod(severity: ErrorSeverity): (message: string, context?: string, metadata?: Record<string, unknown>, error?: Error) => void {
     switch (severity) {
       case ErrorSeverity.LOW:
-        return console.info
+        return this.logger.info.bind(this.logger)
       case ErrorSeverity.MEDIUM:
-        return console.warn
+        return this.logger.warn.bind(this.logger)
       case ErrorSeverity.HIGH:
       case ErrorSeverity.CRITICAL:
-        return console.error
+        return this.logger.error.bind(this.logger)
       default:
-        return console.log
+        return this.logger.info.bind(this.logger)
     }
   }
 
   private formatLogEntry(entry: LogEntry): string {
     const timestamp = new Date(entry.timestamp).toISOString()
-    const tags = entry.tags?.length > 0 ? `[${entry.tags.join(', ')}]` : ''
+    const tags = entry.tags && entry.tags.length > 0 ? `[${entry.tags.join(', ')}]` : ''
     const source = entry.source ? `[${entry.source}]` : ''
 
     return `${timestamp} ${source} ${tags} [${entry.level.toUpperCase()}] ${entry.message}`

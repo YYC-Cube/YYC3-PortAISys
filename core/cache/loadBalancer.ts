@@ -1,11 +1,9 @@
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   Server,
   ServerMetrics,
   ServerStats,
   LoadBalancingStats,
-  LoadBalancingAlgorithm,
-  SessionAffinity,
   LoadBalancerConfig
 } from './types';
 
@@ -367,7 +365,6 @@ class CircuitBreaker {
   private config: any;
   private failureCount: number = 0;
   private successCount: number = 0;
-  private lastFailureTime: number = 0;
   private state: 'closed' | 'open' | 'half-open' = 'closed';
   private lastStateChange: number = Date.now();
 
@@ -377,7 +374,6 @@ class CircuitBreaker {
 
   recordFailure(): void {
     this.failureCount++;
-    this.lastFailureTime = Date.now();
 
     if (this.failureCount >= this.config.failureThreshold) {
       this.state = 'open';

@@ -237,16 +237,7 @@ export interface GrowthIntelligence {
 }
 
 export class PredictiveValueCreation {
-  private config: PredictiveValueCreationConfig;
-  private valueHistory: Map<string, any>;
-  private predictionModels: Map<string, any>;
-  private marketData: Map<string, any>;
-
-  constructor(config: PredictiveValueCreationConfig) {
-    this.config = config;
-    this.valueHistory = new Map();
-    this.predictionModels = new Map();
-    this.marketData = new Map();
+  constructor(_config: PredictiveValueCreationConfig) {
   }
 
   async valueStreamPrediction(): Promise<ValueStreamPrediction> {

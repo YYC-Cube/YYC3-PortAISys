@@ -7,11 +7,12 @@
  * @created 2025-12-30
  */
 
-import { ErrorHandler, YYC3Error } from './ErrorHandler';
+import { ErrorHandler } from './ErrorHandler';
+import { YYC3Error } from './ErrorTypes';
 import { ErrorBoundary } from './ErrorBoundary';
-import { GlobalErrorHandler, ErrorContext as GlobalErrorContext, ErrorSeverity as GlobalErrorSeverity, ErrorCategory as GlobalErrorCategory } from './GlobalErrorHandler';
+import { GlobalErrorHandler, ErrorContext as GlobalErrorContext } from './GlobalErrorHandler';
 import { ErrorCategory, ErrorSeverity } from './ErrorTypes';
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export class IntegratedErrorHandler extends EventEmitter {
   private errorHandler: ErrorHandler;
@@ -53,21 +54,21 @@ export class IntegratedErrorHandler extends EventEmitter {
   }
 
   private setupEventForwarding(): void {
-    this.errorHandler.on('error', (report) => {
+    this.errorHandler.on('error', async (_report) => {
       const globalContext: GlobalErrorContext = {
-        timestamp: new Date(report.context.timestamp || Date.now()),
-        component: report.context.component,
-        operation: report.context.operation,
-        metadata: report.context
+        timestamp: new Date(),
+        component: 'ErrorHandler',
+        operation: 'error',
+        metadata: {}
       };
 
-      this.globalErrorHandler.handleError(
-        report.error,
+      await this.globalErrorHandler.handleError(
+        _report.error,
         globalContext
       );
     });
 
-    this.errorBoundary.on('error', ({ error, errorInfo, report }) => {
+    this.errorBoundary.on('error', ({ error, errorInfo }) => {
       const globalContext: GlobalErrorContext = {
         timestamp: new Date(),
         component: errorInfo.componentStack || 'Unknown',

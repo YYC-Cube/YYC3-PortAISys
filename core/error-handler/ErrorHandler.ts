@@ -1,14 +1,12 @@
-import { EventEmitter } from 'eventemitter3'
+import EventEmitter from 'eventemitter3'
 import {
   YYC3Error,
   ErrorSeverity,
   ErrorCategory,
   isYYC3Error,
-  getErrorCode,
-  getErrorCategory,
-  getErrorSeverity,
   isRetryable,
 } from './ErrorTypes'
+import { Logger, LogLevel } from '../utils/logger'
 
 export interface ErrorReport {
   error: YYC3Error
@@ -89,9 +87,11 @@ export class ErrorHandler extends EventEmitter {
   private maxHistorySize = 1000
   private recoveryStrategies: Map<ErrorCategory, ErrorRecoveryStrategy[]> = new Map()
   private alertHistory: Map<string, number> = new Map()
+  private logger: Logger
 
   constructor(config: Partial<ErrorHandlerConfig> = {}) {
     super()
+    this.logger = new Logger({ level: LogLevel.INFO, format: 'text', console: true })
     this.config = {
       enableLogging: config.enableLogging ?? true,
       enableReporting: config.enableReporting ?? true,
@@ -220,7 +220,6 @@ export class ErrorHandler extends EventEmitter {
         const retryDelay =
           this.config.recoveryConfig?.retryConfig?.initialDelay || this.config.retryDelay
 
-        let lastError: any
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
           try {
             const result = await recoveryFunction()
@@ -228,8 +227,7 @@ export class ErrorHandler extends EventEmitter {
             report.success = true
             this.emit('recovery', { error: yyc3Error, result })
             break
-          } catch (recoveryError) {
-            lastError = recoveryError
+          } catch (_recoveryError) {
             if (attempt < maxAttempts - 1) {
               await this.sleep(retryDelay)
             }
@@ -377,17 +375,17 @@ export class ErrorHandler extends EventEmitter {
     })
   }
 
-  private getLogMethod(severity: ErrorSeverity): (...args: any[]) => void {
+  private getLogMethod(severity: ErrorSeverity): (message: string, context?: string, metadata?: Record<string, unknown>, error?: Error) => void {
     switch (severity) {
       case ErrorSeverity.LOW:
-        return console.info
+        return this.logger.info.bind(this.logger)
       case ErrorSeverity.MEDIUM:
-        return console.warn
+        return this.logger.warn.bind(this.logger)
       case ErrorSeverity.HIGH:
       case ErrorSeverity.CRITICAL:
-        return console.error
+        return this.logger.error.bind(this.logger)
       default:
-        return console.log
+        return this.logger.info.bind(this.logger)
     }
   }
 
@@ -399,7 +397,7 @@ export class ErrorHandler extends EventEmitter {
     })
   }
 
-  private async attemptRecovery(error: YYC3Error, context: Record<string, any>): Promise<boolean> {
+  private async attemptRecovery(error: YYC3Error, _context: Record<string, any>): Promise<boolean> {
     const strategies = this.recoveryStrategies.get(error.category) || []
 
     for (const strategy of strategies) {
@@ -411,7 +409,7 @@ export class ErrorHandler extends EventEmitter {
             return true
           }
         } catch (recoveryError) {
-          console.error('Recovery failed:', recoveryError)
+          this.logger.error('Recovery failed:', 'ErrorHandler', { error: recoveryError }, recoveryError as Error)
         }
       }
     }

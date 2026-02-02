@@ -44,8 +44,8 @@ export interface PerformanceMetric {
 // 交互记录
 export interface InteractionRecord {
   timestamp: Date;
-  userMessage: UserMessage;
-  aiResponse: AIResponse;
+  userMessage: LearningUserMessage;
+  aiResponse: LearningAIResponse;
   context?: any;
   performance?: PerformanceMetric;
 }
@@ -103,14 +103,14 @@ export interface FeedbackAnalysisResult {
 }
 
 // 用户消息和AI响应接口（从核心类型导入或重定义）
-export interface UserMessage {
+export interface LearningUserMessage {
   id: string;
   content: string;
   timestamp: Date;
   metadata?: Record<string, any>;
 }
 
-export interface AIResponse {
+export interface LearningAIResponse {
   id: string;
   content: string;
   timestamp: Date;

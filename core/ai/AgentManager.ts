@@ -10,7 +10,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import { v4 as uuidv4 } from 'uuid';
 import {
   AgentMessage,
@@ -144,9 +144,12 @@ export class AgentManager extends EventEmitter {
       lastActive: Date.now(),
       status: AgentStatusType.IDLE,
       statistics: {
+        totalMessages: 0,
         messagesReceived: 0,
         messagesProcessed: 0,
         messagesFailed: 0,
+        successfulCommands: 0,
+        failedCommands: 0,
         avgResponseTime: 0,
         activeAgents: 0,
         totalAgents: 0,

@@ -7,7 +7,7 @@
  * @created 2026-01-07
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   PerformanceMetric,
   PerformanceThreshold,
@@ -149,7 +149,7 @@ export class PerformanceMonitorImpl extends EventEmitter implements PerformanceM
     };
   }
 
-  private async collectSystemMetrics(testId: string): Promise<PerformanceMetric[]> {
+  private async collectSystemMetrics(_testId: string): Promise<PerformanceMetric[]> {
     const metrics: PerformanceMetric[] = [];
     const timestamp = new Date();
 
@@ -200,9 +200,9 @@ export class PerformanceMonitorImpl extends EventEmitter implements PerformanceM
     let totalIdle = 0;
     let totalTick = 0;
 
-    cpus.forEach(cpu => {
+    cpus.forEach((cpu: any) => {
       for (const type in cpu.times) {
-        totalTick += (cpu.times as any)[type];
+        totalTick += cpu.times[type];
       }
       totalIdle += cpu.times.idle;
     });

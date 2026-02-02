@@ -7,7 +7,7 @@
  * @created 2025-12-30
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export enum PerformanceDomain {
   CPU = 'cpu',
@@ -380,12 +380,12 @@ export class PerformanceOptimizer extends EventEmitter {
   }
 
   private analyzeDomainIssues(
-    domain: PerformanceDomain,
+    _domain: PerformanceDomain,
     metrics: DomainMetrics,
-    trends: MetricTrends
+    _trends: MetricTrends
   ): PerformanceIssue[] {
     const issues: PerformanceIssue[] = [];
-    const thresholds = this.getThresholds(domain);
+    const thresholds = this.getThresholds(_domain);
 
     if (metrics.cpuUsage > thresholds.cpuUsage) {
       issues.push({
@@ -438,7 +438,7 @@ export class PerformanceOptimizer extends EventEmitter {
     return issues;
   }
 
-  private getThresholds(domain: PerformanceDomain): Record<string, number> {
+  private getThresholds(_domain: PerformanceDomain): Record<string, number> {
     return {
       cpuUsage: 80,
       memoryUsage: 85,
@@ -707,7 +707,7 @@ export class PerformanceOptimizer extends EventEmitter {
 
   private async calculateOptimizationImpact(
     beforeMetrics: PerformanceMetrics,
-    executedActions: OptimizationAction[]
+    _executedActions: OptimizationAction[]
   ): Promise<OptimizationImpact> {
     const afterMetrics = await this.collectPerformanceMetrics();
 

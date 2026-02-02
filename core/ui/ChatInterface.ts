@@ -7,7 +7,7 @@
  * @created 2025-01-30
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   IChatInterface,
   ChatMessage,
@@ -79,7 +79,14 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
       endpoint: 'https://api.openai.com/v1/chat/completions',
       timeout: 30000,
       maxTokens: 4096,
-      temperature: 0.7
+      temperature: 0.7,
+      enableLearning: true,
+      enableMemory: true,
+      enableToolUse: true,
+      enableContextAwareness: true,
+      position: 'bottom-right',
+      theme: 'auto',
+      language: 'zh-CN'
     };
     
     this.modelAdapter = new OpenAIModelAdapter(modelConfig || defaultConfig, this.errorHandler);

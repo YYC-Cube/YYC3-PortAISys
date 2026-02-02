@@ -1,6 +1,6 @@
-import { EventEmitter } from 'eventemitter3'
+import EventEmitter from 'eventemitter3'
 import { YYC3Error, ErrorSeverity, isYYC3Error } from './ErrorTypes'
-import { ErrorHandler, ErrorReport } from './ErrorHandler'
+import { ErrorHandler } from './ErrorHandler'
 
 export interface ErrorBoundaryConfig {
   fallbackComponent?: () => void
@@ -14,6 +14,8 @@ export interface ErrorInfo {
   componentStack?: string
   errorBoundary?: string
   context?: Record<string, any>
+  attempt?: number
+  maxRetries?: number
 }
 
 export class ErrorBoundary extends EventEmitter {

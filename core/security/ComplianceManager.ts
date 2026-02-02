@@ -250,7 +250,8 @@ export class ComplianceManager implements IComplianceManager {
     return {
       name: framework.name,
       status,
-      score
+      score,
+      gaps: []
     };
   }
 

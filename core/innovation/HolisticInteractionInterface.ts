@@ -155,17 +155,9 @@ export interface HolisticInteractionInterfaceConfig {
 
 export class HolisticInteractionInterface {
   private config: HolisticInteractionInterfaceConfig;
-  private arEngine: Map<string, any>;
-  private gestureSystem: Map<string, any>;
-  private bciSystem: Map<string, any>;
-  private virtualAssistants: Map<string, any>;
 
   constructor(config: HolisticInteractionInterfaceConfig) {
     this.config = config;
-    this.arEngine = new Map();
-    this.gestureSystem = new Map();
-    this.bciSystem = new Map();
-    this.virtualAssistants = new Map();
   }
 
   async augmentedRealityWorkbench(): Promise<AugmentedRealityWorkbench> {

@@ -5,7 +5,7 @@
  */
 
 import type { AutonomousAIConfig } from '../../autonomous-ai-widget/types';
-import type { ClosedLoopMetrics } from '../types';
+import { Logger } from '../../utils/logger';
 
 /**
  * 系统目标接口
@@ -23,11 +23,11 @@ interface SystemGoal {
 }
 
 export class GoalManagementSystem {
-  private config: AutonomousAIConfig;
   private goals: SystemGoal[] = [];
+  private logger: Logger;
 
-  constructor(config: AutonomousAIConfig) {
-    this.config = config;
+  constructor(_config: AutonomousAIConfig) {
+    this.logger = new Logger({ level: 'INFO', format: 'text', console: true });
     this.initializeGoals();
   }
 
@@ -77,7 +77,7 @@ export class GoalManagementSystem {
    * 审查当前系统目标的进展情况
    * @param metrics 闭环系统指标数据
    */
-  async reviewGoals(metrics: ClosedLoopMetrics): Promise<void> {
+  async reviewGoals(metrics: any): Promise<void> {
     // 根据最新的指标数据更新目标状态
     this.goals = this.goals.map(goal => {
       const currentValue = this.calculateCurrentValue(goal, metrics);
@@ -92,13 +92,13 @@ export class GoalManagementSystem {
     });
 
     // 记录目标审查结果
-    console.log('GoalManagementSystem: Goals reviewed:', this.goals);
+    this.logger.info('Goals reviewed:', 'GoalManagementSystem', { goals: this.goals });
   }
 
   /**
    * 计算目标的当前值
    */
-  private calculateCurrentValue(goal: SystemGoal, metrics: ClosedLoopMetrics): number {
+  private calculateCurrentValue(goal: SystemGoal, metrics: any): number {
     // 根据目标的指标计算当前值
     switch (goal.id) {
       case 'goal-1':

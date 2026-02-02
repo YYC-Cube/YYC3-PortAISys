@@ -7,7 +7,7 @@
  * @created 2025-01-05
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export class MemoryManager extends EventEmitter {
   private memoryUsage: number;

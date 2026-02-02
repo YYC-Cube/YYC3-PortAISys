@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import { Logger } from '../../utils/logger';
 import { MonitoringSystemImpl } from './monitoring';
 import { AlertSystemImpl } from './alert';
@@ -28,13 +28,11 @@ export class MonitoringPlatform extends EventEmitter {
   private notification: NotificationSystemImpl;
   private analysis: AnalysisSystemImpl;
   private logger: Logger;
-  private dataDirectory: string;
   private isRunning: boolean = false;
 
   constructor(logger: Logger, dataDirectory: string = './data/monitoring') {
     super();
     this.logger = logger;
-    this.dataDirectory = dataDirectory;
     
     this.monitoring = new MonitoringSystemImpl(logger, dataDirectory);
     this.alert = new AlertSystemImpl(logger, dataDirectory);

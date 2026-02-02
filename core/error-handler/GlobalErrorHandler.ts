@@ -7,7 +7,7 @@
  * @created 2025-12-30
  */
 
-import { EventEmitter } from 'events'
+import EventEmitter from 'eventemitter3'
 
 export enum ErrorSeverity {
   CRITICAL = 'critical',
@@ -228,7 +228,7 @@ export class GlobalErrorHandler extends EventEmitter {
     try {
       this.emit('error', errorRecord)
     } catch (emitError) {
-      if (emitError instanceof Error && emitError.code !== 'ERR_UNHANDLED_ERROR') {
+      if (emitError instanceof Error && 'code' in emitError && (emitError as any).code !== 'ERR_UNHANDLED_ERROR') {
         throw emitError
       }
     }
@@ -350,7 +350,7 @@ export class GlobalErrorHandler extends EventEmitter {
   }
 
   private selectRecoveryStrategy(errorRecord: ErrorRecord): RecoveryStrategy {
-    const { category, severity, context } = errorRecord
+    const { category, severity } = errorRecord
 
     if (severity === ErrorSeverity.CRITICAL) {
       return RecoveryStrategy.MANUAL_INTERVENTION
@@ -550,34 +550,6 @@ export class GlobalErrorHandler extends EventEmitter {
     this.patternAnalysisInterval = setInterval(() => {
       this.emit('patternAnalysis', this.getErrorPatterns())
     }, 60000)
-  }
-
-  private cleanupOldData(): void {
-    const retentionTime = this.parseRetentionPeriod(this.config.errorRetentionPeriod)
-    const cutoffTime = Date.now() - retentionTime
-
-    this.errorHistory = this.errorHistory.filter(e => e.timestamp.getTime() > cutoffTime)
-  }
-
-  private parseRetentionPeriod(period: string): number {
-    const match = period.match(/^(\d+)([dhm])$/)
-    if (!match) {
-      return 30 * 24 * 60 * 60 * 1000
-    }
-
-    const value = parseInt(match[1], 10)
-    const unit = match[2]
-
-    switch (unit) {
-      case 'd':
-        return value * 24 * 60 * 60 * 1000
-      case 'h':
-        return value * 60 * 60 * 1000
-      case 'm':
-        return value * 60 * 1000
-      default:
-        return 30 * 24 * 60 * 60 * 1000
-    }
   }
 
   private generateErrorId(): string {

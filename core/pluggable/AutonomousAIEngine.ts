@@ -7,7 +7,7 @@
  * @created 2025-12-30
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import {
   IAutonomousAIEngine,
   EngineStatus,
@@ -34,7 +34,7 @@ import {
   SubsystemAssignment,
   DependencyGraph
 } from './types';
-import { ValidationError, NotFoundError, InternalError, ConflictError } from '../error-handler/ErrorTypes';
+import { ValidationError, NotFoundError, ConflictError } from '../error-handler/ErrorTypes';
 
 export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEngine {
   private status: EngineStatus = EngineStatus.UNINITIALIZED;
@@ -78,7 +78,7 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
 
   async initialize(config: EngineConfig): Promise<void> {
     if (this.status !== EngineStatus.UNINITIALIZED) {
-      throw new ConflictError('Engine already initialized', 'engineStatus', {
+      throw new ConflictError('Engine already initialized', {
         additionalData: { 
           currentStatus: this.status,
           requiredStatus: EngineStatus.UNINITIALIZED
@@ -672,7 +672,7 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
     return assignments;
   }
 
-  private findSuitableSubsystem(task: TaskRequirement): ISubsystem | undefined {
+  private findSuitableSubsystem(_task: TaskRequirement): ISubsystem | undefined {
     for (const [name, subsystem] of this.subsystems) {
       const status = this.subsystemStatus.get(name);
       if (status && status.status === EngineStatus.RUNNING) {
@@ -748,11 +748,11 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
 
   private async executeConcurrently(
     concurrencyPlan: Map<string, string[]>,
-    monitoring: any
+    _monitoring: any
   ): Promise<Map<string, any>> {
     const results = new Map<string, any>();
 
-    for (const [batchName, taskIds] of concurrencyPlan) {
+    for (const [_batchName, taskIds] of concurrencyPlan) {
       const batchPromises = taskIds.map(async (taskId) => {
         try {
           const result = await this.executeTaskById(taskId);
@@ -824,7 +824,7 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
   }
 
   private async saveCoordinationLearning(results: Map<string, any>, resolved: any): Promise<void> {
-    const learningData = {
+    const _learningData = {
       timestamp: new Date(),
       results: Array.from(results.entries()),
       resolved,

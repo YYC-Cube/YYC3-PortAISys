@@ -55,4 +55,73 @@ export class ValueDrivenImplementation {
       }
     };
   }
+
+  private async definePhase1Metrics(): Promise<any[]> {
+    return [];
+  }
+
+  private async definePhase1Deliverables(): Promise<any[]> {
+    return [];
+  }
+
+  private async definePhase2Value(): Promise<ValueDrivers> {
+    return {
+      efficiency: {},
+      quality: {},
+      cost: {}
+    };
+  }
+
+  private async definePhase2Metrics(): Promise<any[]> {
+    return [];
+  }
+
+  private async definePhase2Deliverables(): Promise<any[]> {
+    return [];
+  }
+
+  private async definePhase3Value(): Promise<ValueDrivers> {
+    return {
+      efficiency: {},
+      quality: {},
+      cost: {}
+    };
+  }
+
+  private async definePhase3Metrics(): Promise<any[]> {
+    return [];
+  }
+
+  private async definePhase3Deliverables(): Promise<any[]> {
+    return [];
+  }
+
+  private async defineContinuousValue(): Promise<ValueDrivers> {
+    return {
+      efficiency: {},
+      quality: {},
+      cost: {}
+    };
+  }
+
+  private async defineContinuousMetrics(): Promise<any[]> {
+    return [];
+  }
+
+  private async defineOptimizationCycles(): Promise<any[]> {
+    return [];
+  }
+}
+
+interface ValueDrivers {
+  efficiency: any;
+  quality: any;
+  cost: any;
+}
+
+interface PhasedValueDelivery {
+  phase1: any;
+  phase2: any;
+  phase3: any;
+  continuous: any;
 }

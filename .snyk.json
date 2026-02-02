@@ -1,0 +1,47 @@
+{
+  "name": "yyc3-portaisys",
+  "version": "1.0.0",
+  "description": "YYC³ Portable Intelligent AI System - Security Configuration",
+  "scripts": {
+    "security:audit": "npm audit --audit-level=moderate",
+    "security:audit:fix": "npm audit fix",
+    "security:snyk:auth": "snyk auth",
+    "security:snyk:test": "snyk test",
+    "security:snyk:monitor": "snyk monitor",
+    "security:snyk:license": "snyk license",
+    "security:zap:scan": "zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' http://localhost:3200",
+    "security:zap:spider": "zap-cli spider http://localhost:3200",
+    "security:zap:active-scan": "zap-cli active-scan http://localhost:3200",
+    "security:zap:report": "zap-cli report -o security-report.html -f html",
+    "security:scan": "npm run security:audit && npm run security:snyk:test",
+    "security:scan:full": "npm run security:audit && npm run security:snyk:test && npm run security:snyk:license",
+    "security:zap:full": "npm run security:zap:spider && npm run security:zap:active-scan && npm run security:zap:report"
+  },
+  "devDependencies": {
+    "snyk": "^1.1263.0",
+    "@snyk/protect": "^1.1263.0"
+  },
+  "snyk": {
+    "org": "yyc3-team",
+    "severity-threshold": "medium",
+    "language": "typescript",
+    "exclude": [
+      "node_modules",
+      "dist",
+      "build",
+      ".git",
+      "coverage",
+      "test"
+    ],
+    "test": {
+      "auto-deploy": true,
+      "auto-deploy-branch": "main",
+      "auto-deploy-branch-pattern": "release/*",
+      "auto-deploy-branch-pattern-match": "prefix"
+    },
+    "monitor": {
+      "project-name": "yyc3-portaisys",
+      "project-environment": "production"
+    }
+  }
+}

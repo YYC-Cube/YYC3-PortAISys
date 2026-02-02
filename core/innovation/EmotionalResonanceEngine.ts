@@ -83,13 +83,11 @@ export class EmotionalResonanceEngine {
   private config: EmotionalResonanceEngineConfig;
   private emotionalMemory: Map<string, any>;
   private resonanceModels: Map<string, any>;
-  private emotionHistory: Map<string, any>;
 
   constructor(config: EmotionalResonanceEngineConfig) {
     this.config = config;
     this.emotionalMemory = new Map();
     this.resonanceModels = new Map();
-    this.emotionHistory = new Map();
   }
 
   async implementEmotionalAI(): Promise<EmotionalAIStack> {
@@ -256,14 +254,14 @@ export class EmotionalResonanceEngine {
   }
 
   async detectEmotion(customerId: string, interactionData: any): Promise<any> {
-    const voiceEmotion = this.config.enableVoiceEmotionDetection 
+    const voiceEmotion = this.config.enableVoiceEmotionDetection
       ? await this.analyzeVoiceEmotion(interactionData.voice)
       : null;
-    
+
     const linguisticEmotion = this.config.enableLinguisticEmotionDetection
       ? await this.analyzeLinguisticEmotion(interactionData.text)
       : null;
-    
+
     const behavioralEmotion = this.config.enableBehavioralEmotionDetection
       ? await this.analyzeBehavioralEmotion(interactionData.behavior)
       : null;
@@ -279,7 +277,7 @@ export class EmotionalResonanceEngine {
     return combinedEmotion;
   }
 
-  private async analyzeVoiceEmotion(voiceData: any): Promise<any> {
+  private async analyzeVoiceEmotion(_voiceData: any): Promise<any> {
     return {
       primaryEmotion: 'neutral',
       confidence: 0.87,
@@ -294,7 +292,7 @@ export class EmotionalResonanceEngine {
     };
   }
 
-  private async analyzeLinguisticEmotion(textData: string): Promise<any> {
+  private async analyzeLinguisticEmotion(_textData: string): Promise<any> {
     return {
       primaryEmotion: 'positive',
       confidence: 0.82,
@@ -309,7 +307,7 @@ export class EmotionalResonanceEngine {
     };
   }
 
-  private async analyzeBehavioralEmotion(behaviorData: any): Promise<any> {
+  private async analyzeBehavioralEmotion(_behaviorData: any): Promise<any> {
     return {
       primaryEmotion: 'engaged',
       confidence: 0.79,
@@ -329,7 +327,7 @@ export class EmotionalResonanceEngine {
     behavioralEmotion: any
   ): Promise<any> {
     const emotions = [voiceEmotion, linguisticEmotion, behavioralEmotion].filter(e => e !== null);
-    
+
     if (emotions.length === 0) {
       return {
         primaryEmotion: 'unknown',
@@ -353,7 +351,7 @@ export class EmotionalResonanceEngine {
     });
 
     const primaryEmotion = Object.entries(weightedEmotions)
-      .reduce((a, b) => a[1] > b[1] ? a : b)[0];
+      .reduce((a, b) => (a[1] as number) > (b[1] as number) ? a : b)[0];
 
     const confidence = emotions.reduce((acc, emotion) => acc + emotion.confidence, 0) / emotions.length;
 
@@ -403,7 +401,7 @@ export class EmotionalResonanceEngine {
 
   private async buildResonanceModel(customerId: string): Promise<any> {
     const emotionalHistory = await this.getEmotionalHistory(customerId);
-    
+
     return {
       customerId,
       modelType: this.config.resonanceAlgorithmModel,
@@ -417,7 +415,7 @@ export class EmotionalResonanceEngine {
 
   private async extractEmotionalPatterns(history: any[]): Promise<any> {
     const patterns = new Map<string, number>();
-    
+
     history.forEach(entry => {
       const emotion = entry.primaryEmotion;
       patterns.set(emotion, (patterns.get(emotion) || 0) + 1);
@@ -426,7 +424,7 @@ export class EmotionalResonanceEngine {
     return Object.fromEntries(patterns);
   }
 
-  private async identifyTriggerEvents(history: any[]): Promise<any> {
+  private async identifyTriggerEvents(_history: any[]): Promise<any> {
     return {
       commonTriggers: [],
       emotionalTriggers: {},
@@ -434,7 +432,7 @@ export class EmotionalResonanceEngine {
     };
   }
 
-  private async identifyEffectiveResponses(history: any[]): Promise<any> {
+  private async identifyEffectiveResponses(_history: any[]): Promise<any> {
     return {
       successfulResponses: [],
       responseStrategies: {},
@@ -500,7 +498,7 @@ export class EmotionalResonanceEngine {
   private async generatePersonalizedStrategy(
     currentEmotion: any,
     emotionalContext: any,
-    resonanceModel: any
+    _resonanceModel: any
   ): Promise<any> {
     return {
       approach: 'empathetic',
@@ -538,7 +536,7 @@ export class EmotionalResonanceEngine {
 
   private async determineEmotionalTone(
     currentEmotion: any,
-    emotionalContext: any
+    _emotionalContext: any
   ): Promise<string> {
     const emotion = currentEmotion.primaryEmotion;
     const confidence = currentEmotion.confidence;
@@ -564,7 +562,7 @@ export class EmotionalResonanceEngine {
 
   private async recommendActions(
     currentEmotion: any,
-    resonanceModel: any
+    _resonanceModel: any
   ): Promise<string[]> {
     const emotion = currentEmotion.primaryEmotion;
     const actions: Record<string, string[]> = {
@@ -584,7 +582,7 @@ export class EmotionalResonanceEngine {
 
   private async updateResonanceModel(
     customerId: string,
-    response: any
+    _response: any
   ): Promise<void> {
     const existingModel = this.resonanceModels.get(customerId);
     if (existingModel) {
@@ -598,8 +596,8 @@ export class EmotionalResonanceEngine {
     const totalCustomers = this.emotionalMemory.size;
     const totalEmotionalEvents = Array.from(this.emotionalMemory.values())
       .reduce((acc, history) => acc + history.length, 0);
-    const averageEventsPerCustomer = totalCustomers > 0 
-      ? totalEmotionalEvents / totalCustomers 
+    const averageEventsPerCustomer = totalCustomers > 0
+      ? totalEmotionalEvents / totalCustomers
       : 0;
 
     return {

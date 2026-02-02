@@ -8,7 +8,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 
 export interface UserValueProposition {
   id: string;
@@ -458,7 +458,7 @@ export class UserValuePropositionSystem extends EventEmitter {
       .filter(fb => fb.category === category);
   }
 
-  private updatePropositionMetrics(feedback: UserFeedback): void {
+  private updatePropositionMetrics(_feedback: UserFeedback): void {
     this.propositions.forEach(proposition => {
       const relevantFeedback = Array.from(this.feedback.values())
         .flat()

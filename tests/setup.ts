@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, beforeEach } from 'vitest';
 
 // Mock window 对象用于 Node.js 环境（为 Agent 测试）
 if (typeof window === 'undefined') {

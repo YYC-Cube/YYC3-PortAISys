@@ -1,7 +1,7 @@
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { Logger } from '../../utils/logger';
+import { Logger } from '../utils/logger';
 import {
   AlertSystem,
   AlertRule,
@@ -12,7 +12,8 @@ import {
   AlertQuery,
   AlertStatistics,
   AlertStatisticsQuery,
-  AlertRuleCondition,
+  AlertCondition,
+  AlertOperator,
   Metric
 } from './types';
 
@@ -39,12 +40,12 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
       await this.ensureDataDirectory();
       await this.loadRules();
       await this.loadAlerts();
-      this.logger.info('告警系统初始化完成', { 
+      this.logger.info('告警系统初始化完成', 'AlertSystem', { 
         rulesCount: this.rules.size,
         alertsCount: this.alerts.size 
       });
     } catch (error) {
-      this.logger.error('告警系统初始化失败', error as Error);
+      this.logger.error('告警系统初始化失败', 'AlertSystem', undefined, error as Error);
       throw error;
     }
   }
@@ -78,9 +79,9 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
         }
       }
       
-      this.logger.info('加载告警规则', { count: this.rules.size });
+      this.logger.info('加载告警规则', 'AlertSystem', { count: this.rules.size });
     } catch (error) {
-      this.logger.warn('加载告警规则失败', error as Error);
+      this.logger.warn('加载告警规则失败', 'AlertSystem', undefined, error as Error);
     }
   }
 
@@ -100,14 +101,14 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
       }
       
       this.alertHistory.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-      this.logger.info('加载历史告警', { count: this.alerts.size });
+      this.logger.info('加载历史告警', 'AlertSystem', { count: this.alerts.size });
     } catch (error) {
-      this.logger.warn('加载历史告警失败', error as Error);
+      this.logger.warn('加载历史告警失败', 'AlertSystem', undefined, error as Error);
     }
   }
 
   async createAlertRule(rule: AlertRule): Promise<AlertRule> {
-    this.logger.info('创建告警规则', { ruleId: rule.id, name: rule.name });
+    this.logger.info('创建告警规则', 'AlertSystem', { ruleId: rule.id, name: rule.name });
     
     if (this.rules.has(rule.id)) {
       throw new Error(`告警规则 ${rule.id} 已存在`);
@@ -122,13 +123,13 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
     await this.saveRule(rule);
     
     this.emit('rule:created', rule);
-    this.logger.info('告警规则创建成功', { ruleId: rule.id });
+    this.logger.info('告警规则创建成功', 'AlertSystem', { ruleId: rule.id });
     
     return rule;
   }
 
   async updateAlertRule(ruleId: string, rule: Partial<AlertRule>): Promise<AlertRule> {
-    this.logger.info('更新告警规则', { ruleId });
+    this.logger.info('更新告警规则', 'AlertSystem', { ruleId });
     
     const existingRule = this.rules.get(ruleId);
     if (!existingRule) {
@@ -146,13 +147,13 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
     await this.saveRule(updatedRule);
     
     this.emit('rule:updated', updatedRule);
-    this.logger.info('告警规则更新成功', { ruleId });
+    this.logger.info('告警规则更新成功', 'AlertSystem', { ruleId });
     
     return updatedRule;
   }
 
   async deleteAlertRule(ruleId: string): Promise<void> {
-    this.logger.info('删除告警规则', { ruleId });
+    this.logger.info('删除告警规则', 'AlertSystem', { ruleId });
     
     const rule = this.rules.get(ruleId);
     if (!rule) {
@@ -165,11 +166,11 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
       const filePath = path.join(this.dataDirectory, 'rules', `${ruleId}.json`);
       await fs.unlink(filePath);
     } catch (error) {
-      this.logger.warn('删除告警规则文件失败', error as Error);
+      this.logger.warn('删除告警规则文件失败', 'AlertSystem', undefined, error as Error);
     }
     
     this.emit('rule:deleted', rule);
-    this.logger.info('告警规则删除成功', { ruleId });
+    this.logger.info('告警规则删除成功', 'AlertSystem', { ruleId });
   }
 
   async getAlertRules(query?: AlertRuleQuery): Promise<AlertRule[]> {
@@ -216,7 +217,7 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
   }
 
   async acknowledgeAlert(alertId: string, comment?: string): Promise<void> {
-    this.logger.info('确认告警', { alertId, comment });
+    this.logger.info('确认告警', 'AlertSystem', { alertId, comment });
     
     const alert = this.alerts.get(alertId);
     if (!alert) {
@@ -231,11 +232,11 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
     await this.saveAlert(alert);
     
     this.emit('alert:acknowledged', alert);
-    this.logger.info('告警确认成功', { alertId });
+    this.logger.info('告警确认成功', 'AlertSystem', { alertId });
   }
 
   async closeAlert(alertId: string, comment?: string): Promise<void> {
-    this.logger.info('关闭告警', { alertId, comment });
+    this.logger.info('关闭告警', 'AlertSystem', { alertId, comment });
     
     const alert = this.alerts.get(alertId);
     if (!alert) {
@@ -250,7 +251,7 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
     await this.saveAlert(alert);
     
     this.emit('alert:closed', alert);
-    this.logger.info('告警关闭成功', { alertId });
+    this.logger.info('告警关闭成功', 'AlertSystem', { alertId });
   }
 
   async getAlertStatistics(query?: AlertStatisticsQuery): Promise<AlertStatistics> {
@@ -268,48 +269,57 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
 
     const statistics: AlertStatistics = {
       total: filteredAlerts.length,
-      byStatus: {
-        [AlertStatus.OPEN]: 0,
-        [AlertStatus.ACKNOWLEDGED]: 0,
-        [AlertStatus.CLOSED]: 0
-      },
+      active: 0,
+      acknowledged: 0,
+      closed: 0,
       bySeverity: {
         [AlertSeverity.INFO]: 0,
         [AlertSeverity.WARNING]: 0,
         [AlertSeverity.ERROR]: 0,
         [AlertSeverity.CRITICAL]: 0
       },
+      avgResponseTime: 0,
       avgResolutionTime: 0,
-      triggeredCount: 0,
-      acknowledgedCount: 0,
-      closedCount: 0
+      byStatus: {
+        [AlertStatus.OPEN]: 0,
+        [AlertStatus.ACTIVE]: 0,
+        [AlertStatus.ACKNOWLEDGED]: 0,
+        [AlertStatus.CLOSED]: 0
+      }
     };
 
     let totalResolutionTime = 0;
     let resolvedCount = 0;
+    let totalResponseTime = 0;
+    let respondedCount = 0;
 
     for (const alert of filteredAlerts) {
-      statistics.byStatus[alert.status]++;
       statistics.bySeverity[alert.severity]++;
       
+      if (alert.status === AlertStatus.ACTIVE) {
+        statistics.active++;
+      }
       if (alert.status === AlertStatus.ACKNOWLEDGED) {
-        statistics.acknowledgedCount++;
+        statistics.acknowledged++;
+        if (alert.acknowledgedAt && alert.triggeredAt) {
+          totalResponseTime += alert.acknowledgedAt.getTime() - alert.triggeredAt.getTime();
+          respondedCount++;
+        }
       }
       if (alert.status === AlertStatus.CLOSED) {
-        statistics.closedCount++;
+        statistics.closed++;
         if (alert.closedAt && alert.acknowledgedAt) {
           totalResolutionTime += alert.closedAt.getTime() - alert.acknowledgedAt.getTime();
           resolvedCount++;
         }
       }
-      
-      if (alert.triggeredAt) {
-        statistics.triggeredCount++;
-      }
     }
 
     if (resolvedCount > 0) {
       statistics.avgResolutionTime = totalResolutionTime / resolvedCount;
+    }
+    if (respondedCount > 0) {
+      statistics.avgResponseTime = totalResponseTime / respondedCount;
     }
 
     return statistics;
@@ -333,24 +343,24 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
           }
         }
       } catch (error) {
-        this.logger.error('评估告警规则失败', error as Error, { ruleId: rule.id });
+        this.logger.error('评估告警规则失败', 'AlertSystem', { ruleId: rule.id }, error as Error);
       }
     }
   }
 
-  private evaluateCondition(metric: Metric, condition: AlertRuleCondition): boolean {
+  private evaluateCondition(metric: Metric, condition: AlertCondition): boolean {
     switch (condition.operator) {
-      case '>':
+      case AlertOperator.GREATER_THAN:
         return metric.value > condition.threshold;
-      case '<':
+      case AlertOperator.LESS_THAN:
         return metric.value < condition.threshold;
-      case '>=':
+      case AlertOperator.GREATER_THAN_OR_EQUAL:
         return metric.value >= condition.threshold;
-      case '<=':
+      case AlertOperator.LESS_THAN_OR_EQUAL:
         return metric.value <= condition.threshold;
-      case '==':
+      case AlertOperator.EQUAL:
         return metric.value === condition.threshold;
-      case '!=':
+      case AlertOperator.NOT_EQUAL:
         return metric.value !== condition.threshold;
       default:
         return false;
@@ -364,7 +374,7 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
     if (this.suppressionMap.has(suppressionKey)) {
       const lastTriggered = this.suppressionMap.get(suppressionKey)!;
       if (now - lastTriggered < this.suppressionWindow) {
-        this.logger.debug('告警被抑制', { ruleId: rule.id, suppressionKey });
+        this.logger.debug('告警被抑制', 'AlertSystem', { ruleId: rule.id, suppressionKey });
         return;
       }
     }
@@ -373,9 +383,11 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
     if (this.deduplicationMap.has(deduplicationKey)) {
       const existingAlert = this.deduplicationMap.get(deduplicationKey)!;
       if (now - existingAlert.timestamp.getTime() < this.deduplicationWindow) {
-        existingAlert.count++;
+        if (existingAlert.count !== undefined) {
+          existingAlert.count++;
+        }
         existingAlert.lastOccurrence = new Date();
-        this.logger.debug('告警去重', { alertId: existingAlert.id, count: existingAlert.count });
+        this.logger.debug('告警去重', 'AlertSystem', { alertId: existingAlert.id, count: existingAlert.count });
         return;
       }
     }
@@ -388,6 +400,8 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
       status: AlertStatus.OPEN,
       message: rule.message || `告警规则 ${rule.name} 触发`,
       metricName: metric.name,
+      currentValue: metric.value,
+      threshold: rule.condition.threshold,
       metricValue: metric.value,
       labels: metric.labels,
       timestamp: new Date(),
@@ -408,7 +422,7 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
     this.saveRule(rule);
     
     this.emit('alert:triggered', alert);
-    this.logger.warn('告警触发', { 
+    this.logger.warn('告警触发', 'AlertSystem', { 
       alertId: alert.id, 
       ruleId: rule.id, 
       severity: alert.severity,
@@ -421,7 +435,7 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
       const filePath = path.join(this.dataDirectory, 'rules', `${rule.id}.json`);
       await fs.writeFile(filePath, JSON.stringify(rule, null, 2), 'utf-8');
     } catch (error) {
-      this.logger.error('保存告警规则失败', error as Error, { ruleId: rule.id });
+      this.logger.error('保存告警规则失败', 'AlertSystem', { ruleId: rule.id }, error as Error);
       throw error;
     }
   }
@@ -431,7 +445,7 @@ export class AlertSystemImpl extends EventEmitter implements AlertSystem {
       const filePath = path.join(this.dataDirectory, 'alerts', `${alert.id}.json`);
       await fs.writeFile(filePath, JSON.stringify(alert, null, 2), 'utf-8');
     } catch (error) {
-      this.logger.error('保存告警失败', error as Error, { alertId: alert.id });
+      this.logger.error('保存告警失败', 'AlertSystem', { alertId: alert.id }, error as Error);
       throw error;
     }
   }

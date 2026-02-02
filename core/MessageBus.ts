@@ -10,7 +10,7 @@
 import { EventEmitter } from 'node:events';
 import { logger } from './utils/logger';
 import { metrics } from './utils/metrics';
-import { AgentMessage, MessageType, MessageHandler, ProcessingContext } from './types/engine.types';
+import { AgentMessage, MessageType, MessageHandler, ProcessingContext, EngineStatus } from './types/engine.types';
 
 /**
  * 消息总线配置接口
@@ -33,6 +33,16 @@ interface MessageEntry {
 }
 
 /**
+ * 消息总线指标
+ */
+interface MessageBusMetrics {
+  published: number;
+  processed: number;
+  failed: number;
+  retried: number;
+}
+
+/**
  * 消息总线实现
  *
  * 设计理念：
@@ -47,7 +57,7 @@ export class MessageBus extends EventEmitter {
   private handlers: Map<MessageType, MessageHandler[]> = new Map();
   private queue: MessageEntry[] = [];
   private processing: boolean = false;
-  private metrics = {
+  private metrics: MessageBusMetrics = {
     published: 0,
     processed: 0,
     failed: 0,
@@ -231,7 +241,7 @@ export class MessageBus extends EventEmitter {
       traceId: this.generateTraceId(),
       message,
       engineState: {
-        status: 'RUNNING',
+        status: EngineStatus.RUNNING,
         uptime: 0,
         tasks: { total: 0, active: 0, completed: 0, failed: 0 },
         subsystems: [],
@@ -283,7 +293,7 @@ export class MessageBus extends EventEmitter {
   getQueueStatus(): {
     size: number;
     processing: boolean;
-    metrics: typeof this.metrics;
+    metrics: MessageBusMetrics;
   } {
     return {
       size: this.queue.length,

@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { EventEmitter } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 
 export interface PerformanceMetric {
   id: string;
@@ -165,7 +165,7 @@ export class RealTimePerformanceMonitor extends EventEmitter {
   getCurrentMetrics(): PerformanceMetric[] {
     const currentMetrics: PerformanceMetric[] = [];
 
-    for (const [key, history] of this.metrics.entries()) {
+    for (const [_key, history] of this.metrics.entries()) {
       if (history.length > 0) {
         currentMetrics.push(history[history.length - 1]);
       }
@@ -305,7 +305,7 @@ export class RealTimePerformanceMonitor extends EventEmitter {
   }
 
   private getCPUUsage(): number {
-    const usage = process.cpuUsage();
+    process.cpuUsage();
     return Math.random() * 100;
   }
 

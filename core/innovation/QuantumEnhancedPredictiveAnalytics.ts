@@ -198,15 +198,9 @@ export interface HyperScalePrediction {
 
 export class QuantumEnhancedPredictiveAnalytics {
   private config: QuantumEnhancedPredictiveAnalyticsConfig;
-  private quantumState: Map<string, any>;
-  private predictionCache: Map<string, any>;
-  private modelPerformance: Map<string, number>;
 
   constructor(config: QuantumEnhancedPredictiveAnalyticsConfig) {
     this.config = config;
-    this.quantumState = new Map();
-    this.predictionCache = new Map();
-    this.modelPerformance = new Map();
   }
 
   async quantumMachineLearning(): Promise<QuantumMachineLearning> {
@@ -603,7 +597,7 @@ export class QuantumEnhancedPredictiveAnalytics {
     const segmentSizes = personalizedSegments.map(() => Math.floor(Math.random() * 1000) + 100);
     const personalizationStrategies: Record<string, any> = {};
     
-    personalizedSegments.forEach((segment, index) => {
+    personalizedSegments.forEach((segment, _index) => {
       personalizationStrategies[segment] = {
         channelPreference: ['email', 'sms', 'app', 'social'][Math.floor(Math.random() * 4)],
         contentStyle: ['formal', 'casual', 'professional', 'friendly'][Math.floor(Math.random() * 4)],

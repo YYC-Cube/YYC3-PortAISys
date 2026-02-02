@@ -7,7 +7,7 @@
  * @created 2024-10-15
  */
 
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface Event {
   id: string;
@@ -328,7 +328,7 @@ export class EventDrivenComputing extends EventEmitter {
     return async () => {
       const replayEvents: Event[] = [];
 
-      for (const [eventType, events] of this.eventStore) {
+      for (const [_eventType, events] of this.eventStore) {
         for (const event of events) {
           replayEvents.push(event);
         }
@@ -350,11 +350,11 @@ export class EventDrivenComputing extends EventEmitter {
     return async () => {
       const snapshots = new Map<string, any>();
 
-      for (const [eventType, events] of this.eventStore) {
+      for (const [_eventType, events] of this.eventStore) {
         if (events.length === 0) continue;
 
         const latestEvent = events[events.length - 1];
-        snapshots.set(eventType, {
+        snapshots.set(_eventType, {
           timestamp: latestEvent.timestamp,
           data: latestEvent.data,
           version: events.length

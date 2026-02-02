@@ -1,20 +1,21 @@
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { Logger } from '../../utils/logger';
+import { Logger } from '../utils/logger';
 import {
   AnalysisSystem,
   Metric,
   MetricsQuery,
   AnalysisResult,
   Anomaly,
+  AnomalyType,
+  AnomalySeverity,
   Trend,
+  TrendDirection,
   CorrelationResult,
+  CorrelationStrength,
   RootCauseResult,
-  Alert,
-  MetricType,
-  AnomalyDetectionMethod,
-  TrendDirection
+  Alert
 } from './types';
 
 export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
@@ -36,11 +37,11 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     try {
       await this.ensureDataDirectory();
       await this.loadMetricsCache();
-      this.logger.info('分析系统初始化完成', { 
+      this.logger.info('分析系统初始化完成', 'AnalysisSystem', { 
         cacheSize: this.metricsCache.size 
       });
     } catch (error) {
-      this.logger.error('分析系统初始化失败', error as Error);
+      this.logger.error('分析系统初始化失败', 'AnalysisSystem', undefined, error as Error);
       throw error;
     }
   }
@@ -75,14 +76,14 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
         }
       }
       
-      this.logger.info('加载指标缓存', { count: this.metricsCache.size });
+      this.logger.info('加载指标缓存', 'AnalysisSystem', { count: this.metricsCache.size });
     } catch (error) {
-      this.logger.warn('加载指标缓存失败', error as Error);
+      this.logger.warn('加载指标缓存失败', 'AnalysisSystem', undefined, error as Error);
     }
   }
 
   async analyzeMetrics(query: MetricsQuery): Promise<AnalysisResult> {
-    this.logger.info('分析指标', { query });
+    this.logger.info('分析指标', 'AnalysisSystem', { query });
     
     const metrics = await this.getMetrics(query);
     
@@ -93,31 +94,32 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     const values = metrics.map(m => m.value);
     
     const result: AnalysisResult = {
-      metricName: query.metricName,
-      startTime: query.startTime || metrics[0].timestamp,
-      endTime: query.endTime || metrics[metrics.length - 1].timestamp,
-      count: metrics.length,
-      min: Math.min(...values),
-      max: Math.max(...values),
-      avg: this.calculateMean(values),
-      median: this.calculateMedian(values),
-      stdDev: this.calculateStdDev(values),
-      p50: this.calculatePercentile(values, 50),
-      p95: this.calculatePercentile(values, 95),
-      p99: this.calculatePercentile(values, 99),
+      metricName: query.metricName ?? '',
+      statistics: {
+        avg: this.calculateMean(values),
+        max: Math.max(...values),
+        min: Math.min(...values),
+        median: this.calculateMedian(values),
+        stdDev: this.calculateStdDev(values),
+        percentiles: {
+          p50: this.calculatePercentile(values, 50),
+          p95: this.calculatePercentile(values, 95),
+          p99: this.calculatePercentile(values, 99)
+        }
+      },
       trend: this.detectTrend(values),
       anomalies: await this.detectAnomalies(query),
-      correlations: []
+      analyzedAt: new Date()
     };
     
     this.emit('analysis:completed', result);
-    this.logger.info('指标分析完成', { metricName: query.metricName });
+    this.logger.info('指标分析完成', 'AnalysisSystem', { metricName: query.metricName });
     
     return result;
   }
 
   async detectAnomalies(query: MetricsQuery): Promise<Anomaly[]> {
-    this.logger.info('检测异常', { query });
+    this.logger.info('检测异常', 'AnalysisSystem', { query });
     
     const metrics = await this.getMetrics(query);
     
@@ -139,15 +141,14 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
         const anomaly: Anomaly = {
           id: `anomaly-${Date.now()}-${i}`,
           metricName: metric.name,
-          timestamp: metric.timestamp,
+          type: zScore > 0 ? AnomalyType.SPIKE : AnomalyType.DROP,
           value: metric.value,
           expectedValue: mean,
           deviation: metric.value - mean,
-          zScore: zScore,
-          severity: this.calculateAnomalySeverity(zScore),
-          method: AnomalyDetectionMethod.STATISTICAL,
-          confidence: Math.min(zScore / this.anomalyThreshold, 1),
-          labels: metric.labels
+          severity: zScore > 5 ? AnomalySeverity.CRITICAL : (zScore > 4 ? AnomalySeverity.HIGH : (zScore > 3 ? AnomalySeverity.MEDIUM : AnomalySeverity.LOW)),
+          startTime: metric.timestamp,
+          description: `检测到异常值: ${metric.value}, 预期值: ${mean}, 偏差: ${(metric.value - mean).toFixed(2)}`,
+          confidence: Math.min(zScore / this.anomalyThreshold, 1)
         };
         
         anomalies.push(anomaly);
@@ -155,13 +156,13 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     }
     
     this.emit('anomalies:detected', anomalies);
-    this.logger.info('异常检测完成', { count: anomalies.length });
+    this.logger.info('异常检测完成', 'AnalysisSystem', { count: anomalies.length });
     
     return anomalies;
   }
 
   async analyzeTrends(query: MetricsQuery): Promise<Trend[]> {
-    this.logger.info('分析趋势', { query });
+    this.logger.info('分析趋势', 'AnalysisSystem', { query });
     
     const metrics = await this.getMetrics(query);
     
@@ -177,28 +178,22 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     const rSquared = this.calculateRSquared(values);
     
     const trend: Trend = {
-      id: `trend-${Date.now()}`,
-      metricName: query.metricName,
-      startTime: query.startTime || metrics[0].timestamp,
-      endTime: query.endTime || metrics[metrics.length - 1].timestamp,
       direction: direction,
-      slope: slope,
-      rSquared: rSquared,
-      confidence: rSquared,
-      changePercent: ((values[values.length - 1] - values[0]) / values[0]) * 100,
-      forecast: this.forecastTrend(values, 5)
+      strength: Math.abs(slope),
+      forecast: this.forecastTrend(values, 5)[4],
+      confidence: rSquared
     };
     
     trends.push(trend);
     
     this.emit('trends:analyzed', trends);
-    this.logger.info('趋势分析完成', { count: trends.length });
+    this.logger.info('趋势分析完成', 'AnalysisSystem', { count: trends.length });
     
     return trends;
   }
 
   async correlateMetrics(metrics: string[]): Promise<CorrelationResult[]> {
-    this.logger.info('关联分析', { metrics });
+    this.logger.info('关联分析', 'AnalysisSystem', { metrics });
     
     if (metrics.length < 2) {
       return [];
@@ -225,12 +220,10 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
         
         if (Math.abs(correlation) >= this.correlationThreshold) {
           const result: CorrelationResult = {
-            id: `correlation-${Date.now()}-${i}-${j}`,
             metric1: metric1,
             metric2: metric2,
             correlation: correlation,
             strength: this.calculateCorrelationStrength(correlation),
-            direction: correlation > 0 ? 'positive' : 'negative',
             significance: this.calculateSignificance(correlation, Math.min(data1.length, data2.length))
           };
           
@@ -242,13 +235,13 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     results.sort((a, b) => Math.abs(b.correlation) - Math.abs(a.correlation));
     
     this.emit('correlations:analyzed', results);
-    this.logger.info('关联分析完成', { count: results.length });
+    this.logger.info('关联分析完成', 'AnalysisSystem', { count: results.length });
     
     return results;
   }
 
   async analyzeRootCause(alert: Alert): Promise<RootCauseResult> {
-    this.logger.info('根因分析', { alertId: alert.id });
+    this.logger.info('根因分析', 'AnalysisSystem', { alertId: alert.id });
     
     const startTime = new Date(alert.timestamp.getTime() - 30 * 60 * 1000);
     const endTime = new Date(alert.timestamp.getTime() + 30 * 60 * 1000);
@@ -259,7 +252,6 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
       endTime: endTime
     };
     
-    const metrics = await this.getMetrics(query);
     const anomalies = await this.detectAnomalies(query);
     const trends = await this.analyzeTrends(query);
     
@@ -268,24 +260,59 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     
     const result: RootCauseResult = {
       alertId: alert.id,
-      metricName: alert.metricName,
-      timestamp: alert.timestamp,
       rootCause: this.identifyRootCause(alert, anomalies, trends, correlations),
       confidence: this.calculateRootCauseConfidence(anomalies, trends, correlations),
-      relatedAnomalies: anomalies,
-      relatedTrends: trends,
-      relatedCorrelations: correlations,
-      recommendations: this.generateRecommendations(alert, anomalies, trends, correlations)
+      relatedMetrics: Array.from(this.metricsCache.keys()).slice(0, 5),
+      possibleCauses: [],
+      recommendations: this.generateRecommendations(alert, anomalies, trends, correlations).map(r => ({
+        description: r,
+        priority: 'MEDIUM' as any,
+        expectedImpact: '待评估'
+      })),
+      analyzedAt: new Date()
     };
     
     this.emit('rootcause:analyzed', result);
-    this.logger.info('根因分析完成', { alertId: alert.id, rootCause: result.rootCause });
+    this.logger.info('根因分析完成', 'AnalysisSystem', { alertId: alert.id, rootCause: result.rootCause });
     
     return result;
   }
 
+  async getAnomalyHistory(query: MetricsQuery): Promise<Anomaly[]> {
+    this.logger.info('获取异常历史', 'AnalysisSystem', { metricName: query.metricName });
+    
+    const anomalies: Anomaly[] = [];
+    
+    try {
+      const anomalyDir = path.join(this.dataDirectory, 'anomalies');
+      const files = await fs.readdir(anomalyDir);
+      
+      for (const file of files) {
+        if (file.endsWith('.json')) {
+          const filePath = path.join(anomalyDir, file);
+          const content = await fs.readFile(filePath, 'utf-8');
+          const anomaly = JSON.parse(content) as Anomaly;
+          
+          if (anomaly.startTime >= query.startTime && anomaly.startTime <= query.endTime) {
+            if (!query.metricName || anomaly.metricName === query.metricName) {
+              anomalies.push(anomaly);
+            }
+          }
+        }
+      }
+      
+      anomalies.sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
+      
+      this.logger.info('获取异常历史完成', 'AnalysisSystem', { count: anomalies.length });
+    } catch (error) {
+      this.logger.warn('获取异常历史失败', 'AnalysisSystem', undefined, error as Error);
+    }
+    
+    return anomalies;
+  }
+
   private async getMetrics(query: MetricsQuery): Promise<Metric[]> {
-    const cached = this.metricsCache.get(query.metricName);
+    const cached = this.metricsCache.get(query.metricName ?? '');
     
     if (!cached) {
       return [];
@@ -294,16 +321,16 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     let filtered = cached;
     
     if (query.startTime) {
-      filtered = filtered.filter(m => m.timestamp >= query.startTime!);
+      filtered = filtered.filter(m => m.timestamp >= query.startTime);
     }
     
     if (query.endTime) {
-      filtered = filtered.filter(m => m.timestamp <= query.endTime!);
+      filtered = filtered.filter(m => m.timestamp <= query.endTime);
     }
     
-    if (query.labels) {
+    if (query.labelValues) {
       filtered = filtered.filter(m => {
-        for (const [key, value] of Object.entries(query.labels!)) {
+        for (const [key, value] of Object.entries(query.labelValues!)) {
           if (m.labels?.[key] !== value) {
             return false;
           }
@@ -339,17 +366,17 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     return sorted[index];
   }
 
-  private detectTrend(values: number[]): string {
+  private detectTrend(values: number[]): Trend {
     const direction = this.detectTrendDirection(values);
     const slope = this.calculateSlope(values);
+    const strength = Math.abs(slope);
     
-    if (direction === TrendDirection.UP) {
-      return `上升趋势 (斜率: ${slope.toFixed(4)})`;
-    } else if (direction === TrendDirection.DOWN) {
-      return `下降趋势 (斜率: ${slope.toFixed(4)})`;
-    } else {
-      return `平稳趋势 (斜率: ${slope.toFixed(4)})`;
-    }
+    return {
+      direction,
+      strength,
+      forecast: values[values.length - 1] + slope,
+      confidence: Math.min(strength * 10, 1)
+    };
   }
 
   private detectTrendDirection(values: number[]): TrendDirection {
@@ -410,19 +437,19 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     return numerator / Math.sqrt(denominator1 * denominator2);
   }
 
-  private calculateCorrelationStrength(correlation: number): string {
+  private calculateCorrelationStrength(correlation: number): CorrelationStrength {
     const absCorrelation = Math.abs(correlation);
     
     if (absCorrelation >= 0.9) {
-      return '非常强';
+      return correlation > 0 ? CorrelationStrength.STRONG_POSITIVE : CorrelationStrength.STRONG_NEGATIVE;
     } else if (absCorrelation >= 0.7) {
-      return '强';
+      return correlation > 0 ? CorrelationStrength.MODERATE_POSITIVE : CorrelationStrength.MODERATE_NEGATIVE;
     } else if (absCorrelation >= 0.5) {
-      return '中等';
+      return correlation > 0 ? CorrelationStrength.WEAK_POSITIVE : CorrelationStrength.WEAK_NEGATIVE;
     } else if (absCorrelation >= 0.3) {
-      return '弱';
+      return correlation > 0 ? CorrelationStrength.WEAK_POSITIVE : CorrelationStrength.WEAK_NEGATIVE;
     } else {
-      return '非常弱';
+      return CorrelationStrength.NONE;
     }
   }
 
@@ -436,20 +463,8 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     return 1 - 0.5 * this.calculateBetaIncomplete(0.5 * df, 0.5, x);
   }
 
-  private calculateBetaIncomplete(a: number, b: number, x: number): number {
+  private calculateBetaIncomplete(_a: number, _b: number, x: number): number {
     return x;
-  }
-
-  private calculateAnomalySeverity(zScore: number): string {
-    if (zScore >= 5) {
-      return 'critical';
-    } else if (zScore >= 4) {
-      return 'high';
-    } else if (zScore >= 3) {
-      return 'medium';
-    } else {
-      return 'low';
-    }
   }
 
   private forecastTrend(values: number[], steps: number): number[] {
@@ -505,12 +520,12 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     }
     
     if (trends.length > 0) {
-      const maxConfidence = Math.max(...trends.map(t => t.confidence));
+      const maxConfidence = Math.max(...trends.map(t => t.confidence ?? 0));
       confidence = Math.max(confidence, maxConfidence);
     }
     
     if (correlations.length > 0) {
-      const maxSignificance = Math.max(...correlations.map(c => c.significance));
+      const maxSignificance = Math.max(...correlations.map(c => c.significance ?? 0));
       confidence = Math.max(confidence, maxSignificance);
     }
     

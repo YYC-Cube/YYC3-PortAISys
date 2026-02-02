@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import EventEmitter from 'eventemitter3';
 
 export interface MonitoringSystem extends EventEmitter {
   startMonitoring(config: MonitoringConfig): Promise<void>;
@@ -61,6 +61,9 @@ export interface MetricsQuery {
   labelFilters?: LabelFilter[];
   aggregation?: AggregationType;
   interval?: number;
+  metricName?: string;
+  labels?: LabelFilter[];
+  labelValues?: Record<string, string>;
 }
 
 export interface LabelFilter {
@@ -116,6 +119,9 @@ export interface AlertRule {
   enabled: boolean;
   createdAt: Date;
   updatedAt: Date;
+  triggeredCount?: number;
+  message?: string;
+  lastTriggeredAt?: Date;
 }
 
 export interface AlertCondition {
@@ -149,6 +155,16 @@ export enum NotificationChannel {
   WEWORK = 'wework'
 }
 
+export interface NotificationChannelConfig {
+  id: string;
+  type: NotificationChannel;
+  config: Record<string, any>;
+  createdAt: Date;
+  updatedAt: Date;
+  enabled: boolean;
+  recipients?: string[];
+}
+
 export interface SuppressionRule {
   id: string;
   name: string;
@@ -175,9 +191,15 @@ export interface Alert {
   closedAt?: Date;
   closedBy?: string;
   closeComment?: string;
+  timestamp: Date;
+  count?: number;
+  lastOccurrence?: Date;
+  updatedAt?: Date;
+  metricValue?: number;
 }
 
 export enum AlertStatus {
+  OPEN = 'open',
   ACTIVE = 'active',
   ACKNOWLEDGED = 'acknowledged',
   CLOSED = 'closed'
@@ -206,11 +228,15 @@ export interface AlertStatistics {
   bySeverity: Record<AlertSeverity, number>;
   avgResponseTime: number;
   avgResolutionTime: number;
+  byStatus: Record<AlertStatus, number>;
+  closedCount?: number;
+  triggeredCount?: number;
 }
 
 export interface AlertRuleQuery {
   enabled?: boolean;
   severity?: AlertSeverity;
+  metricName?: string;
 }
 
 export interface AlertStatisticsQuery {
@@ -240,6 +266,25 @@ export interface Notification {
   failureReason?: string;
   retryCount: number;
   maxRetries: number;
+  updatedAt?: Date;
+  deliveredAt?: Date;
+  error?: string;
+  timestamp?: Date;
+  metadata?: any;
+}
+
+export interface NotificationTemplate {
+  id: string;
+  name: string;
+  type: NotificationType;
+  channel: NotificationChannel;
+  subject: string;
+  body: string;
+  variables: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  title?: string;
+  content?: string;
 }
 
 export enum NotificationType {
@@ -300,6 +345,7 @@ export interface AnalysisSystem extends EventEmitter {
   analyzeTrends(query: MetricsQuery): Promise<Trend[]>;
   correlateMetrics(metrics: string[]): Promise<CorrelationResult[]>;
   analyzeRootCause(alert: Alert): Promise<RootCauseResult>;
+  getAnomalyHistory(query: MetricsQuery): Promise<Anomaly[]>;
 }
 
 export interface AnalysisResult {
@@ -324,6 +370,7 @@ export interface Trend {
   strength: number;
   forecast?: number;
   confidenceInterval?: [number, number];
+  confidence?: number;
 }
 
 export enum TrendDirection {
@@ -343,6 +390,7 @@ export interface Anomaly {
   startTime: Date;
   endTime?: Date;
   description: string;
+  confidence?: number;
 }
 
 export enum AnomalyType {
@@ -366,6 +414,7 @@ export interface CorrelationResult {
   correlation: number;
   strength: CorrelationStrength;
   lag?: number;
+  significance?: number;
 }
 
 export enum CorrelationStrength {
@@ -407,10 +456,10 @@ export enum RecommendationPriority {
 }
 
 export interface Logger {
-  debug(message: string, meta?: any): void;
-  info(message: string, meta?: any): void;
-  warn(message: string, meta?: any): void;
-  error(message: string, meta?: any): void;
+  debug(message: string, context?: string, metadata?: Record<string, unknown>): void;
+  info(message: string, context?: string, metadata?: Record<string, unknown>): void;
+  warn(message: string, context?: string, metadata?: Record<string, unknown>, error?: Error): void;
+  error(message: string, context?: string, metadata?: Record<string, unknown>, error?: Error): void;
 }
 
 export interface MetricCollector {

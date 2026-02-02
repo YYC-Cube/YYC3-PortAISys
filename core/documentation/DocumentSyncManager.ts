@@ -102,7 +102,7 @@ export class DocumentSyncManager {
         logger.info('备份目录已创建', 'DocumentSync', { directory: this.config.backupDirectory });
       }
     } catch (error) {
-      logger.error('初始化备份目录失败', 'DocumentSync', { error: error.message });
+      logger.error('初始化备份目录失败', 'DocumentSync', { error: error instanceof Error ? error.message : String(error) });
     }
   }
 
@@ -181,7 +181,7 @@ export class DocumentSyncManager {
           }
         }
       } catch (error) {
-        logger.error('扫描目录失败', 'DocumentSync', { dir, error: error.message });
+        logger.error('扫描目录失败', 'DocumentSync', { dir, error: error instanceof Error ? error.message : String(error) });
       }
     };
     
@@ -261,7 +261,7 @@ export class DocumentSyncManager {
    */
   async sync(options: SyncOptions = {}): Promise<SyncResult> {
     if (this.isSyncing) {
-      logger.warning('同步任务正在进行中', 'DocumentSync');
+      logger.warn('同步任务正在进行中', 'DocumentSync');
       throw new Error('同步任务正在进行中');
     }
 
@@ -290,7 +290,7 @@ export class DocumentSyncManager {
         options
       });
 
-      for (const [codePath, entry] of entriesToSync) {
+      for (const [_codePath, entry] of entriesToSync) {
         try {
           const syncStatus = await this.syncFile(entry, options);
           entry.syncStatus = syncStatus;
@@ -335,7 +335,7 @@ export class DocumentSyncManager {
       });
 
     } catch (error) {
-      logger.error('同步过程中发生错误', 'DocumentSync', { error: error.message });
+      logger.error('同步过程中发生错误', 'DocumentSync', { error: error instanceof Error ? error.message : String(error) });
       result.success = false;
       result.errors++;
     } finally {
@@ -469,7 +469,7 @@ export class DocumentSyncManager {
       logger.error('从代码更新文档失败', 'DocumentSync', {
         codePath,
         docPath,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       throw error;
     }
@@ -510,7 +510,7 @@ export class DocumentSyncManager {
       logger.error('从文档更新代码失败', 'DocumentSync', {
         codePath,
         docPath,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       throw error;
     }
@@ -649,7 +649,6 @@ export class DocumentSyncManager {
     let index = 0;
     
     while ((match = codeBlockRegex.exec(docContent)) !== null) {
-      const language = match[1] || 'code';
       const code = match[0].replace(/```(\w+)?/, '').replace(/```$/, '').trim();
       codeExamples[`example_${index++}`] = code;
     }
@@ -725,7 +724,7 @@ export class DocumentSyncManager {
   /**
    * 将文档内容合并到代码中
    */
-  private mergeDocIntoCode(docComments: Record<string, string>, docCodeExamples: Record<string, string>, codeContent: string, codePath: string): string {
+  private mergeDocIntoCode(docComments: Record<string, string>, _docCodeExamples: Record<string, string>, codeContent: string, codePath: string): string {
     // 查找或创建文件头部注释
     const headerRegex = /\/\*\*[\s\S]*?\*\//;
     let updatedContent = codeContent;
@@ -814,7 +813,7 @@ ${Object.entries(docComments)
       logger.error('解决冲突失败', 'DocumentSync', {
         entry,
         resolution,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       return false;
     }
@@ -848,7 +847,7 @@ ${Object.entries(docComments)
     } catch (error) {
       logger.error('创建备份失败', 'DocumentSync', {
         filePath,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   }
@@ -884,7 +883,7 @@ ${Object.entries(docComments)
       try {
         await this.sync();
       } catch (error) {
-        logger.error('自动同步失败', 'DocumentSync', { error: error.message });
+        logger.error('自动同步失败', 'DocumentSync', { error: error instanceof Error ? error.message : String(error) });
       }
     }, this.config.syncInterval);
     
@@ -979,7 +978,7 @@ ${Object.entries(docComments)
         try {
           listener(data);
         } catch (error) {
-          logger.error(`事件监听器错误: ${event}`, 'DocumentSync', { error: error.message });
+          logger.error(`事件监听器错误: ${event}`, 'DocumentSync', { error: error instanceof Error ? error.message : String(error) });
         }
       });
     }
