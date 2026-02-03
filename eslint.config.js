@@ -30,7 +30,25 @@ export default defineConfig([
       '@typescript-eslint': typescript
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          // 使用过的变量之后，未使用的变量才报错
+          args: 'after-used',
+          // 忽略以下划线开头的参数
+          argsIgnorePattern: '^_',
+          // 不检查catch块的错误参数
+          caughtErrors: 'none',
+          // 忽略以下划线开头的catch错误
+          caughtErrorsIgnorePattern: '^_',
+          // 忽略以下划线开头的解构数组元素
+          destructuredArrayIgnorePattern: '^_',
+          // 允许在剩余属性中有未使用的变量
+          ignoreRestSiblings: true,
+          // 忽略以下划线开头的变量
+          varsIgnorePattern: '^_'
+        }
+      ],
       'no-console': 'error',
       'no-debugger': 'error',
       'max-lines': ['warn', { max: 2000, skipBlankLines: true, skipComments: true }],
