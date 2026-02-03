@@ -107,7 +107,7 @@ async function main() {
         span.setAttribute('test.type', 'error_handling');
         throw new Error('这是一个测试错误');
       });
-    } catch (error) {
+    } catch (_error) {
       logger.info('  ✓ 错误已被捕获并记录到 trace\n', 'tracing-example');
     }
 

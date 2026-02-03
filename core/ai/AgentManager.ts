@@ -367,7 +367,7 @@ export class AgentManager extends EventEmitter {
   }
 
   removeRoute(routeId: string): void {
-    for (const [_from, routes] of this.routes.entries()) {
+    for (const routes of this.routes.values()) {
       const index = routes.findIndex(r => r.id === routeId);
       if (index !== -1) {
         routes.splice(index, 1);

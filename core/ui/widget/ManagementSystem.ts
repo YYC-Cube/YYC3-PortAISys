@@ -780,7 +780,7 @@ class PolicyEnforcer {
       }
 
       return false;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }

@@ -572,25 +572,25 @@ export class ErrorHandlingSystem extends EventEmitter {
     return false;
   }
 
-  private async executeComponentRestart(errorInfo: ErrorInfo, strategy: ErrorRecoveryStrategy): Promise<boolean> {
+  private async executeComponentRestart(errorInfo: ErrorInfo, _strategy: ErrorRecoveryStrategy): Promise<boolean> {
     this.emit('component:restart', errorInfo.component);
 
     return true;
   }
 
-  private async executeStateReset(errorInfo: ErrorInfo, strategy: ErrorRecoveryStrategy): Promise<boolean> {
+  private async executeStateReset(errorInfo: ErrorInfo, _strategy: ErrorRecoveryStrategy): Promise<boolean> {
     this.emit('state:reset', errorInfo.component);
 
     return true;
   }
 
-  private async executeFallback(errorInfo: ErrorInfo, strategy: ErrorRecoveryStrategy): Promise<boolean> {
+  private async executeFallback(errorInfo: ErrorInfo, _strategy: ErrorRecoveryStrategy): Promise<boolean> {
     this.emit('fallback:activated', errorInfo);
 
     return true;
   }
 
-  private async executeServiceDegradation(errorInfo: ErrorInfo, strategy: ErrorRecoveryStrategy): Promise<boolean> {
+  private async executeServiceDegradation(errorInfo: ErrorInfo, _strategy: ErrorRecoveryStrategy): Promise<boolean> {
     this.emit('service:degraded', errorInfo.component);
 
     return true;

@@ -100,7 +100,7 @@ export class ToolRegistry {
     logger.info(`Tool used: ${toolName}`, 'ToolRegistry', { parameters, result });
   }
   
-  private async calculateToolRelevance(tool: AITool, context: AIContext): Promise<number> {
+  private async calculateToolRelevance(_tool: AITool, _context: AIContext): Promise<number> {
     // 实现工具相关性计算逻辑
     return Math.random(); // 临时实现，需要根据实际上下文优化
   }

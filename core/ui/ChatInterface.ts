@@ -360,7 +360,7 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
     this.emit('session:renamed', { sessionId, oldName, newName });
   }
 
-  async suggestReplies(context: ReplyContext): Promise<SuggestedReply[]> {
+  async suggestReplies(_context: ReplyContext): Promise<SuggestedReply[]> {
     const suggestions: SuggestedReply[] = [
       {
         text: '请详细说明一下',

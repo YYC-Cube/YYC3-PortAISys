@@ -78,7 +78,7 @@ export class MessageQueue extends EventEmitter {
     this.processing = false;
   }
 
-  private async processMessage(message: Message): Promise<void> {
+  private async processMessage(_message: Message): Promise<void> {
     return Promise.resolve();
   }
 

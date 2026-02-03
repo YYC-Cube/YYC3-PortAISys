@@ -796,7 +796,7 @@ export class AnalysisSystem extends EventEmitter {
     }
 
     const recentCount = recentData.length;
-    const totalRecent = behaviorData.slice(-100).length;
+    void behaviorData.slice(-100).length;
     const olderCount = behaviorData.filter(d => d.data.action === action && d.timestamp < recentData[0].timestamp).length;
 
     return (recentCount - olderCount) / olderCount;

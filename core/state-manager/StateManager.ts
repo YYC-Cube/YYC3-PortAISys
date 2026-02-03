@@ -275,7 +275,7 @@ export class StateManager extends EventEmitter {
     }
   }
 
-  private persistSnapshot(snapshot: StateSnapshot): void {
+  private persistSnapshot(_snapshot: StateSnapshot): void {
     try {
       const snapshotsData = {
         snapshots: this.snapshots,

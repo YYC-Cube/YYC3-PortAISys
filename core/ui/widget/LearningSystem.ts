@@ -621,7 +621,7 @@ export class LearningSystem extends EventEmitter {
     });
   }
 
-  private generateBehavioralRecommendations(patterns: Pattern[], model: ModelInfo): Recommendation[] {
+  private generateBehavioralRecommendations(patterns: Pattern[], _model: ModelInfo): Recommendation[] {
     const recommendations: Recommendation[] = [];
 
     patterns.forEach(pattern => {
@@ -642,7 +642,7 @@ export class LearningSystem extends EventEmitter {
     return recommendations;
   }
 
-  private generateStrategicRecommendations(patterns: Pattern[], model: ModelInfo): Recommendation[] {
+  private generateStrategicRecommendations(patterns: Pattern[], _model: ModelInfo): Recommendation[] {
     const recommendations: Recommendation[] = [];
 
     patterns.forEach(pattern => {
@@ -663,7 +663,7 @@ export class LearningSystem extends EventEmitter {
     return recommendations;
   }
 
-  private generateKnowledgeRecommendations(patterns: Pattern[], model: ModelInfo): Recommendation[] {
+  private generateKnowledgeRecommendations(patterns: Pattern[], _model: ModelInfo): Recommendation[] {
     const recommendations: Recommendation[] = [];
 
     patterns.forEach(pattern => {

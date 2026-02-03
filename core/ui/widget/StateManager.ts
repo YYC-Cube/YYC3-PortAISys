@@ -386,7 +386,7 @@ export class StateManager extends EventEmitter {
   ): StateSnapshot {
     const { validate = this.validationEnabled, persist = this.persistenceEnabled } = options;
 
-    const newData = this.getNestedValue(this.currentState.data, path);
+    void this.getNestedValue(this.currentState.data, path);
     const updatedData = this.setNestedValue({ ...this.currentState.data }, path, value);
 
     return this.setState(updatedData, { merge: false, validate, persist });
@@ -515,7 +515,7 @@ export class StateManager extends EventEmitter {
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];
 
-    this.schemas.forEach((schema, name) => {
+    this.schemas.forEach((schema, _name) => {
       const schemaErrors = this.validateAgainstSchema(data, schema);
       errors.push(...schemaErrors);
     });

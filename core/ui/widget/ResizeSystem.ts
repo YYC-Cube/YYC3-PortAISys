@@ -282,7 +282,7 @@ export class ResizeSystem extends EventEmitter {
     this.state.duration = 0;
 
     const rect = this.element.getBoundingClientRect();
-    const style = window.getComputedStyle(this.element);
+    void window.getComputedStyle(this.element);
 
     this.state.startWidth = rect.width;
     this.state.startHeight = rect.height;

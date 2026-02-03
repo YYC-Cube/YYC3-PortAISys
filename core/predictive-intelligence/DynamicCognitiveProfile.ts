@@ -296,7 +296,7 @@ export class DynamicCognitiveProfile {
     }
 
     const predictions: FuturePrediction[] = [];
-    const evolution = profile.cognitiveEvolution;
+    void profile.cognitiveEvolution;
 
     predictions.push({
       timeframe: '1 month',

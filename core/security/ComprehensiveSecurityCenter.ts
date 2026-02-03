@@ -683,7 +683,7 @@ export class ComprehensiveSecurityCenter {
   async verifyPassword(password: string, hash: string): Promise<boolean> {
     try {
       return await bcrypt.compare(password, hash);
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
   }

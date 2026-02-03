@@ -141,8 +141,8 @@ export class SecurityAuditManager {
     try {
       if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
         const fs = require('fs');
-        const path = require('path');
-        
+        void require('path');
+
         if (!fs.existsSync(this.config.reportDirectory)) {
           fs.mkdirSync(this.config.reportDirectory, { recursive: true });
           logger.info('安全报告目录已创建', 'SecurityAudit', { directory: this.config.reportDirectory });

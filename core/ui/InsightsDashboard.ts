@@ -185,7 +185,7 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
     }
   }
 
-  private async fetchMetricValue(metricId: string): Promise<number | undefined> {
+  private async fetchMetricValue(_metricId: string): Promise<number | undefined> {
     return Math.floor(Math.random() * 100);
   }
 
@@ -199,7 +199,7 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
     }
   }
 
-  private async fetchChartData(chartId: string): Promise<any[] | undefined> {
+  private async fetchChartData(_chartId: string): Promise<any[] | undefined> {
     const dataPoints = 10;
     return Array.from({ length: dataPoints }, (_, i) => ({
       x: i,

@@ -362,8 +362,8 @@ export class ExecutionSystem extends EventEmitter {
     this.processQueue();
   }
 
-  private checkWorkflowCompletion(task: Task): void {
-    for (const [workflowId, workflow] of this.workflows) {
+  private checkWorkflowCompletion(_task: Task): void {
+    for (const [_workflowId, workflow] of this.workflows) {
       if (workflow.status === 'running' || workflow.status === 'pending') {
         const allTasksCompleted = workflow.tasks.every(t => t.status === 'completed');
         const anyTaskFailed = workflow.tasks.some(t => t.status === 'failed');
@@ -383,8 +383,8 @@ export class ExecutionSystem extends EventEmitter {
     }
   }
 
-  private checkWorkflowFailure(task: Task): void {
-    for (const [workflowId, workflow] of this.workflows) {
+  private checkWorkflowFailure(_task: Task): void {
+    for (const [_workflowId, workflow] of this.workflows) {
       if (workflow.status === 'running' || workflow.status === 'pending') {
         const anyTaskFailed = workflow.tasks.some(t => t.status === 'failed');
 

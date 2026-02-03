@@ -62,7 +62,7 @@ export class ApiMockManager {
     const mockFn = vi.fn();
     
     // 配置模拟函数行为
-    mockFn.mockImplementation(async (...args: any[]) => {
+    mockFn.mockImplementation(async (..._args: any[]) => {
       const mockInstance = this.mocks.get(key);
       if (!mockInstance) {
         throw new Error(`Mock not found: ${key}`);
@@ -98,7 +98,7 @@ export class ApiMockManager {
         mockFn.mockReset();
         mockInstance.callCount = 0;
       },
-      verify: (times?: number) => {
+      verify: (_times?: number) => {
         // 验证逻辑由测试框架处理
         return mockFn;
       }

@@ -49,7 +49,7 @@ export const searchTool: AITool = {
       default: 'zh-CN'
     }
   ],
-  async execute(params, context) {
+  async execute(params, _context) {
     const startTime = Date.now();
     const { query, numResults = 5, language = 'zh-CN' } = params;
 
@@ -146,7 +146,7 @@ export const calculatorTool: AITool = {
       }
     }
   ],
-  async execute(params, context) {
+  async execute(params, _context) {
     const startTime = Date.now();
     const { expression, precision = 4 } = params;
 
@@ -265,9 +265,9 @@ export const codeInterpreterTool: AITool = {
       }
     }
   ],
-  async execute(params, context) {
+  async execute(params, _context) {
     const startTime = Date.now();
-    const { code, language, timeout = 5000 } = params;
+    const { code, language, timeout: _timeout = 5000 } = params;
 
     try {
       // 模拟代码执行

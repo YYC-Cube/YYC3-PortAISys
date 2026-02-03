@@ -910,7 +910,7 @@ export class AutonomousMarketingIntelligence {
     ];
   }
 
-  private async createCustomerSegments(customerData: any[]): Promise<CustomerSegment[]> {
+  private async createCustomerSegments(_customerData: any[]): Promise<CustomerSegment[]> {
     return [
       {
         segmentId: 'high_value_customers',
@@ -990,7 +990,7 @@ export class AutonomousMarketingIntelligence {
     ];
   }
 
-  private async createAutomatedCampaigns(campaignData: any[]): Promise<AutomatedCampaign[]> {
+  private async createAutomatedCampaigns(_campaignData: any[]): Promise<AutomatedCampaign[]> {
     return [];
   }
 
@@ -1108,7 +1108,7 @@ export class AutonomousMarketingIntelligence {
     };
   }
 
-  private async analyzeCompetitorsInternal(competitorData: any[]): Promise<CompetitorAnalysis[]> {
+  private async analyzeCompetitorsInternal(_competitorData: any[]): Promise<CompetitorAnalysis[]> {
     return [];
   }
 

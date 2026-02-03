@@ -877,7 +877,7 @@ export class IntelligentAIWidget extends EventEmitter {
     return this.workflowDesigner;
   }
 
-  async exportData(format: 'json' | 'xml' | 'yaml' = 'json'): Promise<any> {
+  async exportData(_format: 'json' | 'xml' | 'yaml' = 'json'): Promise<any> {
     return this.uiSystem.exportAllData();
   }
 

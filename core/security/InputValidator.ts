@@ -264,7 +264,7 @@ export class InputValidator {
     };
   }
 
-  private validate(input: any, schema: z.ZodSchema<any>, context: string): ValidationResult {
+  private validate(input: any, schema: z.ZodSchema<any>, _context: string): ValidationResult {
     try {
       const validated = schema.parse(input);
 

@@ -78,7 +78,7 @@ export class ComplianceManager implements IComplianceManager {
 
     let targetFrameworks = this.frameworks;
 
-    for (const [name, fw] of targetFrameworks.entries()) {
+    for (const [_name, fw] of targetFrameworks.entries()) {
       const status = await this.checkFrameworkCompliance(fw);
       frameworkStatuses.push(status);
 
@@ -268,7 +268,7 @@ export class ComplianceManager implements IComplianceManager {
 
   private async identifyGaps(
     framework: ComplianceFramework,
-    status: FrameworkStatus
+    _status: FrameworkStatus
   ): Promise<ComplianceGap[]> {
     const gaps: ComplianceGap[] = [];
     const frameworkRules = this.complianceRules.filter(

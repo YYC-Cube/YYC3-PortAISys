@@ -175,7 +175,7 @@ export class AnimationSystem extends EventEmitter {
     const duration = config.duration || this.config.defaultDuration;
     const delay = config.delay || 0;
     const iterations = config.iterations || 1;
-    const direction = config.direction || 'normal';
+    const _direction = config.direction || 'normal';
     const fillMode = config.fillMode || 'forwards';
 
     this.metrics.totalAnimations++;
@@ -205,7 +205,7 @@ export class AnimationSystem extends EventEmitter {
       }
 
       const elapsed = timestamp - startTime;
-      const totalDuration = duration * iterations;
+      void (duration * iterations);
       const progress = Math.min(elapsed / duration, 1);
       const currentIteration = Math.floor(elapsed / duration);
 
