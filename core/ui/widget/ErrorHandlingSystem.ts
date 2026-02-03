@@ -11,6 +11,7 @@
  */
 
 import EventEmitter from 'eventemitter3';
+import { logger } from '../../utils/logger';
 
 export interface ErrorHandlingConfig {
   enabled?: boolean;
@@ -614,13 +615,13 @@ export class ErrorHandlingSystem extends EventEmitter {
 
     switch (logLevel) {
       case 'error':
-        console.error(logMessage, errorInfo);
+        logger.error(logMessage, errorInfo);
         break;
       case 'warn':
-        console.warn(logMessage, errorInfo);
+        logger.warn(logMessage, errorInfo);
         break;
       default:
-        console.info(logMessage, errorInfo);
+        logger.info(logMessage, errorInfo);
     }
   }
 

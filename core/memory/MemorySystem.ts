@@ -11,6 +11,7 @@
 import { AutonomousAIConfig } from '../autonomous-ai-widget/types';
 import { LearningRecord, PatternRecognitionResult, PerformanceEvaluation } from '../learning/types';
 import { UserMessage, AIResponse } from '../autonomous-ai-widget/types';
+import { logger } from '../utils/logger';
 
 /**
  * 内存系统 - 管理AI的记忆和数据存储
@@ -319,32 +320,32 @@ export class MemorySystem {
   // 持久化存储方法（在实际实现中，这些方法应该连接到数据库或本地存储）
   private async persistInteractionHistory(interaction: { user: UserMessage; ai: AIResponse; timestamp: string }): Promise<void> {
     // 模拟持久化存储
-    console.log('Persisting interaction history:', interaction.timestamp);
+    logger.info('Persisting interaction history:', 'MemorySystem', { timestamp: interaction.timestamp });
   }
 
   private async persistLearningRecord(record: LearningRecord): Promise<void> {
     // 模拟持久化存储
-    console.log('Persisting learning record:', record.id);
+    logger.info('Persisting learning record:', 'MemorySystem', { id: record.id });
   }
 
   private async persistCachedAnswers(): Promise<void> {
     // 模拟持久化存储
-    console.log('Persisting cached answers');
+    logger.info('Persisting cached answers', 'MemorySystem');
   }
 
   private async persistPatterns(patterns: PatternRecognitionResult[]): Promise<void> {
     // 模拟持久化存储
-    console.log('Persisting patterns:', patterns.length);
+    logger.info('Persisting patterns:', 'MemorySystem', { count: patterns.length });
   }
 
   private async persistPerformanceEvaluation(evaluation: PerformanceEvaluation): Promise<void> {
     // 模拟持久化存储
-    console.log('Persisting performance evaluation:', evaluation.id);
+    logger.info('Persisting performance evaluation:', 'MemorySystem', { id: evaluation.id });
   }
 
   private async persistAllData(): Promise<void> {
     // 模拟持久化存储所有数据
-    console.log('Persisting all memory data');
+    logger.info('Persisting all memory data', 'MemorySystem');
   }
 
   /**
@@ -400,6 +401,6 @@ export class MemorySystem {
   }): Promise<void> {
     if (!this.config.enableMemory) return;
 
-    console.log('Saving error log:', errorLog);
+    logger.info('Saving error log:', 'MemorySystem', { errorLog });
   }
 }

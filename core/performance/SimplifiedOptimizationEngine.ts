@@ -10,6 +10,7 @@
  */
 
 import EventEmitter from 'eventemitter3';
+import { logger } from '../utils/logger';
 
 export enum PerformanceDomain {
   CPU = 'cpu',
@@ -485,13 +486,13 @@ export class ActionGenerator {
 export class ActionExecutor {
   async executeAction(action: OptimizationAction): Promise<boolean> {
     try {
-      console.log(`Executing action: ${action.description}`);
+      logger.info(`Executing action: ${action.description}`, 'ActionExecutor');
 
       await this.implementAction(action);
 
       return true;
     } catch (error) {
-      console.error(`Failed to execute action: ${action.description}`, error);
+      logger.error(`Failed to execute action: ${action.description}`, 'ActionExecutor', { error }, error as Error);
       return false;
     }
   }
@@ -500,7 +501,7 @@ export class ActionExecutor {
     const implementationDelay = Math.random() * 1000;
     await new Promise(resolve => setTimeout(resolve, implementationDelay));
 
-    console.log(`Action implemented: ${action.implementation}`);
+    logger.info(`Action implemented: ${action.implementation}`, 'ActionExecutor');
   }
 }
 

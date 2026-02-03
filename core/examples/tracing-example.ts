@@ -9,15 +9,16 @@
 import { AutonomousAIEngine } from '../AutonomousAIEngine';
 import { initializeTracing, shutdownTracing, withSpan } from '../tracing';
 import { EngineConfig, MessageType } from '../types/engine.types';
+import { logger } from '../utils/logger';
 
 /**
  * 主函数：演示tracing集成
  */
 async function main() {
-  console.log('🚀 启动 YYC³ AI System with OpenTelemetry Tracing\n');
+  logger.info('🚀 启动 YYC³ AI System with OpenTelemetry Tracing\n', 'tracing-example');
 
   // 1. 初始化 Tracing（必须在应用启动前）
-  console.log('📊 初始化 OpenTelemetry Tracing...');
+  logger.info('📊 初始化 OpenTelemetry Tracing...', 'tracing-example');
   await initializeTracing({
     serviceName: 'yyc3-portable-ai-system',
     serviceVersion: '1.0.0',
@@ -25,10 +26,10 @@ async function main() {
     enableConsoleLogging: true,
     enabled: true,
   });
-  console.log('✅ Tracing 初始化完成\n');
+  logger.info('✅ Tracing 初始化完成\n', 'tracing-example');
 
   // 2. 创建并初始化引擎
-  console.log('🔧 创建 AI 引擎...');
+  logger.info('🔧 创建 AI 引擎...', 'tracing-example');
   const engineConfig: EngineConfig = {
     version: '1.0.0',
     environment: 'development',
@@ -66,11 +67,11 @@ async function main() {
       await engine.initialize();
       await engine.start();
 
-      console.log('✅ AI 引擎启动成功\n');
+      logger.info('✅ AI 引擎启动成功\n', 'tracing-example');
     });
 
     // 4. 处理一些示例消息
-    console.log('📨 处理示例消息...');
+    logger.info('📨 处理示例消息...', 'tracing-example');
 
     await withSpan('app.process_messages', async () => {
       // 注册一个简单的消息处理器
@@ -93,54 +94,54 @@ async function main() {
 
       for (const message of testMessages) {
         const response = await engine.processMessage(message);
-        console.log(`  ✓ 消息 ${message.id}: ${response.success ? '成功' : '失败'}`);
+        logger.info(`  ✓ 消息 ${message.id}: ${response.success ? '成功' : '失败'}`, 'tracing-example');
       }
     });
 
-    console.log('✅ 消息处理完成\n');
+    logger.info('✅ 消息处理完成\n', 'tracing-example');
 
     // 5. 模拟一些错误场景（演示错误追踪）
-    console.log('⚠️  测试错误追踪...');
+    logger.info('⚠️  测试错误追踪...', 'tracing-example');
     try {
       await withSpan('app.error_test', async (span) => {
         span.setAttribute('test.type', 'error_handling');
         throw new Error('这是一个测试错误');
       });
     } catch (error) {
-      console.log('  ✓ 错误已被捕获并记录到 trace\n');
+      logger.info('  ✓ 错误已被捕获并记录到 trace\n', 'tracing-example');
     }
 
     // 6. 显示引擎状态
-    console.log('📊 引擎状态:');
-    console.log(`  状态: ${engine.getStatus()}`);
+    logger.info('📊 引擎状态:', 'tracing-example');
+    logger.info(`  状态: ${engine.getStatus()}`, 'tracing-example');
     const metrics = engine.getMetrics();
-    console.log(`  消息吞吐: ${metrics.messageThroughput.toFixed(2)} msg/s`);
-    console.log(`  平均处理时间: ${(metrics.responseTimes.average || 0).toFixed(2)}ms`);
-    console.log(`  错误率: ${metrics.errorRate.toFixed(2)}%\n`);
+    logger.info(`  消息吞吐: ${metrics.messageThroughput.toFixed(2)} msg/s`, 'tracing-example');
+    logger.info(`  平均处理时间: ${(metrics.responseTimes.average || 0).toFixed(2)}ms`, 'tracing-example');
+    logger.info(`  错误率: ${metrics.errorRate.toFixed(2)}%\n`, 'tracing-example');
 
     // 7. 关闭引擎
-    console.log('🛑 关闭 AI 引擎...');
+    logger.info('🛑 关闭 AI 引擎...', 'tracing-example');
     await engine.shutdown();
-    console.log('✅ AI 引擎已关闭\n');
+    logger.info('✅ AI 引擎已关闭\n', 'tracing-example');
 
   } catch (error) {
-    console.error('❌ 错误:', error);
+    logger.error('❌ 错误:', 'tracing-example', { error }, error as Error);
   } finally {
     // 8. 关闭 Tracing（确保所有trace数据都被发送）
-    console.log('📊 关闭 Tracing...');
+    logger.info('📊 关闭 Tracing...', 'tracing-example');
     await shutdownTracing();
-    console.log('✅ Tracing 已关闭\n');
+    logger.info('✅ Tracing 已关闭\n', 'tracing-example');
   }
 
-  console.log('🎉 示例完成！');
-  console.log('\n📊 打开 AI Toolkit 的 Trace Viewer 查看追踪数据:');
-  console.log('   VS Code 命令: AI Toolkit: Open Trace Viewer');
-  console.log('   或访问: http://localhost:4318\n');
+  logger.info('🎉 示例完成！', 'tracing-example');
+  logger.info('\n📊 打开 AI Toolkit 的 Trace Viewer 查看追踪数据:', 'tracing-example');
+  logger.info('   VS Code 命令: AI Toolkit: Open Trace Viewer', 'tracing-example');
+  logger.info('   或访问: http://localhost:4318\n', 'tracing-example');
 }
 
 // 运行示例
 if (require.main === module) {
-  main().catch(console.error);
+  main().catch((error) => logger.error('Main function error:', 'tracing-example', { error }, error as Error));
 }
 
 export { main };

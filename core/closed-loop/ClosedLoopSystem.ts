@@ -9,6 +9,7 @@ import { TechnicalMaturityModel } from './technical-evolution/TechnicalMaturityM
 import { TechnologyRoadmap } from './technical-evolution/TechnologyRoadmap';
 
 import type { AutonomousAIConfig } from '../autonomous-ai-widget/types';
+import { logger } from '../utils/logger';
 
 export class ClosedLoopSystem {
   private config: AutonomousAIConfig;
@@ -44,7 +45,7 @@ export class ClosedLoopSystem {
       await this.technologyRoadmap.updateRoadmap(metrics);
 
     } catch (error) {
-      console.error('ClosedLoopSystem: Error running closed loop:', error);
+      logger.error('ClosedLoopSystem: Error running closed loop:', 'ClosedLoopSystem', { error }, error as Error);
     }
   }
 

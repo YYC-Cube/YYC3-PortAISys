@@ -30,13 +30,13 @@ import {
   NotFoundError,
   ValidationError,
   InternalError,
-  YYC3Error
 } from '../error-handler/ErrorTypes';
 import { ErrorHandler } from '../error-handler/ErrorHandler';
 import { ErrorBoundary } from '../error-handler/ErrorBoundary';
 import { OpenAIModelAdapter } from '../adapters/OpenAIModelAdapter';
 import { ModelGenerationRequest } from '../adapters/ModelAdapter';
 import { AutonomousAIConfig } from '../autonomous-ai-widget/types';
+import { logger } from '../utils/logger';
 
 export class ChatInterface extends EventEmitter implements IChatInterface {
   private sessions: Map<string, ChatSession>;
@@ -104,7 +104,7 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
     });
 
     this.on('error', (errorInfo) => {
-      console.error('[ChatInterface Error]', errorInfo);
+      logger.error('[ChatInterface Error]', 'ChatInterface', { errorInfo });
     });
   }
 

@@ -8,6 +8,7 @@
  */
 
 import EventEmitter from 'eventemitter3'
+import { logger } from '../utils/logger'
 
 export enum ErrorSeverity {
   CRITICAL = 'critical',
@@ -539,7 +540,7 @@ export class GlobalErrorHandler extends EventEmitter {
 
   private logError(errorRecord: ErrorRecord): void {
     const logMessage = `[${errorRecord.severity.toUpperCase()}] ${errorRecord.category}: ${errorRecord.error.message}`
-    console.error(logMessage, {
+    logger.error(logMessage, 'GlobalErrorHandler', {
       id: errorRecord.id,
       context: errorRecord.context,
       stack: errorRecord.stackTrace,

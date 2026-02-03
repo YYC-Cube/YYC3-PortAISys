@@ -13,6 +13,7 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
+import { logger } from '../utils/logger';
 
 export interface TracingOptions {
   serviceName?: string;
@@ -47,12 +48,12 @@ export class TracingConfig {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
-      console.warn('[Tracing] Already initialized');
+      logger.warn('[Tracing] Already initialized', 'TracingConfig');
       return;
     }
 
     if (!this.options.enabled) {
-      console.info('[Tracing] Tracing is disabled');
+      logger.info('[Tracing] Tracing is disabled', 'TracingConfig');
       return;
     }
 
@@ -64,7 +65,7 @@ export class TracingConfig {
 
       // 测试环境：跳过实际的OTLP连接，只做基本初始化
       if (this.options.isTestEnvironment) {
-        console.info('[Tracing] Test environment detected - skipping full initialization');
+        logger.info('[Tracing] Test environment detected - skipping full initialization', 'TracingConfig');
         this.isInitialized = true;
         return;
       }
@@ -111,15 +112,15 @@ export class TracingConfig {
       await this.sdk.start();
       this.isInitialized = true;
 
-      console.info('[Tracing] OpenTelemetry initialized successfully', {
+      logger.info('[Tracing] OpenTelemetry initialized successfully', 'TracingConfig', {
         serviceName: this.options.serviceName,
         endpoint: this.options.endpoint,
       });
     } catch (error) {
-      console.error('[Tracing] Failed to initialize OpenTelemetry:', error);
+      logger.error('[Tracing] Failed to initialize OpenTelemetry:', 'TracingConfig', { error }, error as Error);
       // 在测试环境中，即使初始化失败也标记为已初始化，以避免测试超时
       if (this.options.isTestEnvironment) {
-        console.info('[Tracing] Test environment - marking as initialized despite error');
+        logger.info('[Tracing] Test environment - marking as initialized despite error', 'TracingConfig');
         this.isInitialized = true;
       } else {
         throw error;
@@ -137,7 +138,7 @@ export class TracingConfig {
 
     // 测试环境：跳过实际的关闭操作
     if (this.options.isTestEnvironment) {
-      console.info('[Tracing] Test environment detected - skipping full shutdown');
+      logger.info('[Tracing] Test environment detected - skipping full shutdown', 'TracingConfig');
       this.isInitialized = false;
       return;
     }
@@ -149,12 +150,12 @@ export class TracingConfig {
     try {
       await this.sdk.shutdown();
       this.isInitialized = false;
-      console.info('[Tracing] OpenTelemetry shut down successfully');
+      logger.info('[Tracing] OpenTelemetry shut down successfully', 'TracingConfig');
     } catch (error) {
-      console.error('[Tracing] Error shutting down OpenTelemetry:', error);
+      logger.error('[Tracing] Error shutting down OpenTelemetry:', 'TracingConfig', { error }, error as Error);
       // 在测试环境中，即使关闭失败也标记为未初始化，以避免测试超时
       if (this.options.isTestEnvironment) {
-        console.info('[Tracing] Test environment - marking as uninitialized despite error');
+        logger.info('[Tracing] Test environment - marking as uninitialized despite error', 'TracingConfig');
         this.isInitialized = false;
       } else {
         throw error;

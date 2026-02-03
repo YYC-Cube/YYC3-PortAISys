@@ -7,7 +7,7 @@
  * @created 2026-01-24
  */
 
-import { trace, context, Span, SpanStatusCode, Tracer } from '@opentelemetry/api';
+import { trace, Span, SpanStatusCode, Tracer } from '@opentelemetry/api';
 
 /**
  * 获取当前tracer

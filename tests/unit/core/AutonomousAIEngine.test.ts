@@ -1,3 +1,14 @@
+/**
+ * @file 自主AI引擎测试
+ * @description 测试AutonomousAIEngine的核心功能和接口
+ * @module tests/unit/core/AutonomousAIEngine.test
+ * @author YYC³ Team
+ * @version 1.0.0
+ * @created 2026-02-03
+ * @copyright Copyright (c) 2026 YYC³
+ * @license MIT
+ */
+
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { AutonomousAIEngine } from '../../../core/AutonomousAIEngine';
 import { EngineConfig, EngineStatus, MessageType, AgentMessage, ISubsystem } from '../../../core/types/engine.types';

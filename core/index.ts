@@ -14,6 +14,7 @@ import type { AutonomousAIConfig, AIWidgetInstance } from './autonomous-ai-widge
 import { AutonomousAIEngine as PluggableAutonomousAIEngine } from './pluggable/AutonomousAIEngine';
 import type { EngineConfig } from './pluggable/types';
 import { ClosedLoopSystem } from './closed-loop/ClosedLoopSystem';
+import { logger } from './utils/logger';
 
 // 核心配置和实例接口
 export type { AutonomousAIConfig, AIWidgetInstance } from './autonomous-ai-widget/types';
@@ -214,17 +215,17 @@ export const createAIWidget = (config: AutonomousAIConfig): AIWidgetInstance => 
       canAdapt: config.enableContextAwareness
     },
     destroy: () => {
-      console.warn(`Destroying AI widget instance: ${id}`);
+      logger.warn(`Destroying AI widget instance: ${id}`, 'index');
     },
     updateConfig: (newConfig: Partial<AutonomousAIConfig>) => {
       config = { ...config, ...newConfig };
-      console.warn(`Updated config for AI widget instance: ${id}`, newConfig);
+      logger.warn(`Updated config for AI widget instance: ${id}`, 'index', { newConfig });
     },
     sendMessage: async (_message: any) => {
       return { content: '', timestamp: Date.now() };
     },
     registerTool: async (tool: any) => {
-      console.warn(`Registering tool: ${tool.name}`);
+      logger.warn(`Registering tool: ${tool.name}`, 'index');
     }
   };
 };
@@ -236,7 +237,7 @@ export const createAIWidget = (config: AutonomousAIConfig): AIWidgetInstance => 
  */
 export const initializeYYC3AI = async (config: AutonomousAIConfig) => {
   try {
-    console.warn('Initializing YYC³ AI System...');
+    logger.info('Initializing YYC³ AI System...', 'index');
 
     // 转换配置类型
     const engineConfig: EngineConfig = {
@@ -273,11 +274,11 @@ export const initializeYYC3AI = async (config: AutonomousAIConfig) => {
 
     // 启动学习系统
     if (config.enableLearning) {
-      console.warn('Starting learning system...');
+      logger.info('Starting learning system...', 'index');
       // 这里可以添加学习系统的启动逻辑
     }
 
-    console.warn('YYC³ AI System initialized successfully!');
+    logger.info('YYC³ AI System initialized successfully!', 'index');
 
     return {
       engine,
@@ -287,7 +288,7 @@ export const initializeYYC3AI = async (config: AutonomousAIConfig) => {
       systemInfo: SYSTEM_INFO
     };
   } catch (error) {
-    console.error('Failed to initialize YYC³ AI System:', error);
+    logger.error('Failed to initialize YYC³ AI System:', 'index', { error }, error as Error);
     throw error;
   }
 };

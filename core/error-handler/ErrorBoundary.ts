@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3'
 import { YYC3Error, ErrorSeverity, isYYC3Error } from './ErrorTypes'
 import { ErrorHandler } from './ErrorHandler'
+import { logger } from '../utils/logger'
 
 export interface ErrorBoundaryConfig {
   fallbackComponent?: () => void
@@ -159,12 +160,12 @@ export class ErrorBoundary extends EventEmitter {
   }
 
   private defaultFallback(): void {
-    console.error('An error occurred. Please refresh the page.')
+    logger.error('An error occurred. Please refresh the page.', 'ErrorBoundary')
   }
 
   private defaultErrorHandler(error: YYC3Error, errorInfo: ErrorInfo): void {
-    console.error('Error caught by boundary:', error)
-    console.error('Error info:', errorInfo)
+    logger.error('Error caught by boundary:', 'ErrorBoundary', { error })
+    logger.error('Error info:', 'ErrorBoundary', { errorInfo })
   }
 
   getErrorCount(error: YYC3Error): number {

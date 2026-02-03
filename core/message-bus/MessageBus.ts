@@ -1,4 +1,5 @@
 import { ValidationError, InternalError } from '../error-handler/ErrorTypes';
+import { logger } from '../utils/logger';
 
 export interface Message {
   id: string;
@@ -495,7 +496,7 @@ export class MessageBus extends EventTarget {
         const value = JSON.stringify(message);
         window.localStorage.setItem(key, value);
       } catch (error) {
-        console.error('Failed to persist message:', error);
+        logger.error('Failed to persist message:', 'MessageBus', { error }, error as Error);
       }
     }
   }
@@ -528,7 +529,7 @@ export class MessageBus extends EventTarget {
               messages.push(message);
             }
           } catch (error) {
-            console.error('Failed to restore message:', error);
+            logger.error('Failed to restore message:', 'MessageBus', { error }, error as Error);
           }
         }
       }

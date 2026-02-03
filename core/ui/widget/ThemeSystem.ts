@@ -11,6 +11,7 @@
  */
 
 import EventEmitter from 'eventemitter3';
+import { logger } from '../../utils/logger';
 
 export interface ThemeColors {
   primary: string;
@@ -363,7 +364,7 @@ export class ThemeSystem extends EventEmitter {
         }
       }
     } catch (error) {
-      console.warn('Failed to load persisted theme:', error);
+      logger.warn('Failed to load persisted theme:', 'ThemeSystem', { error }, error as Error);
     }
   }
 
@@ -378,7 +379,7 @@ export class ThemeSystem extends EventEmitter {
       };
       localStorage.setItem(this.persistenceKey, JSON.stringify(data));
     } catch (error) {
-      console.warn('Failed to save persisted theme:', error);
+      logger.warn('Failed to save persisted theme:', 'ThemeSystem', { error }, error as Error);
     }
   }
 

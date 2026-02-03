@@ -9,6 +9,7 @@
  */
 
 import EventEmitter from 'eventemitter3';
+import { logger } from '../utils/logger';
 
 export interface IntegrationManifest {
   id: string;
@@ -530,7 +531,7 @@ export class EcosystemIntegrationSystem extends EventEmitter {
         try {
           handler(data);
         } catch (error) {
-          console.error(`Error in event handler for ${event}:`, error);
+          logger.error(`Error in event handler for ${event}:`, 'EcosystemIntegrationSystem', { error }, error as Error);
         }
       });
     }

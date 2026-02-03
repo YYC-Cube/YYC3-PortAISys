@@ -13,7 +13,6 @@ import {
   Workflow,
   WorkflowNode,
   WorkflowEdge,
-  WorkflowPort,
   ValidationResult,
   ValidationError,
   ValidationWarning,

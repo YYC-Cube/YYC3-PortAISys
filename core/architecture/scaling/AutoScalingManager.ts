@@ -10,6 +10,7 @@
  */
 
 import { ServiceRegistry } from '../service-registry/ServiceRegistry';
+import { logger } from '../../utils/logger';
 
 export interface AutoScalingConfig {
   serviceType: string;
@@ -152,7 +153,7 @@ export class AutoScalingManager {
       try {
         await this.evaluateScaling(serviceType);
       } catch (error) {
-        console.error(`Error evaluating scaling for service ${serviceType}:`, error);
+        logger.error(`Error evaluating scaling for service ${serviceType}:`, 'AutoScalingManager', { error }, error as Error);
       }
     }, 30000); // 每30秒评估一次
 
@@ -687,7 +688,7 @@ export class AutoScalingManager {
         try {
           listener(data);
         } catch (error) {
-          console.error(`Error in event listener for ${event}:`, error);
+          logger.error(`Error in event listener for ${event}:`, 'AutoScalingManager', { error }, error as Error);
         }
       });
     }

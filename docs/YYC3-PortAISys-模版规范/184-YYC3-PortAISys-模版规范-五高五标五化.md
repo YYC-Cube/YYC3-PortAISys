@@ -1,5 +1,13 @@
 # YYC³ PortAISys 模版规范 - AI平台 - 五高五标五化核心特性集成指南
 
+> ***YanYuCloudCube***
+> 言启象限 | 语枢未来
+> ***Words Initiate Quadrants, Language Serves as Core for the Future***
+> 万象归元于云枢 | 深栈智启新纪元
+> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+
+---
+
 ## 概述
 
 YYC³ PortAISys AI平台严格遵循企业级标准，集成了"五高五标五化"核心特性，确保平台具备高性能、高可靠性、高安全性、高扩展性和高可维护性。 

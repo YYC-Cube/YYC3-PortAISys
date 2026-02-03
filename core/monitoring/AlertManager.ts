@@ -1,4 +1,5 @@
 import EventEmitter from 'eventemitter3';
+import { logger } from '../utils/logger';
 
 export interface Alert {
   id: string;
@@ -390,7 +391,7 @@ export class AlertManager extends EventEmitter {
     try {
       switch (channel.type) {
         case 'console':
-          console.log(`[ALERT] ${alert.severity.toUpperCase()}: ${alert.title} - ${alert.message}`);
+          logger.info(`[ALERT] ${alert.severity.toUpperCase()}: ${alert.title} - ${alert.message}`, 'AlertManager');
           break;
         case 'webhook':
           this.sendWebhookNotification(alert, channel);
@@ -402,14 +403,14 @@ export class AlertManager extends EventEmitter {
           this.sendSlackNotification(alert, channel);
           break;
         default:
-          console.warn(`Unsupported channel type: ${channel.type}`);
+          logger.warn(`Unsupported channel type: ${channel.type}`, 'AlertManager');
       }
 
       notification.sent = true;
       notification.sentAt = Date.now();
     } catch (error) {
       notification.error = error instanceof Error ? error.message : String(error);
-      console.error(`Failed to send notification: ${notification.error}`);
+      logger.error(`Failed to send notification: ${notification.error}`, 'AlertManager', { error }, error as Error);
     }
 
     this.notifications.push(notification);
@@ -422,17 +423,17 @@ export class AlertManager extends EventEmitter {
       return;
     }
 
-    console.log(`Sending webhook notification to ${url}`, alert);
+    logger.info(`Sending webhook notification to ${url}`, 'AlertManager', { alert });
   }
 
   private sendEmailNotification(alert: Alert, channel: AlertChannel): void {
     const to = channel.config.to;
-    console.log(`Sending email notification to ${to}`, alert);
+    logger.info(`Sending email notification to ${to}`, 'AlertManager', { alert });
   }
 
   private sendSlackNotification(alert: Alert, channel: AlertChannel): void {
     const webhookUrl = channel.config.webhookUrl;
-    console.log(`Sending Slack notification to ${webhookUrl}`, alert);
+    logger.info(`Sending Slack notification to ${webhookUrl}`, 'AlertManager', { alert });
   }
 
   private startEscalationCheck(): void {
@@ -461,7 +462,7 @@ export class AlertManager extends EventEmitter {
   }
 
   private escalateAlert(alert: Alert, target: string): void {
-    console.log(`Escalating alert ${alert.id} to ${target}`, alert);
+    logger.info(`Escalating alert ${alert.id} to ${target}`, 'AlertManager', { alert });
     this.emit('alert-escalated', { alert, target });
   }
 

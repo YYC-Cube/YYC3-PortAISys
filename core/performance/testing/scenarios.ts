@@ -12,6 +12,7 @@ import {
   TestScenario,
   TestType
 } from './types';
+import { logger } from '../../utils/logger';
 
 export class PredefinedScenarios {
   static getBaselineScenario(): TestScenario {
@@ -62,10 +63,10 @@ export class PredefinedScenarios {
       description: '建立系统基准性能指标，用于后续性能比较',
       config,
       setup: async () => {
-        console.log('设置基准测试环境...');
+        logger.info('设置基准测试环境...', 'scenarios');
       },
       teardown: async () => {
-        console.log('清理基准测试环境...');
+        logger.info('清理基准测试环境...', 'scenarios');
       },
       executeRequest: async () => {
         return { success: true };
@@ -121,10 +122,10 @@ export class PredefinedScenarios {
       description: '测试系统在高负载下的性能表现，识别性能瓶颈',
       config,
       setup: async () => {
-        console.log('设置压力测试环境...');
+        logger.info('设置压力测试环境...', 'scenarios');
       },
       teardown: async () => {
-        console.log('清理压力测试环境...');
+        logger.info('清理压力测试环境...', 'scenarios');
       },
       executeRequest: async () => {
         return { success: true };
@@ -180,10 +181,10 @@ export class PredefinedScenarios {
       description: '持续监控系统性能指标，及时发现性能问题',
       config,
       setup: async () => {
-        console.log('设置监控测试环境...');
+        logger.info('设置监控测试环境...', 'scenarios');
       },
       teardown: async () => {
-        console.log('清理监控测试环境...');
+        logger.info('清理监控测试环境...', 'scenarios');
       },
       executeRequest: async () => {
         return { success: true };
@@ -239,10 +240,10 @@ export class PredefinedScenarios {
       description: '分析系统性能并生成优化建议',
       config,
       setup: async () => {
-        console.log('设置分析测试环境...');
+        logger.info('设置分析测试环境...', 'scenarios');
       },
       teardown: async () => {
-        console.log('清理分析测试环境...');
+        logger.info('清理分析测试环境...', 'scenarios');
       },
       executeRequest: async () => {
         return { success: true };
@@ -291,10 +292,10 @@ export class PredefinedScenarios {
       description: '测试API接口的性能表现，包括响应时间和吞吐量',
       config,
       setup: async () => {
-        console.log('设置API测试环境...');
+        logger.info('设置API测试环境...', 'scenarios');
       },
       teardown: async () => {
-        console.log('清理API测试环境...');
+        logger.info('清理API测试环境...', 'scenarios');
       },
       executeRequest: async () => {
         return { success: true };
@@ -343,10 +344,10 @@ export class PredefinedScenarios {
       description: '测试数据库查询的性能表现，识别慢查询',
       config,
       setup: async () => {
-        console.log('设置数据库测试环境...');
+        logger.info('设置数据库测试环境...', 'scenarios');
       },
       teardown: async () => {
-        console.log('清理数据库测试环境...');
+        logger.info('清理数据库测试环境...', 'scenarios');
       },
       executeRequest: async () => {
         return { success: true };
@@ -394,10 +395,10 @@ export class PredefinedScenarios {
       description,
       config: mergedConfig,
       setup: async () => {
-        console.log(`设置自定义测试环境: ${name}...`);
+        logger.info(`设置自定义测试环境: ${name}...`, 'scenarios');
       },
       teardown: async () => {
-        console.log(`清理自定义测试环境: ${name}...`);
+        logger.info(`清理自定义测试环境: ${name}...`, 'scenarios');
       },
       executeRequest: async () => {
         return { success: true };

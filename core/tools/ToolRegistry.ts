@@ -9,6 +9,7 @@
 
 import { NotFoundError, InternalError } from '../error-handler/ErrorTypes';
 import type { AIContext } from '../autonomous-ai-widget/types';
+import { logger } from '../utils/logger';
 
 // 工具定义
 export interface AITool {
@@ -96,7 +97,7 @@ export class ToolRegistry {
   
   private async recordToolUsage(toolName: string, parameters: any, result: ToolResult): Promise<void> {
     // 实现工具使用记录逻辑
-    console.log(`Tool used: ${toolName}`, { parameters, result });
+    logger.info(`Tool used: ${toolName}`, 'ToolRegistry', { parameters, result });
   }
   
   private async calculateToolRelevance(tool: AITool, context: AIContext): Promise<number> {

@@ -11,6 +11,7 @@
  */
 
 import EventEmitter from 'eventemitter3';
+import { logger } from '../../utils/logger';
 
 export interface StateManagerConfig {
   enabled?: boolean;
@@ -246,11 +247,11 @@ export class StateManager extends EventEmitter {
             this.config.onStateRestored(state);
           }
         } else {
-          console.warn('Persisted state validation failed:', validation.errors);
+          logger.warn('Persisted state validation failed:', 'StateManager', { errors: validation.errors });
         }
       }
     } catch (error) {
-      console.error('Failed to load persisted state:', error);
+      logger.error('Failed to load persisted state:', 'StateManager', { error }, error as Error);
     }
   }
 
@@ -263,7 +264,7 @@ export class StateManager extends EventEmitter {
       const stateToPersist = this.optimizeState(this.currentState);
       localStorage.setItem(this.persistenceKey, JSON.stringify(stateToPersist));
     } catch (error) {
-      console.error('Failed to persist state:', error);
+      logger.error('Failed to persist state:', 'StateManager', { error }, error as Error);
     }
   }
 
@@ -684,7 +685,7 @@ export class StateManager extends EventEmitter {
         this.config.onStateSynced(this.currentState);
       }
     } catch (error) {
-      console.error('Failed to sync state:', error);
+      logger.error('Failed to sync state:', 'StateManager', { error }, error as Error);
     }
   }
 

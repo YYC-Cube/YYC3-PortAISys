@@ -1,3 +1,5 @@
+import { logger } from '../utils/logger';
+
 export interface EncodingConfig {
   enableHTML?: boolean;
   enableJavaScript?: boolean;
@@ -83,7 +85,7 @@ export class OutputEncoder {
       this.recordEncoding('url', value, encoded);
       return encoded;
     } catch (error) {
-      console.error('URL encoding error:', error);
+      logger.error('URL encoding error:', 'OutputEncoder', { error }, error as Error);
       return value;
     }
   }
@@ -96,7 +98,7 @@ export class OutputEncoder {
       this.recordEncoding('urlComponent', value, encoded);
       return encoded;
     } catch (error) {
-      console.error('URL component encoding error:', error);
+      logger.error('URL component encoding error:', 'OutputEncoder', { error }, error as Error);
       return value;
     }
   }
@@ -145,7 +147,7 @@ export class OutputEncoder {
       this.recordEncoding('json', typeof value === 'string' ? value : JSON.stringify(value), encoded);
       return encoded;
     } catch (error) {
-      console.error('JSON encoding error:', error);
+      logger.error('JSON encoding error:', 'OutputEncoder', { error }, error as Error);
       return JSON.stringify(value);
     }
   }
@@ -168,7 +170,7 @@ export class OutputEncoder {
       this.recordEncoding('base64', value, encoded);
       return encoded;
     } catch (error) {
-      console.error('Base64 encoding error:', error);
+      logger.error('Base64 encoding error:', 'OutputEncoder', { error }, error as Error);
       return value;
     }
   }
@@ -179,7 +181,7 @@ export class OutputEncoder {
       this.recordEncoding('hex', value, encoded);
       return encoded;
     } catch (error) {
-      console.error('Hex encoding error:', error);
+      logger.error('Hex encoding error:', 'OutputEncoder', { error }, error as Error);
       return value;
     }
   }

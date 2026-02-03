@@ -35,6 +35,7 @@ import {
   DependencyGraph
 } from './types';
 import { ValidationError, NotFoundError, ConflictError } from '../error-handler/ErrorTypes';
+import { logger } from '../utils/logger';
 
 export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEngine {
   private status: EngineStatus = EngineStatus.UNINITIALIZED;
@@ -572,7 +573,7 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
 
   private log(level: string, message: string): void {
     if (this.debugMode || this.config.logLevel === 'debug') {
-      console.log(`[${level.toUpperCase()}] ${new Date().toISOString()} - ${message}`);
+      logger.info(`[${level.toUpperCase()}] ${new Date().toISOString()} - ${message}`, 'AutonomousAIEngine');
     }
   }
 

@@ -8,6 +8,7 @@
  */
 
 import EventEmitter from 'eventemitter3';
+import { logger } from '../utils/logger';
 
 /**
  * 指标类型
@@ -301,8 +302,8 @@ export class PrometheusIntegration extends EventEmitter {
     return {
       start: async () => {
         // 模拟HTTP服务器
-        console.log(`Prometheus metrics server starting on port ${this.config.port}`);
-        console.log(`Metrics available at http://localhost:${this.config.port}${this.config.path}`);
+        logger.info(`Prometheus metrics server starting on port ${this.config.port}`, 'PrometheusIntegration');
+        logger.info(`Metrics available at http://localhost:${this.config.port}${this.config.path}`, 'PrometheusIntegration');
         
         server = {
           address: () => ({ port: this.config.port }),
@@ -317,7 +318,7 @@ export class PrometheusIntegration extends EventEmitter {
           server.close();
           server = null;
           this.emit('server:stopped');
-          console.log('Prometheus metrics server stopped');
+          logger.info('Prometheus metrics server stopped', 'PrometheusIntegration');
         }
       }
     };

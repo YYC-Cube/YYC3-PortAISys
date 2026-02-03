@@ -19,6 +19,7 @@ import {
   isRetryable
 } from '../error-handler/ErrorTypes';
 import { ErrorHandler } from '../error-handler/ErrorHandler';
+import { logger } from '../utils/logger';
 
 /**
  * 流式响应回调函数类型
@@ -592,7 +593,7 @@ export class OpenAIModelAdapter implements ModelAdapter {
                 usage = parsed.usage;
               }
             } catch (parseError) {
-              console.warn('Failed to parse SSE data:', data, parseError);
+              logger.warn('Failed to parse SSE data:', 'OpenAIModelAdapter', { data, parseError }, parseError as Error);
             }
           }
         }

@@ -8,6 +8,7 @@
  */
 
 import EventEmitter from 'eventemitter3';
+import { logger } from '../utils/logger';
 
 export interface SystemEvent {
   id: string;
@@ -181,7 +182,7 @@ export class EventDispatcher extends EventEmitter {
     try {
       await Promise.all(promises);
     } catch (error) {
-      console.error('[EventDispatcher] Error in async dispatch:', error);
+      logger.error('[EventDispatcher] Error in async dispatch:', 'EventDispatcher', { error }, error as Error);
     }
   }
 

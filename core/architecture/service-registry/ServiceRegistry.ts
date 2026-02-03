@@ -9,6 +9,8 @@
  * @license MIT
  */
 
+import { logger } from '../../utils/logger';
+
 export interface ServiceInfo {
   id: string;
   name: string;
@@ -239,7 +241,7 @@ export class ServiceRegistry {
         try {
           listener(data);
         } catch (error) {
-          console.error(`Error in event listener for ${event}:`, error);
+          logger.error(`Error in event listener for ${event}:`, 'ServiceRegistry', { error }, error as Error);
         }
       });
     }

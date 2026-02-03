@@ -12,6 +12,7 @@ import {
   NotFoundError,
   InternalError
 } from '../error-handler/ErrorTypes';
+import { logger } from '../utils/logger';
 
 export interface StateSnapshot {
   id: string;
@@ -270,7 +271,7 @@ export class StateManager extends EventEmitter {
       
       localStorage.setItem('yyc3_state', JSON.stringify(stateData));
     } catch (error) {
-      console.error('[StateManager] Failed to persist state:', error);
+      logger.error('[StateManager] Failed to persist state:', 'StateManager', { error }, error as Error);
     }
   }
 
@@ -283,7 +284,7 @@ export class StateManager extends EventEmitter {
       
       localStorage.setItem('yyc3_snapshots', JSON.stringify(snapshotsData));
     } catch (error) {
-      console.error('[StateManager] Failed to persist snapshots:', error);
+      logger.error('[StateManager] Failed to persist snapshots:', 'StateManager', { error }, error as Error);
     }
   }
 

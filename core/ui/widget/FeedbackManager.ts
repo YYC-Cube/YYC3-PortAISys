@@ -8,6 +8,7 @@
  */
 
 import EventEmitter from 'eventemitter3';
+import { logger } from '../../utils/logger';
 
 interface FeedbackManagerConfig {
   widget: any;
@@ -95,7 +96,7 @@ export class FeedbackManager extends EventEmitter {
 
   private analyzeFeedback(feedback: Feedback): void {
     // 简单的反馈分析
-    console.log('Analyzing feedback:', feedback);
+    logger.info('Analyzing feedback:', 'FeedbackManager', { feedback });
   }
 
   getAverageRating(): number {

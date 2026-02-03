@@ -19,6 +19,7 @@ import EventEmitter from 'eventemitter3';
 import {
   InternalError
 } from '../error-handler/ErrorTypes';
+import { logger } from '../utils/logger';
 
 export interface PopupInstance {
   id: string;
@@ -77,7 +78,7 @@ export abstract class BaseAgent extends EventEmitter {
       timestamp: Date.now()
     });
 
-    console.warn(`智能体 ${this.config.id} 已绑定到弹窗 ${popup.id}`);
+    logger.warn(`智能体 ${this.config.id} 已绑定到弹窗 ${popup.id}`, 'BaseAgent');
   }
 
   async handleMessage(message: AgentMessage): Promise<AgentResponse> {
@@ -124,7 +125,7 @@ export abstract class BaseAgent extends EventEmitter {
       return response;
 
     } catch (error) {
-      console.error(`智能体处理消息失败:`, error);
+      logger.error(`智能体处理消息失败:`, 'BaseAgent', { error }, error as Error);
 
       return {
         success: false,

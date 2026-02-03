@@ -612,6 +612,7 @@ pnpm run check
 ### 错误修复记录 ✅
 
 **最新修复**: 2026-02-03
+
 - ✅ 修复91个文件中的eventemitter3导入方式问题
 - ✅ 安装@types/node类型定义包
 - ✅ 安装glob模块及其类型定义
@@ -620,7 +621,7 @@ pnpm run check
 - ✅ 修复11个linter错误
 - ✅ ESLint检查通过（0错误，269警告）
 
-**详细报告**: [错误修复报告](docs/错误修复报告-2026-02-03.md)
+**详细报告**: [错误修复报告](docs/YYC3-PortAISys-错误修复报告-2026-02-03.md)
 
 ### 实现统计
 
@@ -736,7 +737,7 @@ pnpm run check
 
 完整的API文档已创建，包含所有端点的详细说明：
 
-**📋 [查看完整API文档](./docs/API-Documentation.md)**
+**📋 [查看完整API文档](./docs/YYC3-PortAISys-API文档/README.md)**
 
 #### 主要API模块
 
@@ -898,7 +899,7 @@ import { Permission } from '@/types/permissions';
 
 详细的性能优化方案，包括缓存优化和数据库查询优化策略。
 
-**📋 [查看性能优化方案](./docs/性能优化方案.md)**
+**📋 [查看性能优化方案](./docs/YYC3-PortAISys-性能优化方案.md)**
 
 #### 优化目标
 
@@ -942,7 +943,7 @@ import { Permission } from '@/types/permissions';
 
 详细的安全加固方案，包括依赖项安全、应用层安全、网络层安全。
 
-**📋 [查看安全加固方案](./docs/安全加固方案.md)**
+**📋 [查看安全加固方案](./docs/YYC3-PortAISys-技术文档/YYC3-PortAISys-安全加固方案.md)**
 
 #### 加固目标
 

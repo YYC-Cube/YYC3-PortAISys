@@ -9,6 +9,7 @@
 
 import EventEmitter from 'eventemitter3';
 import { WidgetState } from '../IntelligentAIWidget';
+import { logger } from '../../utils/logger';
 
 export class StatePersistence extends EventEmitter {
   private state: WidgetState;
@@ -30,7 +31,7 @@ export class StatePersistence extends EventEmitter {
       localStorage.setItem(this.storageKey, serialized);
       this.emit('state:saved', this.state);
     } catch (error) {
-      console.error('Failed to save state:', error);
+      logger.error('Failed to save state:', 'StatePersistence', { error }, error as Error);
       this.emit('save:error', error);
     }
   }
@@ -46,7 +47,7 @@ export class StatePersistence extends EventEmitter {
         this.emit('state:loaded', this.state);
       }
     } catch (error) {
-      console.error('Failed to load state:', error);
+      logger.error('Failed to load state:', 'StatePersistence', { error }, error as Error);
       this.emit('load:error', error);
     }
   }
@@ -56,7 +57,7 @@ export class StatePersistence extends EventEmitter {
       localStorage.removeItem(this.storageKey);
       this.emit('state:cleared');
     } catch (error) {
-      console.error('Failed to clear state:', error);
+      logger.error('Failed to clear state:', 'StatePersistence', { error }, error as Error);
       this.emit('clear:error', error);
     }
   }

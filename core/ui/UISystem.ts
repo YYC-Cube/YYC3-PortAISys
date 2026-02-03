@@ -13,18 +13,9 @@ import { ToolboxPanel } from './ToolboxPanel';
 import { InsightsDashboard } from './InsightsDashboard';
 import { WorkflowDesigner } from './WorkflowDesigner';
 import { UIManager } from './UIManager';
+import { logger } from '../utils/logger';
 import {
   ChatMessage,
-  Tool,
-  MetricData,
-  ChartData,
-  Insight,
-  Workflow,
-  WorkflowNode,
-  WorkflowEdge,
-  Notification,
-  Modal,
-  UIEvent,
 } from './types';
 
 export interface UISystemConfig {
@@ -69,7 +60,7 @@ export class UISystem extends EventEmitter {
 
   initialize(): void {
     if (this.initialized) {
-      console.warn('UISystem already initialized');
+      logger.warn('UISystem already initialized', 'UISystem');
       return;
     }
 
@@ -99,9 +90,9 @@ export class UISystem extends EventEmitter {
       this.initialized = true;
       this.emit('initialized');
       
-      console.log('UISystem initialized successfully');
+      logger.info('UISystem initialized successfully', 'UISystem');
     } catch (error) {
-      console.error('Failed to initialize UISystem:', error);
+      logger.error('Failed to initialize UISystem:', 'UISystem', { error }, error as Error);
       throw error;
     }
   }
@@ -295,7 +286,7 @@ export class UISystem extends EventEmitter {
     this.removeAllListeners();
     this.initialized = false;
     
-    console.log('UISystem destroyed');
+    logger.info('UISystem destroyed', 'UISystem');
   }
 
   isInitialized(): boolean {

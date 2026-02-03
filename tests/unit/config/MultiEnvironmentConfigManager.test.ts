@@ -72,9 +72,9 @@ describe('MultiEnvironmentConfigManager', () => {
         name: 'Test Environment',
         version: '1.0.0',
         description: 'Test configuration',
-        variables: { PORT: 3000 },
+        variables: { PORT: 3201 },
         features: { feature1: true },
-        services: { api: { host: 'localhost', port: 3000 } },
+        services: { api: { host: 'localhost', port: 3201 } },
         database: { host: 'localhost', port: 5432, database: 'test', username: 'user' },
         cache: { host: 'localhost', port: 6379 },
         logging: { level: 'info' },
@@ -102,7 +102,7 @@ describe('MultiEnvironmentConfigManager', () => {
       const config = manager.getConfig('development');
       expect(config).toBeDefined();
       expect(config?.name).toBe('Test Environment');
-      expect(config?.variables.get('PORT')).toBe(3000);
+      expect(config?.variables.get('PORT')).toBe(3201);
     });
 
     it('应该在配置文件不存在时使用默认值', async () => {
@@ -116,7 +116,7 @@ describe('MultiEnvironmentConfigManager', () => {
     it('应该加载所有环境的配置', async () => {
       const configData = {
         name: 'Test Environment',
-        variables: { PORT: 3000 },
+        variables: { PORT: 3201 },
         features: {},
         services: {},
         database: { host: 'localhost', port: 5432, database: 'test', username: 'user' },
@@ -284,7 +284,7 @@ describe('MultiEnvironmentConfigManager', () => {
       const service = manager.getService('api', 'development');
       expect(service).toBeDefined();
       expect(service?.host).toBe('localhost');
-      expect(service?.port).toBe(3000);
+      expect(service?.port).toBe(3201);
     });
 
     it('应该在服务不存在时返回undefined', async () => {
@@ -373,7 +373,7 @@ describe('MultiEnvironmentConfigManager', () => {
       const exported = manager.exportConfig('development', 'env');
 
       expect(exported).toContain('NODE_ENV=development');
-      expect(exported).toContain('PORT=3000');
+      expect(exported).toContain('PORT=3201');
     });
 
     it('应该在配置不存在时抛出错误', () => {

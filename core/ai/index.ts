@@ -24,6 +24,7 @@ import {
   AgentCapability,
   AgentContext
 } from './AgentProtocol';
+import { logger } from '../utils/logger';
 
 export class AgentSystem {
   private manager: AgentManager;
@@ -39,19 +40,19 @@ export class AgentSystem {
     }
 
     this.manager.on('agent:registered', (data) => {
-      console.log(`[AgentSystem] 智能体已注册: ${data.agentId}`);
+      logger.info(`[AgentSystem] 智能体已注册: ${data.agentId}`, 'AgentSystem');
     });
 
     this.manager.on('message:sent', (data) => {
-      console.log(`[AgentSystem] 消息已发送: ${data.message.id} -> ${data.message.to}`);
+      logger.info(`[AgentSystem] 消息已发送: ${data.message.id} -> ${data.message.to}`, 'AgentSystem');
     });
 
     this.manager.on('message:failed', (data) => {
-      console.error(`[AgentSystem] 消息发送失败: ${data.message.id}`, data.error);
+      logger.error(`[AgentSystem] 消息发送失败: ${data.message.id}`, 'AgentSystem', { error: data.error });
     });
 
     this.initialized = true;
-    console.log('[AgentSystem] 智能体系统已初始化');
+    logger.info('[AgentSystem] 智能体系统已初始化', 'AgentSystem');
   }
 
   createLayoutAgent(config: AgentConfig): LayoutAgent {
@@ -165,7 +166,7 @@ export class AgentSystem {
   async shutdown(): Promise<void> {
     await this.manager.shutdown();
     this.initialized = false;
-    console.log('[AgentSystem] 智能体系统已关闭');
+    logger.info('[AgentSystem] 智能体系统已关闭', 'AgentSystem');
   }
 
   isInitialized(): boolean {

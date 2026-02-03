@@ -8,8 +8,9 @@
  */
 
 import EventEmitter from 'eventemitter3';
-import type { Plugin, PluginManifest, InstallOptions, UpdateInfo } from './types';
+import type { Plugin, InstallOptions, UpdateInfo } from './types';
 import { PluginMarketplace } from './PluginMarketplace';
+import { logger } from '../utils/logger';
 
 /**
  * 插件状态
@@ -134,7 +135,7 @@ export class PluginManager extends EventEmitter {
         try {
           await this.disable(pluginId);
         } catch (error) {
-          console.error(`Failed to disable plugin ${pluginId} during shutdown:`, error);
+          logger.error(`Failed to disable plugin ${pluginId} during shutdown:`, 'PluginManager', { error }, error as Error);
         }
       }
     }

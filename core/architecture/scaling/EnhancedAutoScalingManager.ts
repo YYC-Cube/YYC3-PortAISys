@@ -10,6 +10,7 @@
  */
 
 import { ServiceRegistry } from '../service-registry/ServiceRegistry';
+import { logger } from '../../utils/logger';
 
 export interface AutoScalingConfig {
   serviceType: string;
@@ -226,7 +227,7 @@ export class EnhancedAutoScalingManager {
       try {
         await this.evaluateScaling(serviceType);
       } catch (error) {
-        console.error(`Error evaluating scaling for service ${serviceType}:`, error);
+        logger.error(`Error evaluating scaling for service ${serviceType}:`, 'EnhancedAutoScalingManager', { error }, error as Error);
         this.emit('scalingError', { serviceType, error });
       }
     }, 30000);
@@ -286,7 +287,7 @@ export class EnhancedAutoScalingManager {
       try {
         prediction = await this.generatePrediction(serviceType);
       } catch (error) {
-        console.warn(`Failed to generate prediction for ${serviceType}:`, error);
+        logger.warn(`Failed to generate prediction for ${serviceType}:`, 'EnhancedAutoScalingManager', { error }, error as Error);
       }
     }
 

@@ -14,6 +14,7 @@ import {
   TimeoutError,
   InternalError
 } from '../error-handler/ErrorTypes';
+import { logger } from '../utils/logger';
 
 export interface Task {
   id: string;
@@ -332,7 +333,7 @@ export class TaskScheduler extends EventEmitter {
            this.runningTasks.size < this.config.maxConcurrentTasks) {
       const task = this.taskQueue.shift()!;
       this.executeTask(task.id).catch(error => {
-        console.error(`Task execution failed: ${task.id}`, error);
+        logger.error(`Task execution failed: ${task.id}`, 'TaskScheduler', { error }, error as Error);
       });
     }
   }

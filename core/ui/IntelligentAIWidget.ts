@@ -32,15 +32,9 @@ import { KeyboardNavigation } from './widget/KeyboardNavigation';
 import { WidgetSandbox } from './widget/WidgetSandbox';
 import { PermissionManager } from './widget/PermissionManager';
 import { ContentSecurity } from './widget/ContentSecurity';
+import { logger } from '../utils/logger';
 import {
   ChatMessage,
-  Tool,
-  MetricData,
-  ChartData,
-  Insight,
-  Workflow,
-  Notification,
-  Modal,
 } from './types';
 
 export interface WidgetConfig {
@@ -267,7 +261,7 @@ export class IntelligentAIWidget extends EventEmitter {
 
   async initialize(): Promise<void> {
     if (this.initialized) {
-      console.warn('IntelligentAIWidget already initialized');
+      logger.warn('IntelligentAIWidget already initialized', 'IntelligentAIWidget');
       return;
     }
 
@@ -352,10 +346,10 @@ export class IntelligentAIWidget extends EventEmitter {
       this.performance.loadTime = initializationTime;
       
       this.emit('initialized', { initializationTime });
-      console.log(`IntelligentAIWidget initialized successfully in ${initializationTime}ms`);
+      logger.info(`IntelligentAIWidget initialized successfully in ${initializationTime}ms`, 'IntelligentAIWidget');
     } catch (error) {
       const errorTime = Date.now() - initializationStartTime;
-      console.error(`Failed to initialize IntelligentAIWidget in ${errorTime}ms:`, error);
+      logger.error(`Failed to initialize IntelligentAIWidget in ${errorTime}ms:`, 'IntelligentAIWidget', { error }, error as Error);
       this.emit('initialization:error', { error, timeElapsed: errorTime });
       throw error;
     }
@@ -663,7 +657,7 @@ export class IntelligentAIWidget extends EventEmitter {
         this.handleWorkflowMessage(message.data);
         break;
       default:
-        console.warn('Unknown message type:', message.type);
+        logger.warn('Unknown message type:', 'IntelligentAIWidget', { type: message.type });
     }
   }
 
@@ -702,7 +696,7 @@ export class IntelligentAIWidget extends EventEmitter {
         this.hide();
         break;
       default:
-        console.log('Unhandled keyboard shortcut:', data.shortcut);
+        logger.info('Unhandled keyboard shortcut:', 'IntelligentAIWidget', { shortcut: data.shortcut });
     }
   }
 
@@ -743,7 +737,7 @@ export class IntelligentAIWidget extends EventEmitter {
 
       await this.chatInterface.sendMessage(message);
     } catch (error) {
-      console.error('Failed to handle chat message:', error);
+      logger.error('Failed to handle chat message:', 'IntelligentAIWidget', { error }, error as Error);
       this.emit('error', error);
     }
   }
@@ -752,7 +746,7 @@ export class IntelligentAIWidget extends EventEmitter {
     try {
       await this.toolPanel.executeTool(data.toolId, data.params);
     } catch (error) {
-      console.error('Failed to handle tool message:', error);
+      logger.error('Failed to handle tool message:', 'IntelligentAIWidget', { error }, error as Error);
       this.emit('error', error);
     }
   }
@@ -762,7 +756,7 @@ export class IntelligentAIWidget extends EventEmitter {
       const workflow = this.workflowDesigner.loadWorkflow(data.workflowId);
       await this.workflowDesigner.executeWorkflow(workflow);
     } catch (error) {
-      console.error('Failed to handle workflow message:', error);
+      logger.error('Failed to handle workflow message:', 'IntelligentAIWidget', { error }, error as Error);
       this.emit('error', error);
     }
   }
@@ -933,7 +927,7 @@ export class IntelligentAIWidget extends EventEmitter {
     this.removeAllListeners();
     this.initialized = false;
 
-    console.log('IntelligentAIWidget destroyed');
+    logger.info('IntelligentAIWidget destroyed', 'IntelligentAIWidget');
   }
 
   isInitialized(): boolean {

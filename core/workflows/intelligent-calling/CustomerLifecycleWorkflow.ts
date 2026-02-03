@@ -1,13 +1,5 @@
 // workflows/CustomerLifecycleWorkflow.ts
 
-interface JourneyMapper {
-  mapJourney(customerId: string): Promise<any>;
-}
-
-interface TouchpointOptimizer {
-  optimizeTouchpoints(touchpoints: any[]): Promise<any>;
-}
-
 interface CustomerJourney {
   acquisition: AcquisitionWorkflow;
   activation: ActivationWorkflow;

@@ -17,7 +17,8 @@ import {
 } from './types';
 import { ErrorHandler } from '../error-handler/ErrorHandler';
 import { ErrorBoundary } from '../error-handler/ErrorBoundary';
-import { ValidationError, InternalError } from '../error-handler/ErrorTypes';
+import { ValidationError } from '../error-handler/ErrorTypes';
+import { logger } from '../utils/logger';
 
 export class UIManager extends EventEmitter implements IUIManager {
   private eventHandlers: Map<string, Set<UIEventHandler>>;
@@ -58,7 +59,7 @@ export class UIManager extends EventEmitter implements IUIManager {
     });
 
     this.on('error', (errorInfo) => {
-      console.error('[UIManager Error]', errorInfo);
+      logger.error('[UIManager Error]', 'UIManager', { errorInfo });
     });
   }
 

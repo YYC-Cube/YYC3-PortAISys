@@ -16,7 +16,6 @@ import {
 import {
   ConflictError,
   NotFoundError,
-  ValidationError,
 } from '../error-handler/ErrorTypes';
 
 export class ToolboxPanel extends EventEmitter implements IToolboxPanel {

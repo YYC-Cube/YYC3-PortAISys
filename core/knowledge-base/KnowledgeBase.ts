@@ -11,6 +11,7 @@ import {
   NotFoundError,
   InternalError
 } from '../error-handler/ErrorTypes';
+import { logger } from '../utils/logger';
 
 export interface KnowledgeItem {
   id: string;
@@ -379,7 +380,7 @@ export class KnowledgeBase {
       const key = `yyc3_kb_${item.id}`;
       localStorage.setItem(key, JSON.stringify(item));
     } catch (error) {
-      console.error('[KnowledgeBase] Failed to persist item:', error);
+      logger.error('[KnowledgeBase] Failed to persist item:', 'KnowledgeBase', { error }, error as Error);
     }
   }
 
@@ -388,7 +389,7 @@ export class KnowledgeBase {
       const key = `yyc3_kb_${itemId}`;
       localStorage.removeItem(key);
     } catch (error) {
-      console.error('[KnowledgeBase] Failed to remove item:', error);
+      logger.error('[KnowledgeBase] Failed to remove item:', 'KnowledgeBase', { error }, error as Error);
     }
   }
 
@@ -399,7 +400,7 @@ export class KnowledgeBase {
         localStorage.removeItem(key);
       }
     } catch (error) {
-      console.error('[KnowledgeBase] Failed to clear persistence:', error);
+      logger.error('[KnowledgeBase] Failed to clear persistence:', 'KnowledgeBase', { error }, error as Error);
     }
   }
 

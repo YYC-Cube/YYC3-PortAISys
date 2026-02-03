@@ -7,8 +7,6 @@
  * @created 2025-12-30
  */
 
-import { EventEmitter } from 'node:events';
-
 /**
  * ================== 基础类型定义 ==================
  */

@@ -15,6 +15,7 @@ import { AgentSystem } from '../ai/index';
 import { AgentMessage } from '../ai/AgentProtocol';
 import { AutonomousAIEngine } from '../pluggable/AutonomousAIEngine';
 import { UISystem } from '../ui/UISystem';
+import { logger } from '../utils/logger';
 
 export interface AgentSystemIntegrationConfig {
   enableAutoAgents?: boolean;
@@ -64,7 +65,7 @@ export class AgentSystemIntegration extends EventEmitter {
 
   async initialize(): Promise<void> {
     if (this.integrated) {
-      console.warn('[AgentSystemIntegration] Already integrated');
+      logger.warn('[AgentSystemIntegration] Already integrated', 'AgentSystemIntegration');
       return;
     }
 
@@ -72,7 +73,7 @@ export class AgentSystemIntegration extends EventEmitter {
     this.setupAgentSystemEvents();
     this.integrated = true;
 
-    console.log('[AgentSystemIntegration] 智能体系统集成完成');
+    logger.info('[AgentSystemIntegration] 智能体系统集成完成', 'AgentSystemIntegration');
     this.emit('integrated');
   }
 
@@ -99,7 +100,7 @@ export class AgentSystemIntegration extends EventEmitter {
       this.handleSubsystemRegistered(data);
     });
 
-    console.log('[AgentSystemIntegration] 已与AutonomousAIEngine集成');
+    logger.info('[AgentSystemIntegration] 已与AutonomousAIEngine集成', 'AgentSystemIntegration');
     this.emit('engine:integrated', { engine });
   }
 
@@ -126,7 +127,7 @@ export class AgentSystemIntegration extends EventEmitter {
       this.handleNotificationCreated(data);
     });
 
-    console.log('[AgentSystemIntegration] 已与UISystem集成');
+    logger.info('[AgentSystemIntegration] 已与UISystem集成', 'AgentSystemIntegration');
     this.emit('ui:integrated', { uiSystem });
   }
 
@@ -141,7 +142,7 @@ export class AgentSystemIntegration extends EventEmitter {
       await this.createPopupAgents(popup);
     }
 
-    console.log('[AgentSystemIntegration] 已附加到弹窗');
+    logger.info('[AgentSystemIntegration] 已附加到弹窗', 'AgentSystemIntegration');
     this.emit('popup:attached', { popup });
   }
 
@@ -537,7 +538,7 @@ export class AgentSystemIntegration extends EventEmitter {
     this.agents.clear();
     this.integrated = false;
 
-    console.log('[AgentSystemIntegration] 智能体系统已关闭');
+    logger.info('[AgentSystemIntegration] 智能体系统已关闭', 'AgentSystemIntegration');
     this.emit('shutdown');
   }
 }

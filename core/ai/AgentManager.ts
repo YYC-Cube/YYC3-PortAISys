@@ -19,6 +19,7 @@ import {
   AgentCapability,
   AgentStats
 } from './AgentProtocol';
+import { logger } from '../utils/logger';
 
 export enum AgentStatusType {
   IDLE = 'idle',
@@ -126,7 +127,7 @@ export class AgentManager extends EventEmitter {
     });
 
     this.on('error', (errorInfo) => {
-      console.error('[AgentManager Error]', errorInfo);
+      logger.error('[AgentManager Error]', 'AgentManager', { errorInfo });
     });
   }
 
@@ -171,7 +172,7 @@ export class AgentManager extends EventEmitter {
     });
 
     if (this.config.enableLogging) {
-      console.log(`[AgentManager] 智能体已注册: ${agentId}`);
+      logger.info(`[AgentManager] 智能体已注册: ${agentId}`, 'AgentManager');
     }
 
     return agentId;
@@ -193,7 +194,7 @@ export class AgentManager extends EventEmitter {
     });
 
     if (this.config.enableLogging) {
-      console.log(`[AgentManager] 智能体已注销: ${agentId}`);
+      logger.info(`[AgentManager] 智能体已注销: ${agentId}`, 'AgentManager');
     }
 
     return true;
@@ -530,7 +531,7 @@ export class AgentManager extends EventEmitter {
     });
 
     if (this.config.enableLogging) {
-      console.log('[AgentManager] 智能体管理器已关闭');
+      logger.info('[AgentManager] 智能体管理器已关闭', 'AgentManager');
     }
   }
 

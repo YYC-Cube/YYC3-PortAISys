@@ -196,7 +196,7 @@ export class MultiEnvironmentConfigManager extends EventEmitter {
           key,
           {
             host: value.host || 'localhost',
-            port: value.port || 3000,
+            port: value.port || 3201,
             protocol: value.protocol || 'http',
             timeout: value.timeout || 30000,
             retries: value.retries || 3,
@@ -584,7 +584,7 @@ export class MultiEnvironmentConfigManager extends EventEmitter {
       version: '1.0.0',
       description: `Template configuration for ${environment}`,
       variables: new Map([
-        ['PORT', 3000],
+        ['PORT', 3201],
         ['HOST', 'localhost'],
         ['TIMEOUT', 30000]
       ]),
@@ -596,7 +596,7 @@ export class MultiEnvironmentConfigManager extends EventEmitter {
       services: new Map([
         ['api', {
           host: 'localhost',
-          port: 3000,
+          port: 3201,
           protocol: 'http',
           timeout: 30000,
           retries: 3,

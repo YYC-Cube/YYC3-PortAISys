@@ -10,6 +10,7 @@
  */
 
 import EventEmitter from 'eventemitter3';
+import { logger } from '../utils/logger';
 
 export enum MetricType {
   CPU = 'cpu',
@@ -550,7 +551,7 @@ export class EnhancedMonitoringAlertSystem extends EventEmitter {
   private sendNotification(channel: string, alert: Alert): void {
     switch (channel) {
       case 'console':
-        console.log(`[ALERT] ${alert.message}`);
+        logger.info(`[ALERT] ${alert.message}`, 'EnhancedMonitoringAlertSystem');
         break;
       case 'email':
         this.sendEmailNotification(alert);
@@ -562,27 +563,27 @@ export class EnhancedMonitoringAlertSystem extends EventEmitter {
         this.sendWebhookNotification(alert);
         break;
       default:
-        console.log(`Unknown notification channel: ${channel}`);
+        logger.info(`Unknown notification channel: ${channel}`, 'EnhancedMonitoringAlertSystem');
     }
   }
 
   private sendEmailNotification(alert: Alert): void {
-    console.log(`[EMAIL] Sending alert notification: ${alert.message}`);
+    logger.info(`[EMAIL] Sending alert notification: ${alert.message}`, 'EnhancedMonitoringAlertSystem');
   }
 
   private sendSlackNotification(alert: Alert): void {
-    console.log(`[SLACK] Sending alert notification: ${alert.message}`);
+    logger.info(`[SLACK] Sending alert notification: ${alert.message}`, 'EnhancedMonitoringAlertSystem');
   }
 
   private sendWebhookNotification(alert: Alert): void {
-    console.log(`[WEBHOOK] Sending alert notification: ${alert.message}`);
+    logger.info(`[WEBHOOK] Sending alert notification: ${alert.message}`, 'EnhancedMonitoringAlertSystem');
   }
 
   private executeAutoRemediation(alert: Alert, remediation: { enabled: boolean; script?: string; maxAttempts: number }): void {
-    console.log(`[AUTO-REMEDIATION] Executing for alert: ${alert.id}`);
+    logger.info(`[AUTO-REMEDIATION] Executing for alert: ${alert.id}`, 'EnhancedMonitoringAlertSystem');
 
     if (remediation.script) {
-      console.log(`[AUTO-REMEDIATION] Running script: ${remediation.script}`);
+      logger.info(`[AUTO-REMEDIATION] Running script: ${remediation.script}`, 'EnhancedMonitoringAlertSystem');
     }
 
     this.emit('auto-remediation-executed', { alert, remediation });

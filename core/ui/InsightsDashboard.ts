@@ -15,6 +15,7 @@ import {
   Insight,
   ExportFormat,
 } from './types';
+import { logger } from '../utils/logger';
 
 export class InsightsDashboard extends EventEmitter implements IInsightsDashboard {
   private metrics: Map<string, MetricData>;
@@ -231,7 +232,7 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
           actions: [
             {
               label: '查看详情',
-              action: () => console.log(`查看${metric.name}详情`),
+              action: () => logger.info(`查看${metric.name}详情`, 'InsightsDashboard'),
               style: 'primary',
             },
           ],

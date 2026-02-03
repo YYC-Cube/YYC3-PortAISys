@@ -35,6 +35,7 @@ import { ThreatDetector as ThreatDetectorImpl } from './ThreatDetector';
 import { ComplianceManager as ComplianceManagerImpl } from './ComplianceManager';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+import { logger } from '../utils/logger';
 
 export class ComprehensiveSecurityCenter {
   private threatDetector: ThreatDetector;
@@ -416,7 +417,7 @@ export class ComprehensiveSecurityCenter {
    */
   async logAuditTrail(action: string, details: any): Promise<void> {
     // 简化的审计日志
-    console.log(`[AUDIT] ${new Date().toISOString()} - ${action}`, details);
+    logger.info(`[AUDIT] ${new Date().toISOString()} - ${action}`, 'ComprehensiveSecurityCenter', { details });
   }
 
   /**
@@ -1468,7 +1469,7 @@ export class ComprehensiveSecurityCenter {
    * 执行安全审计
    */
   async performSecurityAudit(): Promise<SecurityAuditResult> {
-    console.log('🔒 开始执行安全审计...');
+    logger.info('🔒 开始执行安全审计...', 'ComprehensiveSecurityCenter');
     
     const auditStartTime = Date.now();
     
@@ -1493,10 +1494,10 @@ export class ComprehensiveSecurityCenter {
       // 发送审计通知
       await this.notifySecurityAuditComplete(report);
       
-      console.log('✅ 安全审计完成！');
+      logger.info('✅ 安全审计完成！', 'ComprehensiveSecurityCenter');
       return report;
     } catch (error) {
-      console.error('❌ 安全审计失败:', error);
+      logger.error('❌ 安全审计失败:', 'ComprehensiveSecurityCenter', { error }, error as Error);
       throw error;
     }
   }
@@ -1505,7 +1506,7 @@ export class ComprehensiveSecurityCenter {
    * 执行渗透测试
    */
   async performPenetrationTest(): Promise<PenetrationTestResult> {
-    console.log('🛡️ 开始执行渗透测试...');
+    logger.info('🛡️ 开始执行渗透测试...', 'ComprehensiveSecurityCenter');
     
     const testStartTime = Date.now();
     
@@ -1530,10 +1531,10 @@ export class ComprehensiveSecurityCenter {
       // 发送测试通知
       await this.notifyPenetrationTestComplete(report);
       
-      console.log('✅ 渗透测试完成！');
+      logger.info('✅ 渗透测试完成！', 'ComprehensiveSecurityCenter');
       return report;
     } catch (error) {
-      console.error('❌ 渗透测试失败:', error);
+      logger.error('❌ 渗透测试失败:', 'ComprehensiveSecurityCenter', { error }, error as Error);
       throw error;
     }
   }
@@ -1948,11 +1949,11 @@ export class ComprehensiveSecurityCenter {
    */
   private async notifySecurityAuditComplete(report: SecurityAuditResult): Promise<void> {
     // 模拟通知发送
-    console.log('📧 发送安全审计通知...');
-    console.log(`审计ID: ${report.auditId}`);
-    console.log(`状态: ${report.status}`);
-    console.log(`发现漏洞: ${report.summary.totalVulnerabilities}`);
-    console.log(`合规状态: ${report.summary.complianceStatus}`);
+    logger.info('📧 发送安全审计通知...', 'ComprehensiveSecurityCenter');
+    logger.info(`审计ID: ${report.auditId}`, 'ComprehensiveSecurityCenter');
+    logger.info(`状态: ${report.status}`, 'ComprehensiveSecurityCenter');
+    logger.info(`发现漏洞: ${report.summary.totalVulnerabilities}`, 'ComprehensiveSecurityCenter');
+    logger.info(`合规状态: ${report.summary.complianceStatus}`, 'ComprehensiveSecurityCenter');
     // 实际实现中，这里应该发送邮件或其他通知
   }
 
@@ -1961,11 +1962,11 @@ export class ComprehensiveSecurityCenter {
    */
   private async notifyPenetrationTestComplete(report: PenetrationTestResult): Promise<void> {
     // 模拟通知发送
-    console.log('📧 发送渗透测试通知...');
-    console.log(`测试ID: ${report.testId}`);
-    console.log(`总体风险: ${report.overallRisk}`);
-    console.log(`发现漏洞: ${report.summary.totalVulnerabilities}`);
-    console.log(`高严重性漏洞: ${report.summary.highSeverityVulnerabilities}`);
+    logger.info('📧 发送渗透测试通知...', 'ComprehensiveSecurityCenter');
+    logger.info(`测试ID: ${report.testId}`, 'ComprehensiveSecurityCenter');
+    logger.info(`总体风险: ${report.overallRisk}`, 'ComprehensiveSecurityCenter');
+    logger.info(`发现漏洞: ${report.summary.totalVulnerabilities}`, 'ComprehensiveSecurityCenter');
+    logger.info(`高严重性漏洞: ${report.summary.highSeverityVulnerabilities}`, 'ComprehensiveSecurityCenter');
     // 实际实现中，这里应该发送邮件或其他通知
   }
 

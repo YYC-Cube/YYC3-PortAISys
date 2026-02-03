@@ -1,5 +1,6 @@
 import { YYC3Error, ErrorCategory } from './ErrorTypes';
 import { ErrorRecoveryStrategy } from './ErrorHandler';
+import { logger } from '../utils/logger';
 
 export interface RetryConfig {
   maxAttempts: number;
@@ -200,7 +201,7 @@ export class FallbackStrategy implements ErrorRecoveryStrategy {
         }
         return true;
       } catch (fallbackError) {
-        console.error('Fallback function failed:', fallbackError);
+        logger.error('Fallback function failed:', 'RecoveryStrategies', { error: fallbackError }, fallbackError as Error);
       }
     }
 
