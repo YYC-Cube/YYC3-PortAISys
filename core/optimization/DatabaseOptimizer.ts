@@ -225,7 +225,7 @@ export class DatabaseOptimizer extends EventEmitter {
     }
 
     // 检测SELECT *
-    for (const [query, _stats] of this.queryStats) {
+    for (const query of this.queryStats.keys()) {
       if (query.includes('SELECT *')) {
         suggestions.push({
           type: 'query',

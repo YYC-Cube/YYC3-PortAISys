@@ -165,7 +165,7 @@ export class RealTimePerformanceMonitor extends EventEmitter {
   getCurrentMetrics(): PerformanceMetric[] {
     const currentMetrics: PerformanceMetric[] = [];
 
-    for (const [_key, history] of this.metrics.entries()) {
+    for (const history of this.metrics.values()) {
       if (history.length > 0) {
         currentMetrics.push(history[history.length - 1]);
       }

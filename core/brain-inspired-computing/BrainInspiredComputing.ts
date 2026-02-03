@@ -280,7 +280,7 @@ export class BrainInspiredComputing extends EventEmitter {
       const timingWindows = new Map<string, number[]>();
 
       for (const neuron of neurons) {
-        for (const [targetId, _weight] of neuron.weights) {
+        for (const [targetId] of neuron.weights) {
           const targetNeuron = this.neurons.get(targetId);
           if (!targetNeuron) continue;
 
@@ -562,7 +562,7 @@ export class BrainInspiredComputing extends EventEmitter {
       const weightChanges = new Map<string, number>();
 
       for (const neuron of neurons) {
-        for (const [targetId, _weight] of neuron.weights) {
+        for (const [targetId] of neuron.weights) {
           const targetNeuron = this.neurons.get(targetId);
           if (!targetNeuron) continue;
 

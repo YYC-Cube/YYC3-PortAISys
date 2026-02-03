@@ -108,7 +108,7 @@ export class ToastManager extends EventEmitter {
 
   removeAllToasts(): void {
     // 清除所有定时器
-    for (const [_id, timer] of this.toastTimers.entries()) {
+    for (const timer of this.toastTimers.values()) {
       clearTimeout(timer);
     }
     this.toastTimers.clear();

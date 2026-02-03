@@ -175,7 +175,7 @@ export class AnimationSystem extends EventEmitter {
     const duration = config.duration || this.config.defaultDuration;
     const delay = config.delay || 0;
     const iterations = config.iterations || 1;
-    const _direction = config.direction || 'normal';
+    void (config.direction || 'normal');
     const fillMode = config.fillMode || 'forwards';
 
     this.metrics.totalAnimations++;

@@ -267,7 +267,8 @@ export const codeInterpreterTool: AITool = {
   ],
   async execute(params, _context) {
     const startTime = Date.now();
-    const { code, language, timeout: _timeout = 5000 } = params;
+    const { code, language } = params;
+    void (params.timeout as number | undefined);
 
     try {
       // 模拟代码执行

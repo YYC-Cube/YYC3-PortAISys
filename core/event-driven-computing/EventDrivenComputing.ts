@@ -328,7 +328,7 @@ export class EventDrivenComputing extends EventEmitter {
     return async () => {
       const replayEvents: Event[] = [];
 
-      for (const [_eventType, events] of this.eventStore) {
+      for (const events of this.eventStore.values()) {
         for (const event of events) {
           replayEvents.push(event);
         }

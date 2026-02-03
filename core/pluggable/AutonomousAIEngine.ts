@@ -753,7 +753,7 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
   ): Promise<Map<string, any>> {
     const results = new Map<string, any>();
 
-    for (const [_batchName, taskIds] of concurrencyPlan) {
+    for (const taskIds of concurrencyPlan.values()) {
       const batchPromises = taskIds.map(async (taskId) => {
         try {
           const result = await this.executeTaskById(taskId);
@@ -825,7 +825,7 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
   }
 
   private async saveCoordinationLearning(results: Map<string, any>, resolved: any): Promise<void> {
-    const _learningData = {
+    void {
       timestamp: new Date(),
       results: Array.from(results.entries()),
       resolved,

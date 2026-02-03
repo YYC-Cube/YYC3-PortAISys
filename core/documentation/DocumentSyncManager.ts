@@ -290,7 +290,7 @@ export class DocumentSyncManager {
         options
       });
 
-      for (const [_codePath, entry] of entriesToSync) {
+      for (const entry of entriesToSync.values()) {
         try {
           const syncStatus = await this.syncFile(entry, options);
           entry.syncStatus = syncStatus;

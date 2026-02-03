@@ -9,8 +9,7 @@
 
 import EventEmitter from 'eventemitter3';
 import {
-  NotFoundError,
-  InternalError
+  NotFoundError
 } from '../error-handler/ErrorTypes';
 import { logger } from '../utils/logger';
 

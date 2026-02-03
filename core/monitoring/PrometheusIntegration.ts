@@ -168,7 +168,7 @@ class Histogram {
     this.sum += value;
     this.count++;
 
-    for (const [bucket, _] of this.buckets) {
+    for (const bucket of this.buckets.keys()) {
       if (value <= bucket) {
         this.buckets.set(bucket, (this.buckets.get(bucket) || 0) + 1);
       }

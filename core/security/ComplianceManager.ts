@@ -78,7 +78,7 @@ export class ComplianceManager implements IComplianceManager {
 
     let targetFrameworks = this.frameworks;
 
-    for (const [_name, fw] of targetFrameworks.entries()) {
+    for (const fw of targetFrameworks.values()) {
       const status = await this.checkFrameworkCompliance(fw);
       frameworkStatuses.push(status);
 

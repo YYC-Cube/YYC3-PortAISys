@@ -259,7 +259,7 @@ export class MultiModelManager extends EventEmitter {
 
   private getModelCandidates(_criteria: SelectionCriteria): any[] {
     const candidates: any[] = [];
-    for (const [_key, model] of this.models) {
+    for (const model of this.models.values()) {
       candidates.push(model);
     }
     return candidates;

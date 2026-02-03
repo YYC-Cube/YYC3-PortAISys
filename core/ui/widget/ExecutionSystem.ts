@@ -363,7 +363,7 @@ export class ExecutionSystem extends EventEmitter {
   }
 
   private checkWorkflowCompletion(_task: Task): void {
-    for (const [_workflowId, workflow] of this.workflows) {
+    for (const workflow of this.workflows.values()) {
       if (workflow.status === 'running' || workflow.status === 'pending') {
         const allTasksCompleted = workflow.tasks.every(t => t.status === 'completed');
         const anyTaskFailed = workflow.tasks.some(t => t.status === 'failed');
@@ -384,7 +384,7 @@ export class ExecutionSystem extends EventEmitter {
   }
 
   private checkWorkflowFailure(_task: Task): void {
-    for (const [_workflowId, workflow] of this.workflows) {
+    for (const workflow of this.workflows.values()) {
       if (workflow.status === 'running' || workflow.status === 'pending') {
         const anyTaskFailed = workflow.tasks.some(t => t.status === 'failed');
 

@@ -122,7 +122,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
 
   private async executeWithRetry(request: ModelRequest, requestId: string): Promise<any> {
     let lastError: Error | null = null;
-    const _currentAttempts = this.retryAttempts.get(requestId) || 0;
+    void (this.retryAttempts.get(requestId) || 0);
 
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {

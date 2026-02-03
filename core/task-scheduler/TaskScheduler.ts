@@ -11,8 +11,7 @@ import EventEmitter from 'eventemitter3';
 import {
   NotFoundError,
   ConflictError,
-  TimeoutError,
-  InternalError
+  TimeoutError
 } from '../error-handler/ErrorTypes';
 import { logger } from '../utils/logger';
 
