@@ -332,13 +332,27 @@ export class MultiModelManager extends EventEmitter {
   }
 
   async generate(request: GenerateRequest): Promise<GenerateResult> {
+    this.validateRequest(request);
+
+    const cachedResult = this.checkCaches(request);
+    if (cachedResult) return cachedResult;
+
+    await this.waitForRateLimit(request);
+    this.checkQuota(request.provider || '', request.maxTokens || 100);
+
+    return this.executeGenerationWithRetry(request);
+  }
+
+  private validateRequest(request: GenerateRequest): void {
     if (!request.prompt || request.prompt.trim() === '') {
       throw new Error('Invalid prompt');
     }
     if (request.prompt.length >= 100000) {
       throw new Error('Prompt too long');
     }
+  }
 
+  private checkCaches(request: GenerateRequest): GenerateResult | null {
     if (request.cache) {
       const cacheKey = this.generateCacheKey(request);
       const cached = this.cache.get(cacheKey);
@@ -350,204 +364,50 @@ export class MultiModelManager extends EventEmitter {
       if (match) return { ...match, fromCache: true, semanticMatch: true };
     }
 
-    if (request.provider) {
-      const rateLimit = this.rateLimits.get(request.provider);
-      if (rateLimit && rateLimit.requestsPerMinute) {
-        const rpm = rateLimit.requestsPerMinute;
-        
-        while (true) {
-          const now = Date.now();
-          const oneMinuteAgo = now - 60000;
+    return null;
+  }
 
-          const recent = this.requestLogs.filter(log => 
-            log.timestamp > oneMinuteAgo && log.modelUsed.includes(request.provider!)
-          );
+  private async waitForRateLimit(request: GenerateRequest): Promise<void> {
+    const provider = request.provider;
+    if (!provider) return;
 
-          // 如果没有超限，立即记录占位符并继续
-          if (recent.length < rpm) {
-            this.requestLogs.push({
-              timestamp: now,
-              prompt: 'placeholder',
-              modelUsed: request.provider!,
-              tokens: 0,
-              latency: 0,
-              success: true
-            });
-            break;
-          }
+    const rateLimit = this.rateLimits.get(provider);
+    if (!rateLimit?.requestsPerMinute) return;
 
-          // 如果超限，等待最老的请求过期
-          const oldest = recent[0];
-          const waitTime = oldest.timestamp + 60000 - now + 100;
-          await new Promise(resolve => setTimeout(resolve, waitTime));
-        }
+    const rpm = rateLimit.requestsPerMinute;
+    while (true) {
+      const now = Date.now();
+      const oneMinuteAgo = now - 60000;
+      const recent = this.requestLogs.filter(log =>
+        log.timestamp > oneMinuteAgo && log.modelUsed.includes(provider)
+      );
+
+      if (recent.length < rpm) {
+        this.requestLogs.push({
+          timestamp: now,
+          prompt: 'placeholder',
+          modelUsed: provider,
+          tokens: 0,
+          latency: 0,
+          success: true
+        });
+        break;
       }
-    }
 
-    if (request.provider) {
-      this.checkQuota(request.provider, request.maxTokens || 100);
+      const oldest = recent[0];
+      const waitTime = oldest.timestamp + 60000 - now + 100;
+      await new Promise(resolve => setTimeout(resolve, waitTime));
     }
+  }
 
+  private async executeGenerationWithRetry(request: GenerateRequest): Promise<GenerateResult> {
     const maxRetries = request.retries || 0;
     const retryDelay = request.retryDelay || 100;
     let lastError: any = null;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        const selected = await this.selectModel({
-          strategy: 'performance',
-          preferredModel: request.modelPreference || (request.images ? 'vision' : ''),
-          allowDowngrade: request.allowDowngrade,
-          timeout: request.timeout,
-        });
-
-        let modelToUse = selected.modelId;
-        if (request.modelId) {
-          modelToUse = request.modelId;
-        }
-
-        // 如果首选模型不可用且允许降级，选择可用的替代模型（按成本最低）
-        if (request.preferredModel && request.allowDowngrade) {
-          const isAvailable = await this.checkModelAvailability(selected.provider, modelToUse);
-          if (!isAvailable) {
-            const alternativeModels = Array.from(this.models.values())
-              .filter(m => !m.id.includes(request.preferredModel!));
-            if (alternativeModels.length > 0) {
-              alternativeModels.sort((a, b) => this.estimateCost(a.provider, a.id, request) - this.estimateCost(b.provider, b.id, request));
-              const alt = alternativeModels[0];
-              modelToUse = alt.id;
-              selected.provider = alt.provider;
-            }
-          }
-        }
-
-        if (request.images) {
-          const visionModels = Array.from(this.models.values()).filter(m => {
-            const caps = this.getCapabilities(m.id);
-            return caps.vision;
-          });
-          if (visionModels.length > 0) {
-            const vm = visionModels[0];
-            modelToUse = `${vm.id}-vision`;
-            selected.provider = vm.provider;
-          }
-        }
-
-        // 处理模型降级
-        if (request.preferredModel && request.allowDowngrade) {
-          const preferred = request.preferredModel;
-          if (!modelToUse.includes(preferred)) {
-            // 首选模型不可用，选择替代品
-            const alternativeModels = Array.from(this.models.values())
-              .filter(m => !m.id.includes(preferred) && m.id !== preferred);
-            if (alternativeModels.length > 0) {
-              const altModel = alternativeModels[0];
-              modelToUse = altModel.id;
-              selected.provider = altModel.provider;
-            }
-          }
-        }
-
-        if (request.abTest) {
-          const testConfig = this.abTests.get(request.abTest);
-          if (testConfig) {
-            const variant = Math.random() < testConfig.splitRatio ? 'A' : 'B';
-            const vc = variant === 'A' ? testConfig.variantA : testConfig.variantB;
-            selected.provider = vc.provider;
-            modelToUse = vc.modelId;
-          }
-        }
-
-        let promptToUse = request.prompt;
-        let originalTokens = this.estimateTokens(request.prompt);
-        let compressedTokens = originalTokens;
-
-        if (request.compressPrompt) {
-          promptToUse = this.compressPrompt(request.prompt);
-          compressedTokens = this.estimateTokens(promptToUse);
-        }
-
-        const start = Date.now();
-        let callPromise: Promise<any> = this.callModel(selected.provider, modelToUse, {
-          ...request,
-          prompt: promptToUse,
-        });
-
-        if (request.timeout) {
-          callPromise = Promise.race([
-            callPromise,
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), request.timeout)),
-          ]);
-        }
-
-        const result = await callPromise;
-        const latency = Date.now() - start;
-
-        if (request.auditLog) {
-          this.auditLogs.push({
-            timestamp: Date.now(),
-            prompt: request.prompt,
-            modelUsed: modelToUse,
-          });
-        }
-
-        this.requestLogs.push({
-          timestamp: Date.now(),
-          prompt: request.prompt,
-          modelUsed: modelToUse,
-          provider: selected.provider,
-          latency,
-        });
-
-        this.detectPerformanceDegradation(selected.provider, latency);
-        this.recordMetrics(selected.provider, modelToUse, selected.estimatedCost || 0);
-        this.updateQuotaUsage(selected.provider, originalTokens);
-
-        const response: GenerateResult = {
-          text: result.text || 'Generated response',
-          modelUsed: modelToUse,
-          tokensUsed: 100,
-          cost: selected.estimatedCost,
-          latency,
-        };
-
-        if (request.encrypt) {
-          response.encrypted = true;
-          response.text = this.encryptData(response.text, request.encryptionKey);
-        }
-
-        if (request.contentFilter) {
-          const { filtered, reason } = this.filterContent(response.text);
-          if (filtered) {
-            response.filtered = true;
-            response.filterReason = reason;
-          }
-        }
-
-        if (request.compressPrompt) {
-          response.originalTokens = originalTokens;
-          response.compressedTokens = compressedTokens;
-        }
-
-        if (request.cache) {
-          const cacheKey = this.generateCacheKey(request);
-          this.cache.set(cacheKey, response);
-        }
-
-        if (request.semanticCache) {
-          this.semanticCache.set(request.prompt, response);
-        }
-
-        if (request.abTest) {
-          const results = this.abTestResults.get(request.abTest) || [];
-          results.push({
-            variant: modelToUse.includes('gpt-4') ? 'A' : 'B',
-            result: response,
-          });
-          this.abTestResults.set(request.abTest, results);
-        }
-
-        return response;
+        return await this.executeGenerationAttempt(request);
       } catch (error: any) {
         lastError = error;
         if (error.message === 'timeout' || error.message === 'Quota exceeded') {
@@ -564,6 +424,210 @@ export class MultiModelManager extends EventEmitter {
     }
 
     throw lastError || new Error('Generation failed');
+  }
+
+  private async executeGenerationAttempt(request: GenerateRequest): Promise<GenerateResult> {
+    const { selected, modelToUse } = await this.prepareModelForGeneration(request);
+    const { promptToUse, originalTokens, compressedTokens } = this.preparePromptForGeneration(request);
+    const { result, latency } = await this.callModelWithTimeout(selected, modelToUse, request, promptToUse);
+
+    this.logGeneration(selected, modelToUse, request, latency);
+    this.updateMetrics(selected, modelToUse, originalTokens, latency);
+
+    const response = this.buildGenerateResponse(result, modelToUse, selected, latency, request, originalTokens, compressedTokens);
+    this.saveResponseToCaches(request, response, modelToUse);
+
+    return response;
+  }
+
+  private async prepareModelForGeneration(request: GenerateRequest): Promise<{ selected: any; modelToUse: string }> {
+    const selected = await this.selectModel({
+      strategy: 'performance',
+      preferredModel: request.modelPreference || (request.images ? 'vision' : ''),
+      allowDowngrade: request.allowDowngrade,
+      timeout: request.timeout,
+    });
+
+    let modelToUse = request.modelId || selected.modelId;
+
+    if (request.preferredModel && request.allowDowngrade) {
+      modelToUse = this.handleModelDowngrade(selected, modelToUse, request.preferredModel);
+    }
+
+    if (request.images) {
+      modelToUse = this.selectVisionModel(modelToUse, selected);
+    }
+
+    if (request.abTest) {
+      const abTestSelection = this.selectABTestModel(request.abTest);
+      if (abTestSelection) {
+        selected.provider = abTestSelection.provider;
+        modelToUse = abTestSelection.modelId;
+      }
+    }
+
+    return { selected, modelToUse };
+  }
+
+  private handleModelDowngrade(selected: any, modelToUse: string, preferredModel: string): string {
+    const isAvailable = this.checkModelAvailabilitySync(selected.provider, modelToUse);
+    if (!isAvailable && !modelToUse.includes(preferredModel)) {
+      const alternativeModels = Array.from(this.models.values())
+        .filter(m => !m.id.includes(preferredModel) && m.id !== preferredModel);
+      if (alternativeModels.length > 0) {
+        alternativeModels.sort((a, b) => this.estimateCost(a.provider, a.id, {}) - this.estimateCost(b.provider, b.id, {}));
+        const altModel = alternativeModels[0];
+        selected.provider = altModel.provider;
+        return altModel.id;
+      }
+    }
+    return modelToUse;
+  }
+
+  private checkModelAvailabilitySync(provider: string, modelId: string): boolean {
+    const key = `${provider}:${modelId}`;
+    return this.models.has(key);
+  }
+
+  private selectVisionModel(modelToUse: string, selected: any): string {
+    const visionModels = Array.from(this.models.values()).filter(m => {
+      const caps = this.getCapabilities(m.id);
+      return caps.vision;
+    });
+    if (visionModels.length > 0) {
+      const vm = visionModels[0];
+      selected.provider = vm.provider;
+      return `${vm.id}-vision`;
+    }
+    return modelToUse;
+  }
+
+  private selectABTestModel(testId: string): { provider: string; modelId: string } | null {
+    const testConfig = this.abTests.get(testId);
+    if (!testConfig) return null;
+
+    const variant = Math.random() < testConfig.splitRatio ? 'A' : 'B';
+    return variant === 'A' ? testConfig.variantA : testConfig.variantB;
+  }
+
+  private preparePromptForGeneration(request: GenerateRequest): { promptToUse: string; originalTokens: number; compressedTokens: number } {
+    let promptToUse = request.prompt;
+    const originalTokens = this.estimateTokens(request.prompt);
+    let compressedTokens = originalTokens;
+
+    if (request.compressPrompt) {
+      promptToUse = this.compressPrompt(request.prompt);
+      compressedTokens = this.estimateTokens(promptToUse);
+    }
+
+    return { promptToUse, originalTokens, compressedTokens };
+  }
+
+  private async callModelWithTimeout(
+    selected: any,
+    modelToUse: string,
+    request: GenerateRequest,
+    promptToUse: string
+  ): Promise<{ result: any; latency: number }> {
+    const start = Date.now();
+    let callPromise: Promise<any> = this.callModel(selected.provider, modelToUse, {
+      ...request,
+      prompt: promptToUse,
+    });
+
+    if (request.timeout) {
+      callPromise = Promise.race([
+        callPromise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), request.timeout)),
+      ]);
+    }
+
+    const result = await callPromise;
+    const latency = Date.now() - start;
+
+    return { result, latency };
+  }
+
+  private logGeneration(selected: any, modelToUse: string, request: GenerateRequest, latency: number): void {
+    if (request.auditLog) {
+      this.auditLogs.push({
+        timestamp: Date.now(),
+        prompt: request.prompt,
+        modelUsed: modelToUse,
+      });
+    }
+
+    this.requestLogs.push({
+      timestamp: Date.now(),
+      prompt: request.prompt,
+      modelUsed: modelToUse,
+      provider: selected.provider,
+      latency,
+    });
+  }
+
+  private updateMetrics(selected: any, modelToUse: string, originalTokens: number, latency: number): void {
+    this.detectPerformanceDegradation(selected.provider, latency);
+    this.recordMetrics(selected.provider, modelToUse, selected.estimatedCost || 0);
+    this.updateQuotaUsage(selected.provider, originalTokens);
+  }
+
+  private buildGenerateResponse(
+    result: any,
+    modelToUse: string,
+    selected: any,
+    latency: number,
+    request: GenerateRequest,
+    originalTokens: number,
+    compressedTokens: number
+  ): GenerateResult {
+    const response: GenerateResult = {
+      text: result.text || 'Generated response',
+      modelUsed: modelToUse,
+      tokensUsed: 100,
+      cost: selected.estimatedCost,
+      latency,
+    };
+
+    if (request.encrypt) {
+      response.encrypted = true;
+      response.text = this.encryptData(response.text, request.encryptionKey);
+    }
+
+    if (request.contentFilter) {
+      const { filtered, reason } = this.filterContent(response.text);
+      if (filtered) {
+        response.filtered = true;
+        response.filterReason = reason;
+      }
+    }
+
+    if (request.compressPrompt) {
+      response.originalTokens = originalTokens;
+      response.compressedTokens = compressedTokens;
+    }
+
+    return response;
+  }
+
+  private saveResponseToCaches(request: GenerateRequest, response: GenerateResult, modelToUse: string): void {
+    if (request.cache) {
+      const cacheKey = this.generateCacheKey(request);
+      this.cache.set(cacheKey, response);
+    }
+
+    if (request.semanticCache) {
+      this.semanticCache.set(request.prompt, response);
+    }
+
+    if (request.abTest) {
+      const results = this.abTestResults.get(request.abTest) || [];
+      results.push({
+        variant: modelToUse.includes('gpt-4') ? 'A' : 'B',
+        result: response,
+      });
+      this.abTestResults.set(request.abTest, results);
+    }
   }
 
   private generateCacheKey(request: GenerateRequest): string {

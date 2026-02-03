@@ -183,7 +183,7 @@ export class MultiEnvironmentConfigManager extends EventEmitter {
     secretsData: any,
     environment: Environment
   ): EnvironmentConfig {
-    const config: EnvironmentConfig = {
+    return {
       name: configData.name || `${environment} Environment`,
       environment,
       version: configData.version || '1.0.0',
@@ -191,69 +191,91 @@ export class MultiEnvironmentConfigManager extends EventEmitter {
       variables: new Map(Object.entries(configData.variables || {})),
       secrets: new Map(Object.entries(secretsData || {})),
       features: new Map(Object.entries(configData.features || {})),
-      services: new Map(
-        Object.entries(configData.services || {}).map(([key, value]: [string, any]) => [
-          key,
-          {
-            host: value.host || 'localhost',
-            port: value.port || 3201,
-            protocol: value.protocol || 'http',
-            timeout: value.timeout || 30000,
-            retries: value.retries || 3,
-            enabled: value.enabled !== false
-          }
-        ])
-      ),
-      database: {
-        host: configData.database?.host || 'localhost',
-        port: configData.database?.port || 5432,
-        database: configData.database?.database || 'yyc3',
-        username: configData.database?.username || 'postgres',
-        password: secretsData.database?.password,
-        ssl: configData.database?.ssl || false,
-        poolSize: configData.database?.poolSize || 10,
-        connectionTimeout: configData.database?.connectionTimeout || 10000,
-        queryTimeout: configData.database?.queryTimeout || 30000
-      },
-      cache: {
-        host: configData.cache?.host || 'localhost',
-        port: configData.cache?.port || 6379,
-        password: secretsData.cache?.password,
-        ttl: configData.cache?.ttl || 3600,
-        maxSize: configData.cache?.maxSize || 1000,
-        enabled: configData.cache?.enabled !== false
-      },
-      logging: {
-        level: configData.logging?.level || 'info',
-        format: configData.logging?.format || 'json',
-        output: configData.logging?.output || 'console',
-        filePath: configData.logging?.filePath,
-        maxSize: configData.logging?.maxSize || 10485760,
-        maxFiles: configData.logging?.maxFiles || 5
-      },
-      monitoring: {
-        enabled: configData.monitoring?.enabled !== false,
-        metricsEnabled: configData.monitoring?.metricsEnabled !== false,
-        tracingEnabled: configData.monitoring?.tracingEnabled !== false,
-        alertingEnabled: configData.monitoring?.alertingEnabled !== false,
-        endpoint: configData.monitoring?.endpoint,
-        apiKey: secretsData.monitoring?.apiKey
-      },
-      security: {
-        encryptionEnabled: configData.security?.encryptionEnabled !== false,
-        authenticationEnabled: configData.security?.authenticationEnabled !== false,
-        rateLimitingEnabled: configData.security?.rateLimitingEnabled !== false,
-        corsEnabled: configData.security?.corsEnabled !== false,
-        csrfProtectionEnabled: configData.security?.csrfProtectionEnabled !== false,
-        allowedOrigins: configData.security?.allowedOrigins || ['*'],
-        rateLimit: {
-          windowMs: configData.security?.rateLimit?.windowMs || 900000,
-          maxRequests: configData.security?.rateLimit?.maxRequests || 100
+      services: this.createServicesConfig(configData.services),
+      database: this.createDatabaseConfig(configData.database, secretsData.database),
+      cache: this.createCacheConfig(configData.cache, secretsData.cache),
+      logging: this.createLoggingConfig(configData.logging),
+      monitoring: this.createMonitoringConfig(configData.monitoring, secretsData.monitoring),
+      security: this.createSecurityConfig(configData.security)
+    };
+  }
+
+  private createServicesConfig(servicesData: any): Map<string, ServiceConfig> {
+    return new Map(
+      Object.entries(servicesData || {}).map(([key, value]: [string, any]) => [
+        key,
+        {
+          host: value.host || 'localhost',
+          port: value.port || 3201,
+          protocol: value.protocol || 'http',
+          timeout: value.timeout || 30000,
+          retries: value.retries || 3,
+          enabled: value.enabled !== false
         }
+      ])
+    );
+  }
+
+  private createDatabaseConfig(dbData: any, secretsDb: any): DatabaseConfig {
+    return {
+      host: dbData?.host || 'localhost',
+      port: dbData?.port || 5432,
+      database: dbData?.database || 'yyc3',
+      username: dbData?.username || 'postgres',
+      password: secretsDb?.password,
+      ssl: dbData?.ssl || false,
+      poolSize: dbData?.poolSize || 10,
+      connectionTimeout: dbData?.connectionTimeout || 10000,
+      queryTimeout: dbData?.queryTimeout || 30000
+    };
+  }
+
+  private createCacheConfig(cacheData: any, secretsCache: any): CacheConfig {
+    return {
+      host: cacheData?.host || 'localhost',
+      port: cacheData?.port || 6379,
+      password: secretsCache?.password,
+      ttl: cacheData?.ttl || 3600,
+      maxSize: cacheData?.maxSize || 1000,
+      enabled: cacheData?.enabled !== false
+    };
+  }
+
+  private createLoggingConfig(loggingData: any): LoggingConfig {
+    return {
+      level: loggingData?.level || 'info',
+      format: loggingData?.format || 'json',
+      output: loggingData?.output || 'console',
+      filePath: loggingData?.filePath,
+      maxSize: loggingData?.maxSize || 10485760,
+      maxFiles: loggingData?.maxFiles || 5
+    };
+  }
+
+  private createMonitoringConfig(monitoringData: any, secretsMonitoring: any): MonitoringConfig {
+    return {
+      enabled: monitoringData?.enabled !== false,
+      metricsEnabled: monitoringData?.metricsEnabled !== false,
+      tracingEnabled: monitoringData?.tracingEnabled !== false,
+      alertingEnabled: monitoringData?.alertingEnabled !== false,
+      endpoint: monitoringData?.endpoint,
+      apiKey: secretsMonitoring?.apiKey
+    };
+  }
+
+  private createSecurityConfig(securityData: any): SecurityConfig {
+    return {
+      encryptionEnabled: securityData?.encryptionEnabled !== false,
+      authenticationEnabled: securityData?.authenticationEnabled !== false,
+      rateLimitingEnabled: securityData?.rateLimitingEnabled !== false,
+      corsEnabled: securityData?.corsEnabled !== false,
+      csrfProtectionEnabled: securityData?.csrfProtectionEnabled !== false,
+      allowedOrigins: securityData?.allowedOrigins || ['*'],
+      rateLimit: {
+        windowMs: securityData?.rateLimit?.windowMs || 900000,
+        maxRequests: securityData?.rateLimit?.maxRequests || 100
       }
     };
-
-    return config;
   }
 
   async loadAllConfigs(): Promise<void> {

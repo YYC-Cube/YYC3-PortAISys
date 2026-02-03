@@ -518,128 +518,136 @@ export class OpenAIModelAdapter implements ModelAdapter {
   ): Promise<ModelGenerationResponse> {
     const reader = body.getReader();
     const decoder = new TextDecoder();
-    let fullContent = '';
-    let toolCall: any = null;
-    let usage: any = null;
-    let modelId = '';
+    const streamState = {
+      fullContent: '',
+      toolCall: null as any,
+      usage: null as any,
+      modelId: ''
+    };
 
     try {
-      while (true) {
-        // 检查是否被取消
-        if (this.abortController?.signal.aborted) {
-          throw new Error('Request cancelled');
-        }
+      await this.processStreamLoop(reader, decoder, streamState, onChunk);
+      this.checkAbortStatus();
 
-        const { done, value } = await reader.read();
-
-        if (done) break;
-
-        // 检查是否被取消
-        if (this.abortController?.signal.aborted) {
-          throw new Error('Request cancelled');
-        }
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n').filter(line => line.trim() !== '');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-
-            if (data === '[DONE]') {
-              continue;
-            }
-
-            try {
-              const parsed = JSON.parse(data);
-              modelId = parsed.model || modelId;
-
-              const delta = parsed.choices?.[0]?.delta;
-              if (!delta) continue;
-
-              // 处理内容增量
-              if (delta.content) {
-                fullContent += delta.content;
-
-                // 调用回调
-                onChunk({
-                  content: delta.content,
-                  done: false
-                });
-              }
-
-              // 处理工具调用
-              if (delta.tool_calls) {
-                const toolCallDelta = delta.tool_calls[0];
-                if (!toolCall) {
-                  toolCall = {
-                    function: {
-                      name: toolCallDelta.function?.name || '',
-                      arguments: toolCallDelta.function?.arguments || ''
-                    }
-                  };
-                } else {
-                  if (toolCallDelta.function?.name) {
-                    toolCall.function.name += toolCallDelta.function.name;
-                  }
-                  if (toolCallDelta.function?.arguments) {
-                    toolCall.function.arguments += toolCallDelta.function.arguments;
-                  }
-                }
-              }
-
-              // 处理使用统计
-              if (parsed.usage) {
-                usage = parsed.usage;
-              }
-            } catch (parseError) {
-              logger.warn('Failed to parse SSE data:', 'OpenAIModelAdapter', { data, parseError }, parseError as Error);
-            }
-          }
-        }
-      }
-
-      // 检查是否被取消（在流结束但还没返回结果时）
-      if (this.abortController?.signal.aborted) {
-        throw new Error('Request cancelled');
-      }
-
-      // 发送最终完成回调
       onChunk({
         content: '',
         done: true,
-        usage: usage ? {
-          promptTokens: usage.prompt_tokens,
-          completionTokens: usage.completion_tokens,
-          totalTokens: usage.total_tokens
+        usage: streamState.usage ? {
+          promptTokens: streamState.usage.prompt_tokens,
+          completionTokens: streamState.usage.completion_tokens,
+          totalTokens: streamState.usage.total_tokens
         } : undefined
       });
 
       this.status = 'idle';
 
       return {
-        content: fullContent,
-        toolUsed: !!toolCall,
-        toolCall: toolCall
+        content: streamState.fullContent,
+        toolUsed: !!streamState.toolCall,
+        toolCall: streamState.toolCall
           ? {
-              name: toolCall.function.name,
-              params: JSON.parse(toolCall.function.arguments),
+              name: streamState.toolCall.function.name,
+              params: JSON.parse(streamState.toolCall.function.arguments),
             }
           : undefined,
-        usage: usage
+        usage: streamState.usage
           ? {
-              promptTokens: usage.prompt_tokens,
-              completionTokens: usage.completion_tokens,
-              totalTokens: usage.total_tokens,
+              promptTokens: streamState.usage.prompt_tokens,
+              completionTokens: streamState.usage.completion_tokens,
+              totalTokens: streamState.usage.total_tokens,
             }
           : undefined,
         timestamp: Date.now(),
-        modelId,
+        modelId: streamState.modelId,
       };
     } finally {
       reader.releaseLock();
-      // 只有在finally块中才清理abortController
       this.abortController = null;
+    }
+  }
+
+  private async processStreamLoop(
+    reader: ReadableStreamDefaultReader<Uint8Array>,
+    decoder: TextDecoder,
+    state: { fullContent: string; toolCall: any; usage: any; modelId: string },
+    onChunk: StreamCallback
+  ): Promise<void> {
+    while (true) {
+      this.checkAbortStatus();
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      this.checkAbortStatus();
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n').filter(line => line.trim() !== '');
+
+      for (const line of lines) {
+        this.processStreamLine(line, state, onChunk);
+      }
+    }
+  }
+
+  private processStreamLine(
+    line: string,
+    state: { fullContent: string; toolCall: any; usage: any; modelId: string },
+    onChunk: StreamCallback
+  ): void {
+    if (!line.startsWith('data: ')) return;
+
+    const data = line.slice(6);
+    if (data === '[DONE]') return;
+
+    try {
+      const parsed = JSON.parse(data);
+      state.modelId = parsed.model || state.modelId;
+
+      const delta = parsed.choices?.[0]?.delta;
+      if (!delta) return;
+
+      if (delta.content) {
+        state.fullContent += delta.content;
+        onChunk({
+          content: delta.content,
+          done: false
+        });
+      }
+
+      if (delta.tool_calls) {
+        this.updateToolCall(delta.tool_calls[0], state);
+      }
+
+      if (parsed.usage) {
+        state.usage = parsed.usage;
+      }
+    } catch (parseError) {
+      logger.warn('Failed to parse SSE data:', 'OpenAIModelAdapter', { data, parseError }, parseError as Error);
+    }
+  }
+
+  private updateToolCall(
+    toolCallDelta: any,
+    state: { toolCall: any }
+  ): void {
+    if (!state.toolCall) {
+      state.toolCall = {
+        function: {
+          name: toolCallDelta.function?.name || '',
+          arguments: toolCallDelta.function?.arguments || ''
+        }
+      };
+    } else {
+      if (toolCallDelta.function?.name) {
+        state.toolCall.function.name += toolCallDelta.function.name;
+      }
+      if (toolCallDelta.function?.arguments) {
+        state.toolCall.function.arguments += toolCallDelta.function.arguments;
+      }
+    }
+  }
+
+  private checkAbortStatus(): void {
+    if (this.abortController?.signal.aborted) {
+      throw new Error('Request cancelled');
     }
   }
 
