@@ -174,172 +174,139 @@ export class ThemeSystem extends EventEmitter {
   }
 
   private initializeBuiltinThemes(): void {
-    const lightTheme: Theme = {
-      id: 'light',
-      name: 'Light',
-      mode: 'light',
-      config: {
-        colors: {
-          primary: '#3b82f6',
-          secondary: '#64748b',
-          accent: '#8b5cf6',
-          background: '#ffffff',
-          surface: '#f8fafc',
-          text: '#0f172a',
-          textSecondary: '#64748b',
-          border: '#e2e8f0',
-          success: '#10b981',
-          warning: '#f59e0b',
-          error: '#ef4444',
-          info: '#3b82f6',
-        },
-        typography: {
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-          fontSize: {
-            xs: '0.75rem',
-            sm: '0.875rem',
-            md: '1rem',
-            lg: '1.125rem',
-            xl: '1.25rem',
-            '2xl': '1.5rem',
-            '3xl': '1.875rem',
-          },
-          fontWeight: {
-            normal: 400,
-            medium: 500,
-            semibold: 600,
-            bold: 700,
-          },
-          lineHeight: {
-            tight: 1.25,
-            normal: 1.5,
-            relaxed: 1.75,
-          },
-        },
-        spacing: {
-          xs: '0.25rem',
-          sm: '0.5rem',
-          md: '1rem',
-          lg: '1.5rem',
-          xl: '2rem',
-          '2xl': '3rem',
-          '3xl': '4rem',
-        },
-        shadows: {
-          sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-          md: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-          lg: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-          xl: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-          '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-        },
-        borderRadius: {
-          none: '0',
-          sm: '0.125rem',
-          md: '0.375rem',
-          lg: '0.5rem',
-          xl: '0.75rem',
-          full: '9999px',
-        },
-        transitions: {
-          duration: {
-            fast: '150ms',
-            normal: '300ms',
-            slow: '500ms',
-          },
-          easing: {
-            easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
-            easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
-            easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-          },
-        },
-      },
-    };
-
-    const darkTheme: Theme = {
-      id: 'dark',
-      name: 'Dark',
-      mode: 'dark',
-      config: {
-        colors: {
-          primary: '#60a5fa',
-          secondary: '#94a3b8',
-          accent: '#a78bfa',
-          background: '#0f172a',
-          surface: '#1e293b',
-          text: '#f1f5f9',
-          textSecondary: '#94a3b8',
-          border: '#334155',
-          success: '#34d399',
-          warning: '#fbbf24',
-          error: '#f87171',
-          info: '#60a5fa',
-        },
-        typography: {
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-          fontSize: {
-            xs: '0.75rem',
-            sm: '0.875rem',
-            md: '1rem',
-            lg: '1.125rem',
-            xl: '1.25rem',
-            '2xl': '1.5rem',
-            '3xl': '1.875rem',
-          },
-          fontWeight: {
-            normal: 400,
-            medium: 500,
-            semibold: 600,
-            bold: 700,
-          },
-          lineHeight: {
-            tight: 1.25,
-            normal: 1.5,
-            relaxed: 1.75,
-          },
-        },
-        spacing: {
-          xs: '0.25rem',
-          sm: '0.5rem',
-          md: '1rem',
-          lg: '1.5rem',
-          xl: '2rem',
-          '2xl': '3rem',
-          '3xl': '4rem',
-        },
-        shadows: {
-          sm: '0 1px 2px 0 rgb(0 0 0 / 0.3)',
-          md: '0 4px 6px -1px rgb(0 0 0 / 0.4)',
-          lg: '0 10px 15px -3px rgb(0 0 0 / 0.4)',
-          xl: '0 20px 25px -5px rgb(0 0 0 / 0.4)',
-          '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.5)',
-        },
-        borderRadius: {
-          none: '0',
-          sm: '0.125rem',
-          md: '0.375rem',
-          lg: '0.5rem',
-          xl: '0.75rem',
-          full: '9999px',
-        },
-        transitions: {
-          duration: {
-            fast: '150ms',
-            normal: '300ms',
-            slow: '500ms',
-          },
-          easing: {
-            easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
-            easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
-            easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-          },
-        },
-      },
-    };
+    const lightTheme = this.createLightTheme();
+    const darkTheme = this.createDarkTheme();
 
     this.themes.set(lightTheme.id, lightTheme);
     this.themes.set(darkTheme.id, darkTheme);
 
     this.currentTheme = lightTheme;
+  }
+
+  private createLightTheme(): Theme {
+    return {
+      id: 'light',
+      name: 'Light',
+      mode: 'light',
+      config: this.createThemeConfig('#3b82f6', '#64748b', '#8b5cf6', '#ffffff', '#f8fafc', '#0f172a')
+    };
+  }
+
+  private createDarkTheme(): Theme {
+    return {
+      id: 'dark',
+      name: 'Dark',
+      mode: 'dark',
+      config: this.createThemeConfig('#60a5fa', '#94a3b8', '#a78bfa', '#0f172a', '#1e293b', '#f1f5f9')
+    };
+  }
+
+  private createThemeConfig(
+    primary: string,
+    secondary: string,
+    accent: string,
+    background: string,
+    surface: string,
+    text: string
+  ): ThemeConfig {
+    const isDark = background === '#0f172a';
+
+    return {
+      colors: {
+        primary,
+        secondary,
+        accent,
+        background,
+        surface,
+        text,
+        textSecondary: secondary,
+        border: isDark ? '#334155' : '#e2e8f0',
+        success: isDark ? '#34d399' : '#10b981',
+        warning: isDark ? '#fbbf24' : '#f59e0b',
+        error: isDark ? '#f87171' : '#ef4444',
+        info: primary
+      },
+      typography: this.getTypographyConfig(),
+      spacing: this.getSpacingConfig(),
+      shadows: this.getShadowConfig(isDark),
+      borderRadius: this.getBorderRadiusConfig(),
+      transitions: this.getTransitionConfig()
+    };
+  }
+
+  private getTypographyConfig(): ThemeTypography {
+    return {
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      fontSize: {
+        xs: '0.75rem',
+        sm: '0.875rem',
+        md: '1rem',
+        lg: '1.125rem',
+        xl: '1.25rem',
+        '2xl': '1.5rem',
+        '3xl': '1.875rem'
+      },
+      fontWeight: {
+        normal: 400,
+        medium: 500,
+        semibold: 600,
+        bold: 700
+      },
+      lineHeight: {
+        tight: 1.25,
+        normal: 1.5,
+        relaxed: 1.75
+      }
+    };
+  }
+
+  private getSpacingConfig(): ThemeSpacing {
+    return {
+      xs: '0.25rem',
+      sm: '0.5rem',
+      md: '1rem',
+      lg: '1.5rem',
+      xl: '2rem',
+      '2xl': '3rem',
+      '3xl': '4rem'
+    };
+  }
+
+  private getShadowConfig(isDark: boolean): ThemeShadows {
+    const opacity = isDark ? 0.4 : 0.1;
+    return {
+      sm: `0 1px 2px 0 rgb(0 0 0 / ${isDark ? 0.3 : 0.05})`,
+      md: `0 4px 6px -1px rgb(0 0 0 / ${opacity})`,
+      lg: `0 10px 15px -3px rgb(0 0 0 / ${opacity})`,
+      xl: `0 20px 25px -5px rgb(0 0 0 / ${opacity})`,
+      '2xl': `0 25px 50px -12px rgb(0 0 0 / ${isDark ? 0.5 : 0.25})`
+    };
+  }
+
+  private getBorderRadiusConfig(): ThemeBorderRadius {
+    return {
+      none: '0',
+      sm: '0.125rem',
+      md: '0.375rem',
+      lg: '0.5rem',
+      xl: '0.75rem',
+      full: '9999px'
+    };
+  }
+
+  private getTransitionConfig(): ThemeTransitions {
+    return {
+      duration: {
+        fast: '150ms',
+        normal: '300ms',
+        slow: '500ms'
+      },
+      easing: {
+        easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+        easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
+        easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)'
+      }
+    };
   }
 
   private initializeCustomThemes(): void {

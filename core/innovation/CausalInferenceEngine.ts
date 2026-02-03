@@ -1045,7 +1045,19 @@ export class CausalInferenceEngine {
   }
 
   private async leveragePointIdentification(): Promise<LeveragePointIdentification> {
-    const highLeveragePoints: HighLeveragePoint[] = [
+    const highLeveragePoints = this.getHighLeveragePoints();
+    const interventionPrioritization = this.getInterventionPrioritization();
+    const systemTransformation = this.getSystemTransformation();
+
+    return {
+      highLeveragePoints,
+      interventionPrioritization,
+      systemTransformation
+    };
+  }
+
+  private getHighLeveragePoints(): HighLeveragePoint[] {
+    return [
       {
         pointId: 'point-1',
         pointName: 'Customer Experience Design',
@@ -1079,7 +1091,9 @@ export class CausalInferenceEngine {
         potentialImpact: 0.45
       }
     ];
+  }
 
+  private getInterventionPrioritization(): InterventionPrioritization {
     const prioritizedInterventions: PrioritizedIntervention[] = [
       {
         interventionId: 'intervention-1',
@@ -1136,13 +1150,27 @@ export class CausalInferenceEngine {
       }
     ];
 
-    const interventionPrioritization: InterventionPrioritization = {
+    return {
       prioritizedInterventions,
       interventionCombinations,
       expectedOutcomes
     };
+  }
 
-    const transformationPath: TransformationPath = {
+  private getSystemTransformation(): SystemTransformation {
+    const transformationPath = this.createTransformationPath();
+    const transformationStages = this.getTransformationStages();
+    const successFactors = this.getSuccessFactors();
+
+    return {
+      transformationPath: [transformationPath],
+      transformationStages,
+      successFactors
+    };
+  }
+
+  private createTransformationPath(): TransformationPath {
+    return {
       pathId: 'path-1',
       pathName: 'Customer-Centric Transformation',
       steps: [
@@ -1174,17 +1202,30 @@ export class CausalInferenceEngine {
       feasibility: 0.75,
       risk: 0.35
     };
+  }
 
-    const transformationStages: TransformationStage[] = [
+  private getTransformationStages(): TransformationStage[] {
+    return [
       {
         stageId: 'stage-1',
         stageName: 'Foundation',
         objectives: ['Build infrastructure', 'Train team', 'Establish metrics'],
         milestones: [
-          { milestoneId: 'milestone-1', name: 'Infrastructure Ready', targetDate: '2026-03-01', criteria: ['All systems operational'] }
+          {
+            milestoneId: 'milestone-1',
+            name: 'Infrastructure Ready',
+            targetDate: '2026-03-01',
+            criteria: ['All systems operational']
+          }
         ],
         metrics: [
-          { metricId: 'metric-1', name: 'System Uptime', target: 99.5, current: 95.0, unit: '%' }
+          {
+            metricId: 'metric-1',
+            name: 'System Uptime',
+            target: 99.5,
+            current: 95.0,
+            unit: '%'
+          }
         ]
       },
       {
@@ -1192,31 +1233,53 @@ export class CausalInferenceEngine {
         stageName: 'Optimization',
         objectives: ['Optimize processes', 'Improve efficiency', 'Scale operations'],
         milestones: [
-          { milestoneId: 'milestone-2', name: 'Process Optimization Complete', targetDate: '2026-06-01', criteria: ['All processes optimized'] }
+          {
+            milestoneId: 'milestone-2',
+            name: 'Process Optimization Complete',
+            targetDate: '2026-06-01',
+            criteria: ['All processes optimized']
+          }
         ],
         metrics: [
-          { metricId: 'metric-2', name: 'Process Efficiency', target: 85, current: 70, unit: '%' }
+          {
+            metricId: 'metric-2',
+            name: 'Process Efficiency',
+            target: 85,
+            current: 70,
+            unit: '%'
+          }
         ]
       }
     ];
+  }
 
-    const successFactors: SuccessFactor[] = [
-      { factorId: 'factor-1', factorName: 'Leadership Commitment', importance: 0.95, currentState: 0.7, targetState: 0.95, gap: 0.25 },
-      { factorId: 'factor-2', factorName: 'Employee Engagement', importance: 0.85, currentState: 0.6, targetState: 0.85, gap: 0.25 },
-      { factorId: 'factor-3', factorName: 'Technology Readiness', importance: 0.80, currentState: 0.75, targetState: 0.90, gap: 0.15 }
+  private getSuccessFactors(): SuccessFactor[] {
+    return [
+      {
+        factorId: 'factor-1',
+        factorName: 'Leadership Commitment',
+        importance: 0.95,
+        currentState: 0.7,
+        targetState: 0.95,
+        gap: 0.25
+      },
+      {
+        factorId: 'factor-2',
+        factorName: 'Employee Engagement',
+        importance: 0.85,
+        currentState: 0.6,
+        targetState: 0.85,
+        gap: 0.25
+      },
+      {
+        factorId: 'factor-3',
+        factorName: 'Technology Readiness',
+        importance: 0.80,
+        currentState: 0.75,
+        targetState: 0.90,
+        gap: 0.15
+      }
     ];
-
-    const systemTransformation: SystemTransformation = {
-      transformationPath: [transformationPath],
-      transformationStages,
-      successFactors
-    };
-
-    return {
-      highLeveragePoints,
-      interventionPrioritization,
-      systemTransformation
-    };
   }
 
   async updateConfig(newConfig: Partial<CausalInferenceEngineConfig>): Promise<void> {

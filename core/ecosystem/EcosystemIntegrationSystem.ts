@@ -137,158 +137,182 @@ export class EcosystemIntegrationSystem extends EventEmitter {
   }
 
   private initializeDefaultIntegrations(): void {
-    const defaultIntegrations: IntegrationManifest[] = [
-      {
-        id: 'openai-integration',
-        name: 'OpenAI Integration',
-        version: '1.0.0',
-        description: 'OpenAI API integration for AI capabilities',
-        author: 'YYC³',
-        category: 'ai',
-        type: 'api',
-        capabilities: ['text-generation', 'image-generation', 'embedding', 'fine-tuning'],
-        permissions: ['api:read', 'api:write'],
-        endpoints: {
-          api: 'https://api.openai.com/v1',
-          chat: 'https://api.openai.com/v1/chat/completions',
-          embedding: 'https://api.openai.com/v1/embeddings'
-        },
-        authentication: {
-          type: 'api-key'
-        },
-        compatibility: {
-          minVersion: '1.0.0',
-          maxVersion: '2.0.0'
-        }
-      },
-      {
-        id: 'slack-integration',
-        name: 'Slack Integration',
-        version: '1.0.0',
-        description: 'Slack integration for team communication',
-        author: 'YYC³',
-        category: 'communication',
-        type: 'webhook',
-        capabilities: ['messaging', 'notifications', 'file-sharing', 'channels'],
-        permissions: ['channels:read', 'channels:write', 'chat:write'],
-        endpoints: {
-          api: 'https://slack.com/api',
-          webhook: 'https://hooks.slack.com/services'
-        },
-        authentication: {
-          type: 'oauth2',
-          authUrl: 'https://slack.com/oauth/authorize',
-          tokenUrl: 'https://slack.com/api/oauth.v2.access',
-          scopes: ['channels:read', 'channels:write', 'chat:write']
-        },
-        compatibility: {
-          minVersion: '1.0.0',
-          maxVersion: '2.0.0'
-        }
-      },
-      {
-        id: 'github-integration',
-        name: 'GitHub Integration',
-        version: '1.0.0',
-        description: 'GitHub integration for code management',
-        author: 'YYC³',
-        category: 'productivity',
-        type: 'api',
-        capabilities: ['repository-management', 'issues', 'pull-requests', 'actions'],
-        permissions: ['repo:read', 'repo:write', 'issues:read', 'issues:write'],
-        endpoints: {
-          api: 'https://api.github.com',
-          webhook: 'https://api.github.com/hub'
-        },
-        authentication: {
-          type: 'oauth2',
-          authUrl: 'https://github.com/login/oauth/authorize',
-          tokenUrl: 'https://github.com/login/oauth/access_token',
-          scopes: ['repo', 'issues']
-        },
-        compatibility: {
-          minVersion: '1.0.0',
-          maxVersion: '2.0.0'
-        }
-      },
-      {
-        id: 'aws-integration',
-        name: 'AWS Integration',
-        version: '1.0.0',
-        description: 'AWS integration for cloud services',
-        author: 'YYC³',
-        category: 'data',
-        type: 'sdk',
-        capabilities: ['storage', 'compute', 'database', 'messaging', 'analytics'],
-        permissions: ['s3:read', 's3:write', 'ec2:read', 'ec2:write'],
-        endpoints: {
-          api: 'https://aws.amazon.com',
-          s3: 'https://s3.amazonaws.com',
-          ec2: 'https://ec2.amazonaws.com'
-        },
-        authentication: {
-          type: 'custom',
-          customAuth: async (config) => {
-            return { accessKeyId: config.accessKey, secretKey: config.secretKey };
-          }
-        },
-        compatibility: {
-          minVersion: '1.0.0',
-          maxVersion: '2.0.0'
-        }
-      },
-      {
-        id: 'google-analytics-integration',
-        name: 'Google Analytics Integration',
-        version: '1.0.0',
-        description: 'Google Analytics integration for analytics',
-        author: 'YYC³',
-        category: 'analytics',
-        type: 'api',
-        capabilities: ['page-tracking', 'event-tracking', 'user-analytics', 'conversion-tracking'],
-        permissions: ['analytics:read', 'analytics:write'],
-        endpoints: {
-          api: 'https://analyticsreporting.googleapis.com/v4',
-          data: 'https://www.googleapis.com/analytics/v3/data'
-        },
-        authentication: {
-          type: 'oauth2',
-          authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
-          tokenUrl: 'https://oauth2.googleapis.com/token',
-          scopes: ['https://www.googleapis.com/auth/analytics.readonly']
-        },
-        compatibility: {
-          minVersion: '1.0.0',
-          maxVersion: '2.0.0'
-        }
-      },
-      {
-        id: 'stripe-integration',
-        name: 'Stripe Integration',
-        version: '1.0.0',
-        description: 'Stripe integration for payment processing',
-        author: 'YYC³',
-        category: 'productivity',
-        type: 'api',
-        capabilities: ['payments', 'subscriptions', 'invoices', 'customers'],
-        permissions: ['payments:read', 'payments:write', 'customers:read'],
-        endpoints: {
-          api: 'https://api.stripe.com/v1',
-          webhook: 'https://api.stripe.com/v1/webhooks'
-        },
-        authentication: {
-          type: 'api-key'
-        },
-        compatibility: {
-          minVersion: '1.0.0',
-          maxVersion: '2.0.0'
-        }
-      }
+    const integrations: IntegrationManifest[] = [
+      this.createOpenAIIntegration(),
+      this.createSlackIntegration(),
+      this.createGitHubIntegration(),
+      this.createAWSIntegration(),
+      this.createGoogleAnalyticsIntegration(),
+      this.createStripeIntegration()
     ];
 
-    defaultIntegrations.forEach(manifest => {
+    integrations.forEach(manifest => {
       this.registerIntegration(manifest);
     });
+  }
+
+  private createOpenAIIntegration(): IntegrationManifest {
+    return {
+      id: 'openai-integration',
+      name: 'OpenAI Integration',
+      version: '1.0.0',
+      description: 'OpenAI API integration for AI capabilities',
+      author: 'YYC³',
+      category: 'ai',
+      type: 'api',
+      capabilities: ['text-generation', 'image-generation', 'embedding', 'fine-tuning'],
+      permissions: ['api:read', 'api:write'],
+      endpoints: {
+        api: 'https://api.openai.com/v1',
+        chat: 'https://api.openai.com/v1/chat/completions',
+        embedding: 'https://api.openai.com/v1/embeddings'
+      },
+      authentication: {
+        type: 'api-key'
+      },
+      compatibility: {
+        minVersion: '1.0.0',
+        maxVersion: '2.0.0'
+      }
+    };
+  }
+
+  private createSlackIntegration(): IntegrationManifest {
+    return {
+      id: 'slack-integration',
+      name: 'Slack Integration',
+      version: '1.0.0',
+      description: 'Slack integration for team communication',
+      author: 'YYC³',
+      category: 'communication',
+      type: 'webhook',
+      capabilities: ['messaging', 'notifications', 'file-sharing', 'channels'],
+      permissions: ['channels:read', 'channels:write', 'chat:write'],
+      endpoints: {
+        api: 'https://slack.com/api',
+        webhook: 'https://hooks.slack.com/services'
+      },
+      authentication: {
+        type: 'oauth2',
+        authUrl: 'https://slack.com/oauth/authorize',
+        tokenUrl: 'https://slack.com/api/oauth.v2.access',
+        scopes: ['channels:read', 'channels:write', 'chat:write']
+      },
+      compatibility: {
+        minVersion: '1.0.0',
+        maxVersion: '2.0.0'
+      }
+    };
+  }
+
+  private createGitHubIntegration(): IntegrationManifest {
+    return {
+      id: 'github-integration',
+      name: 'GitHub Integration',
+      version: '1.0.0',
+      description: 'GitHub integration for code management',
+      author: 'YYC³',
+      category: 'productivity',
+      type: 'api',
+      capabilities: ['repository-management', 'issues', 'pull-requests', 'actions'],
+      permissions: ['repo:read', 'repo:write', 'issues:read', 'issues:write'],
+      endpoints: {
+        api: 'https://api.github.com',
+        webhook: 'https://api.github.com/hub'
+      },
+      authentication: {
+        type: 'oauth2',
+        authUrl: 'https://github.com/login/oauth/authorize',
+        tokenUrl: 'https://github.com/login/oauth/access_token',
+        scopes: ['repo', 'issues']
+      },
+      compatibility: {
+        minVersion: '1.0.0',
+        maxVersion: '2.0.0'
+      }
+    };
+  }
+
+  private createAWSIntegration(): IntegrationManifest {
+    return {
+      id: 'aws-integration',
+      name: 'AWS Integration',
+      version: '1.0.0',
+      description: 'AWS integration for cloud services',
+      author: 'YYC³',
+      category: 'data',
+      type: 'sdk',
+      capabilities: ['storage', 'compute', 'database', 'messaging', 'analytics'],
+      permissions: ['s3:read', 's3:write', 'ec2:read', 'ec2:write'],
+      endpoints: {
+        api: 'https://aws.amazon.com',
+        s3: 'https://s3.amazonaws.com',
+        ec2: 'https://ec2.amazonaws.com'
+      },
+      authentication: {
+        type: 'custom',
+        customAuth: async (config) => {
+          return { accessKeyId: config.accessKey, secretKey: config.secretKey };
+        }
+      },
+      compatibility: {
+        minVersion: '1.0.0',
+        maxVersion: '2.0.0'
+      }
+    };
+  }
+
+  private createGoogleAnalyticsIntegration(): IntegrationManifest {
+    return {
+      id: 'google-analytics-integration',
+      name: 'Google Analytics Integration',
+      version: '1.0.0',
+      description: 'Google Analytics integration for analytics',
+      author: 'YYC³',
+      category: 'analytics',
+      type: 'api',
+      capabilities: ['page-tracking', 'event-tracking', 'user-analytics', 'conversion-tracking'],
+      permissions: ['analytics:read', 'analytics:write'],
+      endpoints: {
+        api: 'https://analyticsreporting.googleapis.com/v4',
+        data: 'https://www.googleapis.com/analytics/v3/data'
+      },
+      authentication: {
+        type: 'oauth2',
+        authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+        tokenUrl: 'https://oauth2.googleapis.com/token',
+        scopes: ['https://www.googleapis.com/auth/analytics.readonly']
+      },
+      compatibility: {
+        minVersion: '1.0.0',
+        maxVersion: '2.0.0'
+      }
+    };
+  }
+
+  private createStripeIntegration(): IntegrationManifest {
+    return {
+      id: 'stripe-integration',
+      name: 'Stripe Integration',
+      version: '1.0.0',
+      description: 'Stripe integration for payment processing',
+      author: 'YYC³',
+      category: 'productivity',
+      type: 'api',
+      capabilities: ['payments', 'subscriptions', 'invoices', 'customers'],
+      permissions: ['payments:read', 'payments:write', 'customers:read'],
+      endpoints: {
+        api: 'https://api.stripe.com/v1',
+        webhook: 'https://api.stripe.com/v1/webhooks'
+      },
+      authentication: {
+        type: 'api-key'
+      },
+      compatibility: {
+        minVersion: '1.0.0',
+        maxVersion: '2.0.0'
+      }
+    };
   }
 
   registerIntegration(manifest: IntegrationManifest): void {

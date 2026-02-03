@@ -134,226 +134,254 @@ export class PluginMarketplace extends EventEmitter {
    */
   private initializeSamplePlugins(): void {
     const samplePlugins = [
-      {
-        id: 'analytics-dashboard',
-        metadata: {
-          id: 'analytics-dashboard',
-          name: 'Analytics Dashboard',
-          version: '1.2.0',
-          description: 'Advanced analytics dashboard with real-time metrics',
-          author: 'YYC³ Team',
-          keywords: ['analytics', 'dashboard', 'metrics', 'data'],
-          license: 'MIT',
-          capabilities: ['ui:render', 'data:read'],
-          main: './dist/index.js',
-          hooks: []
-        },
-        category: PluginCategory.ANALYTICS,
-        icon: '📊',
-        rating: {
-          average: 4.8,
-          count: 152,
-          distribution: { 1: 2, 2: 3, 3: 10, 4: 35, 5: 102 }
-        },
-        stats: {
-          downloads: 5420,
-          activeInstalls: 3200,
-          weeklyDownloads: 180,
-          monthlyDownloads: 720
-        },
-        publishedAt: new Date('2025-06-15'),
-        updatedAt: new Date('2026-01-10'),
-        featured: true,
-        verified: true
-      },
-      {
-        id: 'test-plugin',
-        metadata: {
-          id: 'test-plugin',
-          name: 'Test Plugin',
-          version: '2.0.0',
-          description: 'Plugin for testing',
-          author: 'Test',
-          keywords: ['test', 'ml', 'ai'],
-          license: 'MIT',
-          main: './dist/index.js',
-          hooks: []
-        },
-        category: PluginCategory.DEVELOPMENT,
-        rating: {
-          average: 5.0,
-          count: 1,
-          distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
-        },
-        stats: {
-          downloads: 100,
-          activeInstalls: 50,
-          weeklyDownloads: 10,
-          monthlyDownloads: 40
-        },
-        publishedAt: new Date('2026-01-01'),
-        updatedAt: new Date('2026-01-20'),
-        verified: true
-      },
-      {
-        id: 'hot-reload-plugin',
-        metadata: {
-          id: 'hot-reload-plugin',
-          name: 'Hot Reload Plugin',
-          version: '1.0.0',
-          description: 'Plugin for hot reload testing',
-          author: 'Test',
-          keywords: ['test', 'reload'],
-          license: 'MIT',
-          main: './dist/index.js',
-          hooks: []
-        },
-        category: PluginCategory.DEVELOPMENT,
-        rating: {
-          average: 5.0,
-          count: 1,
-          distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
-        },
-        stats: {
-          downloads: 50,
-          activeInstalls: 25,
-          weeklyDownloads: 5,
-          monthlyDownloads: 20
-        },
-        publishedAt: new Date('2026-01-01'),
-        updatedAt: new Date('2026-01-20'),
-        verified: true
-      },
-      {
-        id: 'child-plugin',
-        metadata: {
-          id: 'child-plugin',
-          name: 'Child Plugin',
-          version: '1.0.0',
-          description: 'Child plugin for dependency testing',
-          author: 'Test',
-          keywords: ['test', 'dependency'],
-          license: 'MIT',
-          main: './dist/index.js',
-          hooks: []
-        },
-        category: PluginCategory.DEVELOPMENT,
-        rating: {
-          average: 5.0,
-          count: 1,
-          distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
-        },
-        stats: {
-          downloads: 50,
-          activeInstalls: 25,
-          weeklyDownloads: 5,
-          monthlyDownloads: 20
-        },
-        publishedAt: new Date('2026-01-01'),
-        updatedAt: new Date('2026-01-20'),
-        verified: true
-      },
-      {
-        id: 'parent-plugin',
-        metadata: {
-          id: 'parent-plugin',
-          name: 'Parent Plugin',
-          version: '1.0.0',
-          description: 'Parent plugin for dependency testing',
-          author: 'Test',
-          keywords: ['test', 'dependency'],
-          license: 'MIT',
-          main: './dist/index.js',
-          hooks: [],
-          dependencies: {
-            'child-plugin': '^1.0.0'
-          }
-        },
-        category: PluginCategory.DEVELOPMENT,
-        rating: {
-          average: 5.0,
-          count: 1,
-          distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
-        },
-        stats: {
-          downloads: 50,
-          activeInstalls: 25,
-          weeklyDownloads: 5,
-          monthlyDownloads: 20
-        },
-        publishedAt: new Date('2026-01-01'),
-        updatedAt: new Date('2026-01-20'),
-        verified: true
-      },
-      {
-        id: 'plugin-1',
-        metadata: {
-          id: 'plugin-1',
-          name: 'Plugin 1',
-          version: '1.0.0',
-          description: 'Plugin for circular dependency testing',
-          author: 'Test',
-          keywords: ['test'],
-          license: 'MIT',
-          main: './dist/index.js',
-          hooks: [],
-          dependencies: {
-            'plugin-2': '^1.0.0'
-          }
-        },
-        category: PluginCategory.DEVELOPMENT,
-        rating: {
-          average: 5.0,
-          count: 1,
-          distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
-        },
-        stats: {
-          downloads: 10,
-          activeInstalls: 5,
-          weeklyDownloads: 1,
-          monthlyDownloads: 4
-        },
-        publishedAt: new Date('2026-01-01'),
-        updatedAt: new Date('2026-01-20'),
-        verified: true
-      },
-      {
-        id: 'plugin-2',
-        metadata: {
-          id: 'plugin-2',
-          name: 'Plugin 2',
-          version: '1.0.0',
-          description: 'Plugin for circular dependency testing',
-          author: 'Test',
-          keywords: ['test'],
-          license: 'MIT',
-          main: './dist/index.js',
-          hooks: [],
-          dependencies: {
-            'plugin-1': '^1.0.0'
-          }
-        },
-        category: PluginCategory.DEVELOPMENT,
-        rating: {
-          average: 5.0,
-          count: 1,
-          distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
-        },
-        stats: {
-          downloads: 10,
-          activeInstalls: 5,
-          weeklyDownloads: 1,
-          monthlyDownloads: 4
-        },
-        publishedAt: new Date('2026-01-01'),
-        updatedAt: new Date('2026-01-20'),
-        verified: true
-      }
+      this.createAnalyticsDashboardPlugin(),
+      this.createTestPlugin('test-plugin'),
+      this.createHotReloadPlugin(),
+      this.createChildPlugin(),
+      this.createParentPlugin(),
+      this.createPlugin1(),
+      this.createPlugin2()
     ];
 
     for (const plugin of samplePlugins) {
       this.plugins.set(plugin.id, plugin as any);
     }
+  }
+
+  private createAnalyticsDashboardPlugin() {
+    return {
+      id: 'analytics-dashboard',
+      metadata: {
+        id: 'analytics-dashboard',
+        name: 'Analytics Dashboard',
+        version: '1.2.0',
+        description: 'Advanced analytics dashboard with real-time metrics',
+        author: 'YYC³ Team',
+        keywords: ['analytics', 'dashboard', 'metrics', 'data'],
+        license: 'MIT',
+        capabilities: ['ui:render', 'data:read'],
+        main: './dist/index.js',
+        hooks: []
+      },
+      category: PluginCategory.ANALYTICS,
+      icon: '📊',
+      rating: {
+        average: 4.8,
+        count: 152,
+        distribution: { 1: 2, 2: 3, 3: 10, 4: 35, 5: 102 }
+      },
+      stats: {
+        downloads: 5420,
+        activeInstalls: 3200,
+        weeklyDownloads: 180,
+        monthlyDownloads: 720
+      },
+      publishedAt: new Date('2025-06-15'),
+      updatedAt: new Date('2026-01-10'),
+      featured: true,
+      verified: true
+    };
+  }
+
+  private createTestPlugin(id: string) {
+    return {
+      id,
+      metadata: {
+        id,
+        name: 'Test Plugin',
+        version: '2.0.0',
+        description: 'Plugin for testing',
+        author: 'Test',
+        keywords: ['test', 'ml', 'ai'],
+        license: 'MIT',
+        main: './dist/index.js',
+        hooks: []
+      },
+      category: PluginCategory.DEVELOPMENT,
+      rating: {
+        average: 5.0,
+        count: 1,
+        distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
+      },
+      stats: {
+        downloads: 100,
+        activeInstalls: 50,
+        weeklyDownloads: 10,
+        monthlyDownloads: 40
+      },
+      publishedAt: new Date('2026-01-01'),
+      updatedAt: new Date('2026-01-20'),
+      verified: true
+    };
+  }
+
+  private createHotReloadPlugin() {
+    return {
+      id: 'hot-reload-plugin',
+      metadata: {
+        id: 'hot-reload-plugin',
+        name: 'Hot Reload Plugin',
+        version: '1.0.0',
+        description: 'Plugin for hot reload testing',
+        author: 'Test',
+        keywords: ['test', 'reload'],
+        license: 'MIT',
+        main: './dist/index.js',
+        hooks: []
+      },
+      category: PluginCategory.DEVELOPMENT,
+      rating: {
+        average: 5.0,
+        count: 1,
+        distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
+      },
+      stats: {
+        downloads: 50,
+        activeInstalls: 25,
+        weeklyDownloads: 5,
+        monthlyDownloads: 20
+      },
+      publishedAt: new Date('2026-01-01'),
+      updatedAt: new Date('2026-01-20'),
+      verified: true
+    };
+  }
+
+  private createChildPlugin() {
+    return {
+      id: 'child-plugin',
+      metadata: {
+        id: 'child-plugin',
+        name: 'Child Plugin',
+        version: '1.0.0',
+        description: 'Child plugin for dependency testing',
+        author: 'Test',
+        keywords: ['test', 'dependency'],
+        license: 'MIT',
+        main: './dist/index.js',
+        hooks: []
+      },
+      category: PluginCategory.DEVELOPMENT,
+      rating: {
+        average: 5.0,
+        count: 1,
+        distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
+      },
+      stats: {
+        downloads: 50,
+        activeInstalls: 25,
+        weeklyDownloads: 5,
+        monthlyDownloads: 20
+      },
+      publishedAt: new Date('2026-01-01'),
+      updatedAt: new Date('2026-01-20'),
+      verified: true
+    };
+  }
+
+  private createParentPlugin() {
+    return {
+      id: 'parent-plugin',
+      metadata: {
+        id: 'parent-plugin',
+        name: 'Parent Plugin',
+        version: '1.0.0',
+        description: 'Parent plugin for dependency testing',
+        author: 'Test',
+        keywords: ['test', 'dependency'],
+        license: 'MIT',
+        main: './dist/index.js',
+        hooks: [],
+        dependencies: {
+          'child-plugin': '^1.0.0'
+        }
+      },
+      category: PluginCategory.DEVELOPMENT,
+      rating: {
+        average: 5.0,
+        count: 1,
+        distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
+      },
+      stats: {
+        downloads: 50,
+        activeInstalls: 25,
+        weeklyDownloads: 5,
+        monthlyDownloads: 20
+      },
+      publishedAt: new Date('2026-01-01'),
+      updatedAt: new Date('2026-01-20'),
+      verified: true
+    };
+  }
+
+  private createPlugin1() {
+    return {
+      id: 'plugin-1',
+      metadata: {
+        id: 'plugin-1',
+        name: 'Plugin 1',
+        version: '1.0.0',
+        description: 'Plugin for circular dependency testing',
+        author: 'Test',
+        keywords: ['test'],
+        license: 'MIT',
+        main: './dist/index.js',
+        hooks: [],
+        dependencies: {
+          'plugin-2': '^1.0.0'
+        }
+      },
+      category: PluginCategory.DEVELOPMENT,
+      rating: {
+        average: 5.0,
+        count: 1,
+        distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
+      },
+      stats: {
+        downloads: 10,
+        activeInstalls: 5,
+        weeklyDownloads: 1,
+        monthlyDownloads: 4
+      },
+      publishedAt: new Date('2026-01-01'),
+      updatedAt: new Date('2026-01-20'),
+      verified: true
+    };
+  }
+
+  private createPlugin2() {
+    return {
+      id: 'plugin-2',
+      metadata: {
+        id: 'plugin-2',
+        name: 'Plugin 2',
+        version: '1.0.0',
+        description: 'Plugin for circular dependency testing',
+        author: 'Test',
+        keywords: ['test'],
+        license: 'MIT',
+        main: './dist/index.js',
+        hooks: [],
+        dependencies: {
+          'plugin-1': '^1.0.0'
+        }
+      },
+      category: PluginCategory.DEVELOPMENT,
+      rating: {
+        average: 5.0,
+        count: 1,
+        distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 1 }
+      },
+      stats: {
+        downloads: 10,
+        activeInstalls: 5,
+        weeklyDownloads: 1,
+        monthlyDownloads: 4
+      },
+      publishedAt: new Date('2026-01-01'),
+      updatedAt: new Date('2026-01-20'),
+      verified: true
+    };
   }
 
   /**

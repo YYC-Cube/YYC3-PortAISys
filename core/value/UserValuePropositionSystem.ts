@@ -123,241 +123,229 @@ export class UserValuePropositionSystem extends EventEmitter {
 
   private initializeDefaultPropositions(): void {
     const defaultPropositions: UserValueProposition[] = [
-      {
-        id: 'productivity-boost',
-        name: '生产力提升',
-        description: '通过智能AI助手提升用户工作效率',
-        category: 'productivity',
-        priority: 'high',
-        metrics: {
-          adoptionRate: 0,
-          satisfactionScore: 0,
-          retentionRate: 0,
-          npsScore: 0,
-          timeToValue: 0,
-          roi: 0,
-          usageFrequency: 0,
-          featureUtilization: 0
-        },
-        targetAudience: ['知识工作者', '开发者', '分析师', '管理者'],
-        benefits: [
-          '自动化重复性任务',
-          '智能内容生成',
-          '快速信息检索',
-          '多语言支持',
-          '实时协作'
-        ],
-        painPoints: [
-          '信息过载',
-          '重复性工作',
-          '沟通效率低',
-          '知识管理困难',
-          '跨语言障碍'
-        ],
-        solutions: [
-          'AI驱动的自动化',
-          '智能搜索和推荐',
-          '自然语言交互',
-          '多模态输入输出',
-          '实时翻译'
-        ],
-        differentiation: [
-          '行业领先的AI模型',
-          '高度可定制的界面',
-          '无缝集成能力',
-          '企业级安全保障',
-          '持续学习能力'
-        ]
-      },
-      {
-        id: 'cost-reduction',
-        name: '成本降低',
-        description: '通过自动化和优化降低运营成本',
-        category: 'cost-saving',
-        priority: 'high',
-        metrics: {
-          adoptionRate: 0,
-          satisfactionScore: 0,
-          retentionRate: 0,
-          npsScore: 0,
-          timeToValue: 0,
-          roi: 0,
-          usageFrequency: 0,
-          featureUtilization: 0
-        },
-        targetAudience: ['中小企业', '初创公司', '自由职业者'],
-        benefits: [
-          '减少人力成本',
-          '降低培训成本',
-          '优化资源利用',
-          '减少错误成本',
-          '提高投资回报'
-        ],
-        painPoints: [
-          '高昂的人力成本',
-          '培训周期长',
-          '资源浪费',
-          '错误率高',
-          'ROI不明确'
-        ],
-        solutions: [
-          '自动化工作流程',
-          '智能培训系统',
-          '资源优化算法',
-          '错误检测和预防',
-          'ROI分析工具'
-        ],
-        differentiation: [
-          '快速部署',
-          '按需付费',
-          '透明定价',
-          '灵活扩展',
-          '详细分析报告'
-        ]
-      },
-      {
-        id: 'innovation-enablement',
-        name: '创新赋能',
-        description: '提供AI能力支持用户创新',
-        category: 'innovation',
-        priority: 'medium',
-        metrics: {
-          adoptionRate: 0,
-          satisfactionScore: 0,
-          retentionRate: 0,
-          npsScore: 0,
-          timeToValue: 0,
-          roi: 0,
-          usageFrequency: 0,
-          featureUtilization: 0
-        },
-        targetAudience: ['创新团队', '产品经理', '设计师', '研究人员'],
-        benefits: [
-          '快速原型开发',
-          '创意生成辅助',
-          '趋势分析',
-          '用户洞察',
-          'A/B测试支持'
-        ],
-        painPoints: [
-          '创意瓶颈',
-          '开发周期长',
-          '市场不确定性',
-          '用户反馈收集困难',
-          '测试成本高'
-        ],
-        solutions: [
-          'AI辅助设计',
-          '快速原型工具',
-          '市场趋势分析',
-          '用户反馈分析',
-          '自动化测试'
-        ],
-        differentiation: [
-          '多模态AI能力',
-          '实时协作',
-          '版本控制集成',
-          '设计系统支持',
-          '分析可视化'
-        ]
-      },
-      {
-        id: 'quality-improvement',
-        name: '质量提升',
-        description: '通过AI提升工作质量和准确性',
-        category: 'quality',
-        priority: 'high',
-        metrics: {
-          adoptionRate: 0,
-          satisfactionScore: 0,
-          retentionRate: 0,
-          npsScore: 0,
-          timeToValue: 0,
-          roi: 0,
-          usageFrequency: 0,
-          featureUtilization: 0
-        },
-        targetAudience: ['质量控制团队', '内容创作者', '数据分析师', '合规部门'],
-        benefits: [
-          '提高准确性',
-          '减少错误',
-          '标准化输出',
-          '自动化检查',
-          '持续改进'
-        ],
-        painPoints: [
-          '人为错误',
-          '质量不一致',
-          '检查耗时',
-          '标准难以执行',
-          '改进缓慢'
-        ],
-        solutions: [
-          'AI质量检查',
-          '自动化验证',
-          '标准化模板',
-          '实时监控',
-          '持续学习'
-        ],
-        differentiation: [
-          '高精度AI模型',
-          '可配置规则',
-          '审计追踪',
-          '合规支持',
-          '详细报告'
-        ]
-      },
-      {
-        id: 'experience-enhancement',
-        name: '体验优化',
-        description: '提供卓越的用户体验',
-        category: 'experience',
-        priority: 'high',
-        metrics: {
-          adoptionRate: 0,
-          satisfactionScore: 0,
-          retentionRate: 0,
-          npsScore: 0,
-          timeToValue: 0,
-          roi: 0,
-          usageFrequency: 0,
-          featureUtilization: 0
-        },
-        targetAudience: ['所有用户'],
-        benefits: [
-          '直观的界面',
-          '快速响应',
-          '个性化体验',
-          '无缝集成',
-          '多设备支持'
-        ],
-        painPoints: [
-          '学习曲线陡峭',
-          '响应速度慢',
-          '缺乏个性化',
-          '集成困难',
-          '设备限制'
-        ],
-        solutions: [
-          '简洁的UI设计',
-          '性能优化',
-          'AI个性化',
-          '开放API',
-          '响应式设计'
-        ],
-        differentiation: [
-          '自适应界面',
-          '智能推荐',
-          '上下文感知',
-          '流畅动画',
-          '无障碍支持'
-        ]
-      }
+      this.createProductivityBoostProposition(),
+      this.createCostReductionProposition(),
+      this.createInnovationEnablementProposition(),
+      this.createQualityImprovementProposition(),
+      this.createExperienceEnhancementProposition()
     ];
 
     defaultPropositions.forEach(proposition => {
       this.propositions.set(proposition.id, proposition);
     });
+  }
+
+  private createProductivityBoostProposition(): UserValueProposition {
+    return {
+      id: 'productivity-boost',
+      name: '生产力提升',
+      description: '通过智能AI助手提升用户工作效率',
+      category: 'productivity',
+      priority: 'high',
+      metrics: this.getDefaultMetrics(),
+      targetAudience: ['知识工作者', '开发者', '分析师', '管理者'],
+      benefits: [
+        '自动化重复性任务',
+        '智能内容生成',
+        '快速信息检索',
+        '多语言支持',
+        '实时协作'
+      ],
+      painPoints: [
+        '信息过载',
+        '重复性工作',
+        '沟通效率低',
+        '知识管理困难',
+        '跨语言障碍'
+      ],
+      solutions: [
+        'AI驱动的自动化',
+        '智能搜索和推荐',
+        '自然语言交互',
+        '多模态输入输出',
+        '实时翻译'
+      ],
+      differentiation: [
+        '行业领先的AI模型',
+        '高度可定制的界面',
+        '无缝集成能力',
+        '企业级安全保障',
+        '持续学习能力'
+      ]
+    };
+  }
+
+  private createCostReductionProposition(): UserValueProposition {
+    return {
+      id: 'cost-reduction',
+      name: '成本降低',
+      description: '通过自动化和优化降低运营成本',
+      category: 'cost-saving',
+      priority: 'high',
+      metrics: this.getDefaultMetrics(),
+      targetAudience: ['中小企业', '初创公司', '自由职业者'],
+      benefits: [
+        '减少人力成本',
+        '降低培训成本',
+        '优化资源利用',
+        '减少错误成本',
+        '提高投资回报'
+      ],
+      painPoints: [
+        '高昂的人力成本',
+        '培训周期长',
+        '资源浪费',
+        '错误率高',
+        'ROI不明确'
+      ],
+      solutions: [
+        '自动化工作流程',
+        '智能培训系统',
+        '资源优化算法',
+        '错误检测和预防',
+        'ROI分析工具'
+      ],
+      differentiation: [
+        '快速部署',
+        '按需付费',
+        '透明定价',
+        '灵活扩展',
+        '详细分析报告'
+      ]
+    };
+  }
+
+  private createInnovationEnablementProposition(): UserValueProposition {
+    return {
+      id: 'innovation-enablement',
+      name: '创新赋能',
+      description: '提供AI能力支持用户创新',
+      category: 'innovation',
+      priority: 'medium',
+      metrics: this.getDefaultMetrics(),
+      targetAudience: ['创新团队', '产品经理', '设计师', '研究人员'],
+      benefits: [
+        '快速原型开发',
+        '创意生成辅助',
+        '趋势分析',
+        '用户洞察',
+        'A/B测试支持'
+      ],
+      painPoints: [
+        '创意瓶颈',
+        '开发周期长',
+        '市场不确定性',
+        '用户反馈收集困难',
+        '测试成本高'
+      ],
+      solutions: [
+        'AI辅助设计',
+        '快速原型工具',
+        '市场趋势分析',
+        '用户反馈分析',
+        '自动化测试'
+      ],
+      differentiation: [
+        '多模态AI能力',
+        '实时协作',
+        '版本控制集成',
+        '设计系统支持',
+        '分析可视化'
+      ]
+    };
+  }
+
+  private createQualityImprovementProposition(): UserValueProposition {
+    return {
+      id: 'quality-improvement',
+      name: '质量提升',
+      description: '通过AI提升工作质量和准确性',
+      category: 'quality',
+      priority: 'high',
+      metrics: this.getDefaultMetrics(),
+      targetAudience: ['质量控制团队', '内容创作者', '数据分析师', '合规部门'],
+      benefits: [
+        '提高准确性',
+        '减少错误',
+        '标准化输出',
+        '自动化检查',
+        '持续改进'
+      ],
+      painPoints: [
+        '人为错误',
+        '质量不一致',
+        '检查耗时',
+        '标准难以执行',
+        '改进缓慢'
+      ],
+      solutions: [
+        'AI质量检查',
+        '自动化验证',
+        '标准化模板',
+        '实时监控',
+        '持续学习'
+      ],
+      differentiation: [
+        '高精度AI模型',
+        '可配置规则',
+        '审计追踪',
+        '合规支持',
+        '详细报告'
+      ]
+    };
+  }
+
+  private createExperienceEnhancementProposition(): UserValueProposition {
+    return {
+      id: 'experience-enhancement',
+      name: '体验优化',
+      description: '提供卓越的用户体验',
+      category: 'experience',
+      priority: 'high',
+      metrics: this.getDefaultMetrics(),
+      targetAudience: ['所有用户'],
+      benefits: [
+        '直观的界面',
+        '快速响应',
+        '个性化体验',
+        '无缝集成',
+        '多设备支持'
+      ],
+      painPoints: [
+        '学习曲线陡峭',
+        '响应速度慢',
+        '缺乏个性化',
+        '集成困难',
+        '设备限制'
+      ],
+      solutions: [
+        '简洁的UI设计',
+        '性能优化',
+        'AI个性化',
+        '开放API',
+        '响应式设计'
+      ],
+      differentiation: [
+        '自适应界面',
+        '智能推荐',
+        '上下文感知',
+        '流畅动画',
+        '无障碍支持'
+      ]
+    };
+  }
+
+  private getDefaultMetrics() {
+    return {
+      adoptionRate: 0,
+      satisfactionScore: 0,
+      retentionRate: 0,
+      npsScore: 0,
+      timeToValue: 0,
+      roi: 0,
+      usageFrequency: 0,
+      featureUtilization: 0
+    };
   }
 
   private initializeUserSegments(): void {
