@@ -393,138 +393,12 @@ export class AutoScalingManager {
     currentInstances: number,
     predictedMetrics?: ServiceMetrics
   ): ScalingAction {
-    let shouldScaleUp = false;
-    let shouldScaleDown = false;
-    let reasons: string[] = [];
+    const reasons: string[] = [];
+    const shouldScaleUp = this.checkScaleUpConditions(currentMetrics, predictedMetrics, config, reasons);
+    const shouldScaleDown = this.checkScaleDownConditions(currentMetrics, predictedMetrics, config, reasons);
 
-    // 检查扩容条件
-    if (config.scalingRules.cpuThreshold && currentMetrics.cpuUsage > config.scalingRules.cpuThreshold) {
-      shouldScaleUp = true;
-      reasons.push(`CPU usage (${currentMetrics.cpuUsage.toFixed(2)}%) exceeds threshold (${config.scalingRules.cpuThreshold}%)`);
-    }
-
-    if (config.scalingRules.memoryThreshold && currentMetrics.memoryUsage > config.scalingRules.memoryThreshold) {
-      shouldScaleUp = true;
-      reasons.push(`Memory usage (${currentMetrics.memoryUsage.toFixed(2)}%) exceeds threshold (${config.scalingRules.memoryThreshold}%)`);
-    }
-
-    if (config.scalingRules.requestRateThreshold && currentMetrics.requestRate > config.scalingRules.requestRateThreshold) {
-      shouldScaleUp = true;
-      reasons.push(`Request rate (${currentMetrics.requestRate.toFixed(2)} req/s) exceeds threshold (${config.scalingRules.requestRateThreshold} req/s)`);
-    }
-
-    if (config.scalingRules.responseTimeThreshold && currentMetrics.responseTime > config.scalingRules.responseTimeThreshold) {
-      shouldScaleUp = true;
-      reasons.push(`Response time (${currentMetrics.responseTime.toFixed(2)}ms) exceeds threshold (${config.scalingRules.responseTimeThreshold}ms)`);
-    }
-
-    if (config.scalingRules.errorRateThreshold && currentMetrics.errorRate > config.scalingRules.errorRateThreshold) {
-      shouldScaleUp = true;
-      reasons.push(`Error rate (${currentMetrics.errorRate.toFixed(2)}%) exceeds threshold (${config.scalingRules.errorRateThreshold}%)`);
-    }
-
-    // 检查新的扩容条件
-    if (currentMetrics.diskIO > 80) {
-      shouldScaleUp = true;
-      reasons.push(`Disk IO usage (${currentMetrics.diskIO.toFixed(2)}%) exceeds threshold (80%)`);
-    }
-
-    if (currentMetrics.networkIO > 80) {
-      shouldScaleUp = true;
-      reasons.push(`Network IO usage (${currentMetrics.networkIO.toFixed(2)}%) exceeds threshold (80%)`);
-    }
-
-    if (currentMetrics.queueLength > 100) {
-      shouldScaleUp = true;
-      reasons.push(`Queue length (${currentMetrics.queueLength.toFixed(2)}) exceeds threshold (100)`);
-    }
-
-    // 检查预测性扩容条件
-    if (predictedMetrics) {
-      if (config.scalingRules.cpuThreshold && predictedMetrics.cpuUsage > config.scalingRules.cpuThreshold * 0.8) {
-        shouldScaleUp = true;
-        reasons.push(`Predicted CPU usage (${predictedMetrics.cpuUsage.toFixed(2)}%) will exceed threshold soon`);
-      }
-
-      if (config.scalingRules.requestRateThreshold && predictedMetrics.requestRate > config.scalingRules.requestRateThreshold * 0.8) {
-        shouldScaleUp = true;
-        reasons.push(`Predicted request rate (${predictedMetrics.requestRate.toFixed(2)} req/s) will exceed threshold soon`);
-      }
-
-      // 检查新的预测性扩容条件
-      if (predictedMetrics.diskIO > 70) {
-        shouldScaleUp = true;
-        reasons.push(`Predicted disk IO usage (${predictedMetrics.diskIO.toFixed(2)}%) will exceed threshold soon`);
-      }
-
-      if (predictedMetrics.networkIO > 70) {
-        shouldScaleUp = true;
-        reasons.push(`Predicted network IO usage (${predictedMetrics.networkIO.toFixed(2)}%) will exceed threshold soon`);
-      }
-
-      if (predictedMetrics.queueLength > 80) {
-        shouldScaleUp = true;
-        reasons.push(`Predicted queue length (${predictedMetrics.queueLength.toFixed(2)}) will exceed threshold soon`);
-      }
-    }
-
-    // 检查缩容条件
-    const scaleDownThresholdFactor = 0.7; // 缩容阈值因子
-
-    if (config.scalingRules.cpuThreshold && currentMetrics.cpuUsage < config.scalingRules.cpuThreshold * scaleDownThresholdFactor) {
-      shouldScaleDown = true;
-      reasons.push(`CPU usage (${currentMetrics.cpuUsage.toFixed(2)}%) is below scaling down threshold (${(config.scalingRules.cpuThreshold * scaleDownThresholdFactor).toFixed(2)}%)`);
-    }
-
-    if (config.scalingRules.memoryThreshold && currentMetrics.memoryUsage < config.scalingRules.memoryThreshold * scaleDownThresholdFactor) {
-      shouldScaleDown = true;
-      reasons.push(`Memory usage (${currentMetrics.memoryUsage.toFixed(2)}%) is below scaling down threshold (${(config.scalingRules.memoryThreshold * scaleDownThresholdFactor).toFixed(2)}%)`);
-    }
-
-    if (config.scalingRules.requestRateThreshold && currentMetrics.requestRate < config.scalingRules.requestRateThreshold * scaleDownThresholdFactor) {
-      shouldScaleDown = true;
-      reasons.push(`Request rate (${currentMetrics.requestRate.toFixed(2)} req/s) is below scaling down threshold (${(config.scalingRules.requestRateThreshold * scaleDownThresholdFactor).toFixed(2)} req/s)`);
-    }
-
-    // 检查新的缩容条件
-    if (currentMetrics.diskIO < 30 && currentMetrics.networkIO < 30 && currentMetrics.queueLength < 20) {
-      shouldScaleDown = true;
-      reasons.push(`System resources usage is low (diskIO: ${currentMetrics.diskIO.toFixed(2)}%, networkIO: ${currentMetrics.networkIO.toFixed(2)}%, queueLength: ${currentMetrics.queueLength.toFixed(2)})`);
-    }
-
-    // 检查预测性缩容条件
-    if (predictedMetrics) {
-      if (config.scalingRules.cpuThreshold && predictedMetrics.cpuUsage < config.scalingRules.cpuThreshold * scaleDownThresholdFactor * 0.8) {
-        shouldScaleDown = true;
-        reasons.push(`Predicted CPU usage (${predictedMetrics.cpuUsage.toFixed(2)}%) will remain low`);
-      }
-
-      if (config.scalingRules.requestRateThreshold && predictedMetrics.requestRate < config.scalingRules.requestRateThreshold * scaleDownThresholdFactor * 0.8) {
-        shouldScaleDown = true;
-        reasons.push(`Predicted request rate (${predictedMetrics.requestRate.toFixed(2)} req/s) will remain low`);
-      }
-
-      // 检查新的预测性缩容条件
-      if (predictedMetrics.diskIO < 25 && predictedMetrics.networkIO < 25 && predictedMetrics.queueLength < 15) {
-        shouldScaleDown = true;
-        reasons.push(`Predicted system resources usage will remain low`);
-      }
-    }
-
-    // 确定扩缩容操作
-    let action: 'scale_up' | 'scale_down' | 'no_action' = 'no_action';
-    let targetInstances = currentInstances;
-
-    if (shouldScaleUp && currentInstances < config.maxInstances) {
-      action = 'scale_up';
-      // 基于负载增加适当数量的实例
-      const scaleFactor = this.calculateScaleFactor(currentMetrics, config);
-      targetInstances = Math.min(currentInstances + Math.max(1, Math.floor(scaleFactor)), config.maxInstances);
-    } else if (shouldScaleDown && currentInstances > config.minInstances) {
-      action = 'scale_down';
-      targetInstances = Math.max(currentInstances - 1, config.minInstances);
-    }
-
+    const action = this.determineScalingAction(shouldScaleUp, shouldScaleDown, currentInstances, config);
+    const targetInstances = this.calculateTargetInstances(action, currentInstances, config, currentMetrics);
     const metrics = predictedMetrics ? [currentMetrics, predictedMetrics] : [currentMetrics];
 
     return {
@@ -536,6 +410,211 @@ export class AutoScalingManager {
       metrics,
       timestamp: Date.now()
     };
+  }
+
+  private checkScaleUpConditions(
+    currentMetrics: ServiceMetrics,
+    predictedMetrics?: ServiceMetrics,
+    config?: AutoScalingConfig,
+    reasons?: string[]
+  ): boolean {
+    let shouldScaleUp = this.checkConfigThresholds(currentMetrics, config, reasons);
+    shouldScaleUp = this.checkAdditionalMetrics(currentMetrics, reasons) || shouldScaleUp;
+
+    if (predictedMetrics && config) {
+      shouldScaleUp = this.checkPredictiveScaleUpConditions(predictedMetrics, config, reasons) || shouldScaleUp;
+    }
+
+    return shouldScaleUp;
+  }
+
+  private checkConfigThresholds(
+    metrics: ServiceMetrics,
+    config?: AutoScalingConfig,
+    reasons?: string[]
+  ): boolean {
+    let shouldScaleUp = false;
+    const rules = config?.scalingRules;
+
+    if (rules?.cpuThreshold && metrics.cpuUsage > rules.cpuThreshold) {
+      shouldScaleUp = true;
+      reasons?.push(`CPU usage (${metrics.cpuUsage.toFixed(2)}%) exceeds threshold`);
+    }
+
+    if (rules?.memoryThreshold && metrics.memoryUsage > rules.memoryThreshold) {
+      shouldScaleUp = true;
+      reasons?.push(`Memory usage exceeds threshold`);
+    }
+
+    if (rules?.requestRateThreshold && metrics.requestRate > rules.requestRateThreshold) {
+      shouldScaleUp = true;
+      reasons?.push(`Request rate exceeds threshold`);
+    }
+
+    if (rules?.responseTimeThreshold && metrics.responseTime > rules.responseTimeThreshold) {
+      shouldScaleUp = true;
+      reasons?.push(`Response time exceeds threshold`);
+    }
+
+    if (rules?.errorRateThreshold && metrics.errorRate > rules.errorRateThreshold) {
+      shouldScaleUp = true;
+      reasons?.push(`Error rate exceeds threshold`);
+    }
+
+    return shouldScaleUp;
+  }
+
+  private checkAdditionalMetrics(
+    metrics: ServiceMetrics,
+    reasons?: string[]
+  ): boolean {
+    let shouldScaleUp = false;
+
+    if (metrics.diskIO > 80) {
+      shouldScaleUp = true;
+      reasons?.push(`Disk IO usage exceeds 80%`);
+    }
+
+    if (metrics.networkIO > 80) {
+      shouldScaleUp = true;
+      reasons?.push(`Network IO usage exceeds 80%`);
+    }
+
+    if (metrics.queueLength > 100) {
+      shouldScaleUp = true;
+      reasons?.push(`Queue length exceeds 100`);
+    }
+
+    return shouldScaleUp;
+  }
+
+  private checkPredictiveScaleUpConditions(
+    predictedMetrics: ServiceMetrics,
+    config: AutoScalingConfig,
+    reasons?: string[]
+  ): boolean {
+    let shouldScaleUp = false;
+
+    if (config.scalingRules.cpuThreshold && predictedMetrics.cpuUsage > config.scalingRules.cpuThreshold * 0.8) {
+      shouldScaleUp = true;
+      reasons?.push(`Predicted CPU usage (${predictedMetrics.cpuUsage.toFixed(2)}%) will exceed threshold soon`);
+    }
+
+    if (config.scalingRules.requestRateThreshold && predictedMetrics.requestRate > config.scalingRules.requestRateThreshold * 0.8) {
+      shouldScaleUp = true;
+      reasons?.push(`Predicted request rate (${predictedMetrics.requestRate.toFixed(2)} req/s) will exceed threshold soon`);
+    }
+
+    if (predictedMetrics.diskIO > 70) {
+      shouldScaleUp = true;
+      reasons?.push(`Predicted disk IO usage (${predictedMetrics.diskIO.toFixed(2)}%) will exceed threshold soon`);
+    }
+
+    if (predictedMetrics.networkIO > 70) {
+      shouldScaleUp = true;
+      reasons?.push(`Predicted network IO usage (${predictedMetrics.networkIO.toFixed(2)}%) will exceed threshold soon`);
+    }
+
+    if (predictedMetrics.queueLength > 80) {
+      shouldScaleUp = true;
+      reasons?.push(`Predicted queue length (${predictedMetrics.queueLength.toFixed(2)}) will exceed threshold soon`);
+    }
+
+    return shouldScaleUp;
+  }
+
+  private checkScaleDownConditions(
+    currentMetrics: ServiceMetrics,
+    predictedMetrics?: ServiceMetrics,
+    config?: AutoScalingConfig,
+    reasons?: string[]
+  ): boolean {
+    let shouldScaleDown = false;
+    const scaleDownThresholdFactor = 0.7;
+    const rules = config?.scalingRules;
+
+    if (rules?.cpuThreshold && currentMetrics.cpuUsage < rules.cpuThreshold * scaleDownThresholdFactor) {
+      shouldScaleDown = true;
+      reasons?.push(`CPU usage (${currentMetrics.cpuUsage.toFixed(2)}%) is below scaling down threshold`);
+    }
+
+    if (rules?.memoryThreshold && currentMetrics.memoryUsage < rules.memoryThreshold * scaleDownThresholdFactor) {
+      shouldScaleDown = true;
+      reasons?.push(`Memory usage (${currentMetrics.memoryUsage.toFixed(2)}%) is below scaling down threshold`);
+    }
+
+    if (rules?.requestRateThreshold && currentMetrics.requestRate < rules.requestRateThreshold * scaleDownThresholdFactor) {
+      shouldScaleDown = true;
+      reasons?.push(`Request rate (${currentMetrics.requestRate.toFixed(2)} req/s) is below scaling down threshold`);
+    }
+
+    if (currentMetrics.diskIO < 30 && currentMetrics.networkIO < 30 && currentMetrics.queueLength < 20) {
+      shouldScaleDown = true;
+      reasons?.push(`System resources usage is low`);
+    }
+
+    if (predictedMetrics && config) {
+      shouldScaleDown = this.checkPredictiveScaleDownConditions(predictedMetrics, config, reasons) || shouldScaleDown;
+    }
+
+    return shouldScaleDown;
+  }
+
+  private checkPredictiveScaleDownConditions(
+    predictedMetrics: ServiceMetrics,
+    config: AutoScalingConfig,
+    reasons?: string[]
+  ): boolean {
+    let shouldScaleDown = false;
+    const scaleDownThresholdFactor = 0.7;
+
+    if (config.scalingRules.cpuThreshold && predictedMetrics.cpuUsage < config.scalingRules.cpuThreshold * scaleDownThresholdFactor * 0.8) {
+      shouldScaleDown = true;
+      reasons?.push(`Predicted CPU usage (${predictedMetrics.cpuUsage.toFixed(2)}%) will remain low`);
+    }
+
+    if (config.scalingRules.requestRateThreshold && predictedMetrics.requestRate < config.scalingRules.requestRateThreshold * scaleDownThresholdFactor * 0.8) {
+      shouldScaleDown = true;
+      reasons?.push(`Predicted request rate (${predictedMetrics.requestRate.toFixed(2)} req/s) will remain low`);
+    }
+
+    if (predictedMetrics.diskIO < 25 && predictedMetrics.networkIO < 25 && predictedMetrics.queueLength < 15) {
+      shouldScaleDown = true;
+      reasons?.push(`Predicted system resources usage will remain low`);
+    }
+
+    return shouldScaleDown;
+  }
+
+  private determineScalingAction(
+    shouldScaleUp: boolean,
+    shouldScaleDown: boolean,
+    currentInstances: number,
+    config: AutoScalingConfig
+  ): 'scale_up' | 'scale_down' | 'no_action' {
+    if (shouldScaleUp && currentInstances < config.maxInstances) {
+      return 'scale_up';
+    }
+    if (shouldScaleDown && currentInstances > config.minInstances) {
+      return 'scale_down';
+    }
+    return 'no_action';
+  }
+
+  private calculateTargetInstances(
+    action: 'scale_up' | 'scale_down' | 'no_action',
+    currentInstances: number,
+    config: AutoScalingConfig,
+    currentMetrics: ServiceMetrics
+  ): number {
+    if (action === 'scale_up') {
+      const scaleFactor = this.calculateScaleFactor(currentMetrics, config);
+      return Math.min(currentInstances + Math.max(1, Math.floor(scaleFactor)), config.maxInstances);
+    }
+    if (action === 'scale_down') {
+      return Math.max(currentInstances - 1, config.minInstances);
+    }
+    return currentInstances;
   }
 
   /**
