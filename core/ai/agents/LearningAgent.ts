@@ -764,7 +764,7 @@ export class LearningAgent extends BaseAgent {
       try {
         this.addSample(sample)
         successful++
-      } catch (error) {
+      } catch (_error) {
         failed++
       }
     }

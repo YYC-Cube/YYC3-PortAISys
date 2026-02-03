@@ -647,7 +647,7 @@ class HealthChecker {
         status = 'degraded';
       }
 
-    } catch (error) {
+    } catch (_error) {
       status = 'unhealthy';
       score = 0;
     }

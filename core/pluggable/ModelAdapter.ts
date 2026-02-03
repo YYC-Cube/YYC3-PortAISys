@@ -406,7 +406,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
             if (content) {
               yield content;
             }
-          } catch (error) {
+          } catch (_error) {
             // Skip invalid JSON
           }
         }

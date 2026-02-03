@@ -562,7 +562,7 @@ export class ErrorHandlingSystem extends EventEmitter {
         this.emit('retry:attempt', errorInfo, attempt);
 
         return true;
-      } catch (error) {
+      } catch (_error) {
         if (attempt === strategy.maxAttempts) {
           return false;
         }

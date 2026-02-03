@@ -440,7 +440,7 @@ export class ModelRouter {
     for (const [key, adapter] of this.adapters) {
       try {
         healthStatus[key] = await adapter.healthCheck();
-      } catch (error) {
+      } catch (_error) {
         healthStatus[key] = false;
       }
     }

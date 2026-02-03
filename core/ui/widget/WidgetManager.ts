@@ -478,7 +478,7 @@ export class WidgetManager extends EventEmitter {
       const state = JSON.parse(stateJson) as WidgetState;
       this.loadState(state);
       this.emit('state:imported', state);
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Failed to import state: Invalid JSON format');
     }
   }

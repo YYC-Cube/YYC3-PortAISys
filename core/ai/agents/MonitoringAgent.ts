@@ -270,7 +270,7 @@ export class MonitoringAgent extends BaseAgent {
       this.monitoringInterval = setIntervalFn(() => {
         this.collectMetrics();
       }, interval);
-    } catch (e) {
+    } catch (_e) {
       // 如果 setInterval 失败，继续运行（已经收集了一次）
       return { success: true, interval, fallback: true };
     }

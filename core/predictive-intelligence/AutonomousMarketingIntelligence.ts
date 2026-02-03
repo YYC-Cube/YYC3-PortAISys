@@ -648,7 +648,7 @@ export class AutonomousMarketingIntelligence {
     };
   }
 
-  async generateContent(contentRequests: any[]): Promise<ContentGeneration> {
+  async generateContent(_contentRequests: any[]): Promise<ContentGeneration> {
     return {
       contentTypes: await this.defineContentTypes(),
       generationStrategies: await this.defineGenerationStrategies(),
@@ -657,7 +657,7 @@ export class AutonomousMarketingIntelligence {
     };
   }
 
-  async optimizePerformance(performanceData: any): Promise<PerformanceOptimization> {
+  async optimizePerformance(_performanceData: any): Promise<PerformanceOptimization> {
     return {
       keyPerformanceIndicators: await this.trackKPIs(),
       optimizationAlgorithms: await this.applyOptimizationAlgorithms(),
@@ -666,7 +666,7 @@ export class AutonomousMarketingIntelligence {
     };
   }
 
-  async manageBudget(budgetData: any): Promise<BudgetManagement> {
+  async manageBudget(_budgetData: any): Promise<BudgetManagement> {
     return {
       budgetAllocation: await this.allocateBudget(),
       spendOptimization: await this.optimizeSpend(),

@@ -360,7 +360,7 @@ export class AdaptiveRecoveryStrategy implements ErrorRecoveryStrategy {
       const result = await bestStrategy.recover(error);
       this.recordResult(strategyKey, result);
       return result;
-    } catch (recoveryError) {
+    } catch (_recoveryError) {
       this.recordResult(strategyKey, false);
       return false;
     }

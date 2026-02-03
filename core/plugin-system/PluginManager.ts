@@ -698,7 +698,7 @@ export class PluginManager extends EventEmitter {
   /**
    * 获取最新版本
    */
-  private async fetchLatestVersion(pluginId: string): Promise<string> {
+  private async fetchLatestVersion(_pluginId: string): Promise<string> {
     // 模拟API调用
     return '1.0.0';
   }
@@ -706,7 +706,7 @@ export class PluginManager extends EventEmitter {
   /**
    * 搜索插件
    */
-  async searchPlugins(query: string, filters?: {
+  async searchPlugins(_query: string, _filters?: {
     category?: string;
     tags?: string[];
     minRating?: number;

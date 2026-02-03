@@ -753,7 +753,7 @@ export class MultiModelManager extends EventEmitter {
           modelUsed: modelId,
           tokensUsed: result.tokensUsed || 10,
         };
-      } catch (error) {
+      } catch (_error) {
         continue;
       }
     }
@@ -817,7 +817,7 @@ export class MultiModelManager extends EventEmitter {
           quality,
           cost: this.estimateCost(model.provider, model.modelId, {}),
         });
-      } catch (error) {
+      } catch (_error) {
         results.push({
           provider: model.provider,
           modelId: model.modelId,

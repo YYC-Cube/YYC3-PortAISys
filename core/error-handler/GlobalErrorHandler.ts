@@ -409,7 +409,7 @@ export class GlobalErrorHandler extends EventEmitter {
 
         circuitBreaker.recordSuccess()
         return true
-      } catch (error) {
+      } catch (_error) {
         circuitBreaker.recordFailure()
 
         if (attempt === this.config.maxRetryAttempts) {

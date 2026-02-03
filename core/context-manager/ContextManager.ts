@@ -32,7 +32,7 @@ export class ContextManager {
         title: (typeof document !== 'undefined' && document?.title) || 'unknown',
         timestamp: new Date(),
       };
-    } catch (error) {
+    } catch (_error) {
       // 在 Node.js 环境或其他非浏览器环境中
       return {
         url: 'unknown',
