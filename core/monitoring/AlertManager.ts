@@ -32,7 +32,7 @@ export interface AlertRule {
 
 export interface AlertChannel {
   id: string;
-  type: 'email' | 'slack' | 'webhook' | 'sms' | 'pagerduty';
+  type: 'email' | 'slack' | 'webhook' | 'sms' | 'pagerduty' | 'console';
   config: Record<string, any>;
   enabled: boolean;
 }
@@ -246,6 +246,7 @@ export class AlertManager extends EventEmitter {
       source: data.source || 'system',
       timestamp: Date.now(),
       acknowledged: false,
+      resolved: false,
       tags: data.tags,
       metadata: data,
     };

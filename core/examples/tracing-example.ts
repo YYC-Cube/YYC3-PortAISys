@@ -140,8 +140,6 @@ async function main() {
 }
 
 // 运行示例
-if (require.main === module) {
-  main().catch((error) => logger.error('Main function error:', 'tracing-example', { error }, error as Error));
-}
+main().catch((error) => logger.error('Main function error:', 'tracing-example', { error }, error as Error));
 
 export { main };
