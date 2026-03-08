@@ -1,10 +1,14 @@
 /**
- * @file 事件分发器
- * @description 实现事件分发系统，支持事件过滤、优先级、异步处理等功能
- * @module event-dispatcher
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file event-dispatcher/EventDispatcher.ts
+ * @description Event Dispatcher 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

@@ -1,6 +1,27 @@
-# OpenTelemetry Tracing 集成指南
+---
+@file: YYC3-PortAISys-OpenTelemetry-Tracing集成指南.md
+@description: YYC3-PortAISys-OpenTelemetry-Tracing集成指南 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: technical,code,documentation,zh-CN
+@category: technical
+@language: zh-CN
+@audience: developers
+@complexity: advanced
+---
 
-## 📋 概述
+> ***YanYuCloudCube***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
+
+---
+
+# OpenTelemetry Tracing 集成指南
 
 YYC³ Portable Intelligent AI System 现已集成 OpenTelemetry 分布式追踪功能，可以帮助你：
 
@@ -403,3 +424,9 @@ const exporter = new AzureMonitorTraceExporter({
 **版本**: 1.0.0  
 **更新日期**: 2026-01-24  
 **作者**: YYC³ Team
+
+---
+> 「***Words Initiate Quadrants, Language Serves as Core for Future***」
+> 「***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+</div>

@@ -1,18 +1,20 @@
 /**
- * @file 智能体系统集成模块
- * @description 将智能体系统集成到YYC³核心系统中，实现与AutonomousAIEngine和UISystem的协同工作
- * @module core/integration/AgentSystemIntegration
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
- * @updated 2025-01-30
- * @copyright Copyright (c) 2025 YYC³
+ * @file integration/AgentSystemIntegration.ts
+ * @description Agent System Integration 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';
 import { AgentSystem } from '../ai/index';
 import { AgentMessage } from '../ai/AgentProtocol';
+import { PopupInstance } from '../ai/BaseAgent';
 import { AutonomousAIEngine } from '../pluggable/AutonomousAIEngine';
 import { UISystem } from '../ui/UISystem';
 import { logger } from '../utils/logger';
@@ -154,7 +156,13 @@ export class AgentSystemIntegration extends EventEmitter {
         id: `layout-${popupId}`,
         name: `布局智能体-${popupId}`,
         description: '管理弹窗布局和位置',
-        enabled: true
+        capabilities: [],
+        policies: {
+          maxConcurrentRequests: 10,
+          rateLimit: 100,
+          privacyLevel: 'medium',
+          dataRetention: 86400000
+        }
       });
 
       layoutAgent.bindToPopup(popup);
@@ -168,7 +176,13 @@ export class AgentSystemIntegration extends EventEmitter {
         id: `behavior-${popupId}`,
         name: `行为智能体-${popupId}`,
         description: '管理弹窗行为和交互',
-        enabled: true
+        capabilities: [],
+        policies: {
+          maxConcurrentRequests: 10,
+          rateLimit: 100,
+          privacyLevel: 'medium',
+          dataRetention: 86400000
+        }
       });
 
       behaviorAgent.bindToPopup(popup);
@@ -182,7 +196,13 @@ export class AgentSystemIntegration extends EventEmitter {
         id: `content-${popupId}`,
         name: `内容智能体-${popupId}`,
         description: '管理弹窗内容和更新',
-        enabled: true
+        capabilities: [],
+        policies: {
+          maxConcurrentRequests: 10,
+          rateLimit: 100,
+          privacyLevel: 'medium',
+          dataRetention: 86400000
+        }
       });
 
       contentAgent.bindToPopup(popup);
@@ -196,8 +216,13 @@ export class AgentSystemIntegration extends EventEmitter {
         id: `assistant-${popupId}`,
         name: `助手智能体-${popupId}`,
         description: '提供智能助手功能',
-        version: '1.0.0',
-        enabled: true
+        capabilities: [],
+        policies: {
+          maxConcurrentRequests: 10,
+          rateLimit: 100,
+          privacyLevel: 'medium',
+          dataRetention: 86400000
+        }
       });
 
       assistantAgent.bindToPopup(popup);
@@ -211,8 +236,13 @@ export class AgentSystemIntegration extends EventEmitter {
         id: `monitoring-${popupId}`,
         name: `监控智能体-${popupId}`,
         description: '监控弹窗性能和状态',
-        version: '1.0.0',
-        enabled: true
+        capabilities: [],
+        policies: {
+          maxConcurrentRequests: 10,
+          rateLimit: 100,
+          privacyLevel: 'medium',
+          dataRetention: 86400000
+        }
       });
 
       monitoringAgent.bindToPopup(popup);
@@ -428,7 +458,7 @@ export class AgentSystemIntegration extends EventEmitter {
 
   private handleChatMessage(data: any): void {
     const assistantAgent = this.agents.get(`assistant-${this.popup?.id}`);
-    
+
     if (assistantAgent) {
       const message: AgentMessage = {
         id: `msg-${Date.now()}`,
@@ -451,7 +481,7 @@ export class AgentSystemIntegration extends EventEmitter {
 
   private handleToolExecuted(data: any): void {
     const monitoringAgent = this.agents.get(`monitoring-${this.popup?.id}`);
-    
+
     if (monitoringAgent) {
       const message: AgentMessage = {
         id: `msg-${Date.now()}`,
@@ -475,7 +505,7 @@ export class AgentSystemIntegration extends EventEmitter {
 
   private handleWorkflowExecuted(data: any): void {
     const monitoringAgent = this.agents.get(`monitoring-${this.popup?.id}`);
-    
+
     if (monitoringAgent) {
       const message: AgentMessage = {
         id: `msg-${Date.now()}`,
@@ -499,7 +529,7 @@ export class AgentSystemIntegration extends EventEmitter {
 
   private handleNotificationCreated(data: any): void {
     const assistantAgent = this.agents.get(`assistant-${this.popup?.id}`);
-    
+
     if (assistantAgent) {
       const message: AgentMessage = {
         id: `msg-${Date.now()}`,

@@ -1,10 +1,14 @@
 /**
- * @file OpenAI模型适配器实现
- * @description 实现OpenAI模型的调用适配器
- * @module model/OpenAIAdapter
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2025-12-30
+ * @file model/OpenAIAdapter.ts
+ * @description Open Aiadapter 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { ModelAdapter, ModelAdapterConfig, IModelAdapter } from './ModelAdapter';

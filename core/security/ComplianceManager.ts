@@ -1,3 +1,16 @@
+/**
+ * @file security/ComplianceManager.ts
+ * @description Compliance Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import {
   ComplianceStatus,
   ComplianceReport,
@@ -6,29 +19,21 @@ import {
   ComplianceEvent,
   ComplianceFramework,
   ComplianceAuditTrail,
-  ComplianceReporting,
+  ComplianceRule,
   ComplianceManager as IComplianceManager
 } from './types';
 
 export class ComplianceManager implements IComplianceManager {
   private frameworks: Map<string, ComplianceFramework>;
   private auditTrail: ComplianceAuditTrail;
-  private reporting: ComplianceReporting;
   private complianceRules: ComplianceRule[];
-  private config: any;
 
-  constructor(config?: any) {
-    this.config = config || {};
+  constructor(_config?: any) {
     this.frameworks = new Map();
     this.auditTrail = {
       enabled: true,
       events: [],
       retention: 2555
-    };
-    this.reporting = {
-      frequency: 'monthly',
-      recipients: ['compliance@company.com'],
-      format: 'PDF'
     };
     this.complianceRules = [];
     this.initializeFrameworks();
@@ -362,37 +367,4 @@ export class ComplianceManager implements IComplianceManager {
       this.auditTrail.events = this.auditTrail.events.slice(-10000);
     }
   }
-
-  private async checkDataSubjectRights(): Promise<boolean> {
-    return true;
-  }
-
-  private async checkSecurityPolicy(): Promise<boolean> {
-    return false;
-  }
-
-  private async checkAccessControl(): Promise<boolean> {
-    return true;
-  }
-
-  private async checkPHIProtection(): Promise<boolean> {
-    return false;
-  }
-
-  private async checkCardholderData(): Promise<boolean> {
-    return false;
-  }
-
-  private async checkDataBreachNotification(): Promise<boolean> {
-    return true;
-  }
-}
-
-interface ComplianceRule {
-  id: string;
-  framework: string;
-  requirement: string;
-  description: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  checkFunction: string;
 }

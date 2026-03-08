@@ -1,10 +1,14 @@
 /**
- * @file UI模块入口
- * @description 导出所有UI组件和类型
- * @module ui
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/index.ts
+ * @description Index 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 export * from './types';
@@ -20,4 +24,5 @@ export { ToolboxPanel } from './ToolboxPanel';
 export { InsightsDashboard } from './InsightsDashboard';
 export { WorkflowDesigner } from './WorkflowDesigner';
 export { UIManager } from './UIManager';
-export { UISystem, UISystemConfig } from './UISystem';
+export { UISystem } from './UISystem';
+export type { UISystemConfig } from './UISystem';

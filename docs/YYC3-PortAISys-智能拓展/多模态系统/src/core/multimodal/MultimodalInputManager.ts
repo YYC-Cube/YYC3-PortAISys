@@ -1,6 +1,14 @@
 /**
- * @file MultimodalInputManager.ts
- * @description 多模态输入管理器 - 协调手势、语音、文本等多种输入方式
+ * @file docs/YYC3-PortAISys-智能拓展/多模态系统/src/core/multimodal/MultimodalInputManager.ts
+ * @description Multimodal Input Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,core
  */
 
 import {

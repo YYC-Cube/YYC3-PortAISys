@@ -1,7 +1,14 @@
 /**
- * 五维闭环系统核心类
- * @file core/closed-loop/ClosedLoopSystem.ts
- * @description 实现包含价值创造、技术演进、数据驱动、用户体验、业务价值五个维度的闭环系统
+ * @file closed-loop/ClosedLoopSystem.ts
+ * @description Closed Loop System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { GoalManagementSystem } from './value-creation/GoalManagementSystem';

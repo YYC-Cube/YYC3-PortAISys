@@ -1,11 +1,14 @@
 /**
- * @file 性能指标收集系统
- * @description 提供企业级性能指标收集功能，支持多种指标类型和系统资源监控
- * @module utils/metrics
- * @author YYC³ Team
- * @version 1.1.0
- * @created 2025-12-30
- * @updated 2025-12-30
+ * @file utils/metrics.ts
+ * @description Metrics 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,utils
  */
 
 import { logger } from './logger';

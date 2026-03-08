@@ -1,10 +1,14 @@
 /**
- * @file 模型适配器实现
- * @description 实现可插拔式AI模型适配器，支持多种AI模型提供商
- * @module core/pluggable/ModelAdapter
- * @author YYC³
- * @version 1.0.0
- * @created 2025-12-30
+ * @file pluggable/ModelAdapter.ts
+ * @description Model Adapter 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';
@@ -28,9 +32,9 @@ import { ErrorHandler } from '../error-handler/ErrorHandler';
 export class ModelAdapter extends EventEmitter implements IModelAdapter {
   name: string;
   version: string;
-  private config: ModelConfig;
+  private config: ModelConfig = {} as ModelConfig;
   private isInitialized: boolean = false;
-  private capabilities: ModelCapabilities;
+  protected capabilities: ModelCapabilities;
   private errorHandler: ErrorHandler;
   private retryAttempts: Map<string, number> = new Map();
   private maxRetries: number = 3;
@@ -54,7 +58,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
   async initialize(config: ModelConfig): Promise<void> {
     if (!this.validateConfig(config)) {
       throw new ValidationError('Invalid model configuration', 'config', {
-        additionalData: { 
+        additionalData: {
           providedConfig: config,
           requiredFields: ['name', 'version', 'provider']
         }
@@ -81,8 +85,10 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
 
   async generateResponse(request: ModelRequest): Promise<ModelResponse> {
     if (!this.isInitialized) {
-      const error = new InternalError('Model adapter not initialized', { adapterName: this.name });
-      await this.errorHandler.handleError(error, { operation: 'generateResponse', adapter: this.name });
+      const error = new InternalError('Model adapter not initialized', {
+        additionalData: { adapterName: this.name }
+      });
+      await this.errorHandler.handleError(error, { operation: 'generateResponse', additionalData: { adapter: this.name } });
       throw error;
     }
 
@@ -91,7 +97,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
 
     try {
       const response = await this.executeWithRetry(request, requestId);
-      
+
       const result: ModelResponse = {
         content: response.content,
         tokensUsed: response.tokensUsed,
@@ -110,11 +116,11 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
       return result;
     } catch (error) {
       this.emit('error', error);
-      await this.errorHandler.handleError(error as Error, { 
-        operation: 'generateResponse', 
+      await this.errorHandler.handleError(error as Error, {
+        operation: 'generateResponse',
         adapter: this.name,
         requestId,
-        request 
+        request
       });
       throw error;
     }
@@ -129,14 +135,14 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
         return await this.executeRequest(request);
       } catch (error) {
         lastError = error as Error;
-        
+
         if (!isRetryable(error as Error) || attempt >= this.maxRetries) {
           break;
         }
 
         this.retryAttempts.set(requestId, attempt + 1);
         this.emit('retry', { requestId, attempt: attempt + 1, error });
-        
+
         await new Promise(resolve => setTimeout(resolve, this.retryDelay * Math.pow(2, attempt)));
       }
     }
@@ -147,7 +153,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
   async *generateStreamingResponse(request: ModelRequest): AsyncGenerator<string> {
     if (!this.isInitialized) {
       throw new InternalError('Model adapter not initialized', {
-        additionalData: { 
+        additionalData: {
           adapterName: this.name,
           adapterVersion: this.version,
           requestedOperation: 'generateStreamingResponse'
@@ -243,7 +249,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
 
   private async executeStreamingRequest(request: ModelRequest): Promise<string[]> {
     const chunks: string[] = [];
-    
+
     const parameters = {
       ...request.parameters,
       max_tokens: request.parameters?.maxTokens ?? this.config.maxTokens,
@@ -258,7 +264,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
     };
 
     const stream = await this.makeStreamingApiRequest(requestBody);
-    
+
     for await (const chunk of stream) {
       chunks.push(chunk);
     }
@@ -278,14 +284,13 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout ?? 30000)
       });
 
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
           throw new AuthenticationError(
             `Authentication failed: ${response.status} ${response.statusText}`,
-            endpoint,
             {
               additionalData: { status: response.status, statusText: response.statusText }
             }
@@ -295,7 +300,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
         if (response.status === 408 || response.status === 504) {
           throw new TimeoutError(
             `Request timeout: ${response.status} ${response.statusText}`,
-            endpoint,
+            this.config.timeout ?? 30000,
             {
               additionalData: { status: response.status, statusText: response.statusText }
             }
@@ -305,19 +310,16 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
         if (response.status >= 500) {
           throw new NetworkError(
             `Server error: ${response.status} ${response.statusText}`,
-            endpoint,
             {
-              additionalData: { status: response.status, statusText: response.statusText },
-              retryable: true
+              additionalData: { status: response.status, statusText: response.statusText, endpoint }
             }
           );
         }
 
         throw new NetworkError(
           `API request failed: ${response.status} ${response.statusText}`,
-          endpoint,
           {
-            additionalData: { status: response.status, statusText: response.statusText }
+            additionalData: { status: response.status, statusText: response.statusText, endpoint }
           }
         );
       }
@@ -327,10 +329,8 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new NetworkError(
           `Network error: ${error.message}`,
-          endpoint,
           {
-            additionalData: { originalError: error.message },
-            retryable: true
+            additionalData: { originalError: error.message, endpoint }
           }
         );
       }
@@ -338,9 +338,9 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
       if (error instanceof DOMException && error.name === 'AbortError') {
         throw new TimeoutError(
           `Request aborted due to timeout`,
-          endpoint,
+          this.config.timeout ?? 30000,
           {
-            additionalData: { timeout: this.config.timeout }
+            additionalData: { timeout: this.config.timeout, endpoint }
           }
         );
       }
@@ -360,15 +360,14 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(this.config.timeout)
+      signal: AbortSignal.timeout(this.config.timeout ?? 30000)
     });
 
     if (!response.ok) {
       throw new NetworkError(
         `API request failed: ${response.status} ${response.statusText}`,
-        endpoint,
         {
-          additionalData: { status: response.status, statusText: response.statusText }
+          additionalData: { status: response.status, statusText: response.statusText, endpoint }
         }
       );
     }
@@ -376,7 +375,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
     const reader = response.body?.getReader();
     if (!reader) {
       throw new InternalError('Response body is not readable', {
-        additionalData: { 
+        additionalData: {
           endpoint,
           responseStatus: response.status,
           hasBody: !!response.body
@@ -428,7 +427,7 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
     };
   }
 
-  private getDefaultEndpoint(): string {
+  protected getDefaultEndpoint(): string {
     switch (this.config.provider) {
       case 'openai':
         return 'https://api.openai.com/v1/chat/completions';
@@ -437,7 +436,9 @@ export class ModelAdapter extends EventEmitter implements IModelAdapter {
       case 'azure':
         return `https://${this.config.endpoint}.openai.azure.com/openai/deployments/${this.config.name}/chat/completions?api-version=2023-05-15`;
       default:
-        throw new ValidationError(`Unknown provider: ${this.config.provider}`, 'provider', { provider: this.config.provider });
+        throw new ValidationError(`Unknown provider: ${this.config.provider}`, 'config', {
+          additionalData: { provider: this.config.provider }
+        });
     }
   }
 
@@ -475,6 +476,8 @@ export class AnthropicAdapter extends ModelAdapter {
 }
 
 export class LocalModelAdapter extends ModelAdapter {
+  private localModelEndpoint: string = 'http://localhost:11434/api/generate';
+
   constructor() {
     super('local-adapter', '1.0.0');
     this.capabilities = {
@@ -487,14 +490,12 @@ export class LocalModelAdapter extends ModelAdapter {
     };
   }
 
-  private localModelEndpoint: string = 'http://localhost:11434/api/generate';
-
   async initialize(config: ModelConfig): Promise<void> {
     await super.initialize(config);
     this.localModelEndpoint = config.endpoint || this.localModelEndpoint;
   }
 
-  private getDefaultEndpoint(): string {
+  protected getDefaultEndpoint(): string {
     return this.localModelEndpoint;
   }
 }

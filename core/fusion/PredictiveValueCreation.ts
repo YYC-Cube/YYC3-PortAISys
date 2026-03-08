@@ -1,11 +1,14 @@
 /**
- * @file 预测价值创造
- * @description 实现价值流预测和增长智能功能
- * @module fusion
- * @author YYC
- * @version 1.0.0
- * @created 2024-10-15
- * @updated 2024-10-15
+ * @file fusion/PredictiveValueCreation.ts
+ * @description Predictive Value Creation 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 export interface PredictiveValueCreationConfig {

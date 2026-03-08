@@ -1,10 +1,14 @@
 /**
- * @file 缓存层测试
- * @description 测试智能缓存层的核心功能
- * @module __tests__/unit/cache/CacheLayer.test
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file unit/cache/CacheLayer.test.ts
+ * @description Cache Layer.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

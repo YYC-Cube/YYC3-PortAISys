@@ -1,5 +1,18 @@
+/**
+ * @file monitoring/index.ts
+ * @description Index 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import EventEmitter from 'eventemitter3';
-import { Logger } from '../../utils/logger';
+import { Logger } from '../utils/logger';
 import { MonitoringSystemImpl } from './monitoring';
 import { AlertSystemImpl } from './alert';
 import { NotificationSystemImpl } from './notification';
@@ -12,7 +25,8 @@ import {
   MonitoringConfig,
   AlertRule,
   Alert,
-  NotificationChannel,
+  AlertStatus,
+  NotificationChannelConfig,
   NotificationTemplate,
   MetricsQuery,
   AnalysisResult,
@@ -33,12 +47,12 @@ export class MonitoringPlatform extends EventEmitter {
   constructor(logger: Logger, dataDirectory: string = './data/monitoring') {
     super();
     this.logger = logger;
-    
+
     this.monitoring = new MonitoringSystemImpl(logger, dataDirectory);
     this.alert = new AlertSystemImpl(logger, dataDirectory);
     this.notification = new NotificationSystemImpl(logger, dataDirectory);
     this.analysis = new AnalysisSystemImpl(logger, dataDirectory);
-    
+
     this.setupEventHandlers();
   }
 
@@ -52,55 +66,55 @@ export class MonitoringPlatform extends EventEmitter {
     });
 
     this.alert.on('alert:acknowledged', (alert: Alert) => {
-      this.logger.info('告警已确认', { alertId: alert.id });
+      this.logger.info('告警已确认', 'MonitoringPlatform', { alertId: alert.id });
     });
 
     this.alert.on('alert:closed', (alert: Alert) => {
-      this.logger.info('告警已关闭', { alertId: alert.id });
+      this.logger.info('告警已关闭', 'MonitoringPlatform', { alertId: alert.id });
     });
 
     this.notification.on('notification:sent', (notification) => {
-      this.logger.info('通知已发送', { notificationId: notification.id });
+      this.logger.info('通知已发送', 'MonitoringPlatform', { notificationId: notification.id });
     });
 
     this.notification.on('notification:failed', (notification) => {
-      this.logger.error('通知发送失败', { notificationId: notification.id, error: notification.error });
+      this.logger.error('通知发送失败', 'MonitoringPlatform', { notificationId: notification.id, error: notification.error });
     });
 
     this.analysis.on('anomalies:detected', (anomalies: Anomaly[]) => {
-      this.logger.info('检测到异常', { count: anomalies.length });
+      this.logger.info('检测到异常', 'MonitoringPlatform', { count: anomalies.length });
     });
 
-    this.analysis.on('rootcause:analyzed', (result: RootCauseResult) => {
-      this.logger.info('根因分析完成', { alertId: result.alertId, rootCause: result.rootCause });
+    this.analysis.on('rootcause:analyzed', (result) => {
+      this.logger.info('根因分析完成', 'MonitoringPlatform', { alertId: result.alertId, rootCause: result.rootCause });
     });
   }
 
   async start(config: MonitoringConfig): Promise<void> {
-    this.logger.info('启动监控平台', { config });
-    
+    this.logger.info('启动监控平台', 'MonitoringPlatform', { config });
+
     if (this.isRunning) {
-      this.logger.warn('监控平台已经在运行中');
+      this.logger.warn('监控平台已经在运行中', 'MonitoringPlatform');
       return;
     }
 
     try {
       await this.monitoring.startMonitoring(config);
       this.isRunning = true;
-      
+
       this.emit('platform:started');
-      this.logger.info('监控平台启动成功');
+      this.logger.info('监控平台启动成功', 'MonitoringPlatform');
     } catch (error) {
-      this.logger.error('监控平台启动失败', error as Error);
+      this.logger.error('监控平台启动失败', 'MonitoringPlatform', undefined, error as Error);
       throw error;
     }
   }
 
   async stop(): Promise<void> {
-    this.logger.info('停止监控平台');
-    
+    this.logger.info('停止监控平台', 'MonitoringPlatform');
+
     if (!this.isRunning) {
-      this.logger.warn('监控平台未运行');
+      this.logger.warn('监控平台未运行', 'MonitoringPlatform');
       return;
     }
 
@@ -108,11 +122,11 @@ export class MonitoringPlatform extends EventEmitter {
       await this.monitoring.stopMonitoring();
       await this.notification.shutdown();
       this.isRunning = false;
-      
+
       this.emit('platform:stopped');
-      this.logger.info('监控平台停止成功');
+      this.logger.info('监控平台停止成功', 'MonitoringPlatform');
     } catch (error) {
-      this.logger.error('监控平台停止失败', error as Error);
+      this.logger.error('监控平台停止失败', 'MonitoringPlatform', undefined, error as Error);
       throw error;
     }
   }
@@ -122,24 +136,24 @@ export class MonitoringPlatform extends EventEmitter {
       await this.analysis.updateMetricsCache(metrics);
       this.alert.evaluateMetrics(metrics);
     } catch (error) {
-      this.logger.error('处理指标失败', error as Error);
+      this.logger.error('处理指标失败', 'MonitoringPlatform', undefined, error as Error);
     }
   }
 
   private async handleAlert(alert: Alert): Promise<void> {
     try {
       const rootCause = await this.analysis.analyzeRootCause(alert);
-      
+
       const rule = await this.alert.getAlertRules({ metricName: alert.metricName });
       const channels = rule.length > 0 ? rule[0].notificationChannels : [];
-      
+
       if (channels.length > 0) {
         await this.notification.sendAlertNotification(alert, channels);
       }
-      
+
       this.emit('alert:processed', { alert, rootCause });
     } catch (error) {
-      this.logger.error('处理告警失败', error as Error, { alertId: alert.id });
+      this.logger.error('处理告警失败', 'MonitoringPlatform', { alertId: alert.id }, error as Error);
     }
   }
 
@@ -163,7 +177,7 @@ export class MonitoringPlatform extends EventEmitter {
     return await this.alert.createAlertRule(rule);
   }
 
-  async createNotificationChannel(channel: NotificationChannel): Promise<NotificationChannel> {
+  async createNotificationChannel(channel: NotificationChannelConfig): Promise<NotificationChannelConfig> {
     return await this.notification.addChannel(channel);
   }
 
@@ -194,7 +208,7 @@ export class MonitoringPlatform extends EventEmitter {
   async getPlatformStatus(): Promise<any> {
     const monitoringStatus = await this.monitoring.getMonitoringStatus();
     const alertStatistics = await this.alert.getAlertStatistics();
-    
+
     return {
       isRunning: this.isRunning,
       monitoring: monitoringStatus,
@@ -206,13 +220,13 @@ export class MonitoringPlatform extends EventEmitter {
 
   async getDashboardData(): Promise<any> {
     const realTimeMetrics = await this.monitoring.getRealTimeMetrics();
-    const openAlerts = await this.alert.getAlerts({ status: 'open' });
-    const recentAnomalies = this.analysis.getAnomalyHistory?.(10) || [];
-    
+    const openAlerts = await this.alert.getAlerts({ status: AlertStatus.OPEN });
+    const recentAnomalies = await this.analysis.getAnomalyHistory({ metricName: '', startTime: new Date(Date.now() - 3600000), endTime: new Date() }) || [];
+
     return {
       metrics: realTimeMetrics.slice(0, 20),
       alerts: openAlerts.slice(0, 10),
-      anomalies: recentAnomalies,
+      anomalies: recentAnomalies.slice(0, 10),
       timestamp: new Date()
     };
   }

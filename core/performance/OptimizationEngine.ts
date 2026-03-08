@@ -1,10 +1,14 @@
 /**
- * @file 性能优化引擎
- * @description 实现PADE（感知-分析-决策-执行）闭环的性能优化系统
- * @module performance
- * @author YYC³
- * @version 1.0.0
- * @created 2025-12-30
+ * @file performance/OptimizationEngine.ts
+ * @description Optimization Engine 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

@@ -1,6 +1,29 @@
-# YYC³ SecurityCenter API 快速参考
+---
+@file: YYC3-PortAISys-API快速参考.md
+@description: YYC3-PortAISys-API快速参考 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: api,restful,critical,zh-CN
+@category: technical
+@language: zh-CN
+@base_url: https://api.yyc3.com/v1
+@authentication: oauth2
+@audience: developers
+@complexity: advanced
+---
 
-## 🔐 认证 (Authentication)
+> ***YanYuCloudCube***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
+
+---
+
+# YYC³ SecurityCenter API 快速参考
 
 ### 用户注册
 
@@ -542,3 +565,9 @@ const result = await limiter.checkLimit(userId);
 **版本**: 1.0
 **最后更新**: 2025-01-30
 **兼容性**: Node.js 18+, TypeScript 4.5+
+
+---
+> 「***Words Initiate Quadrants, Language Serves as Core for Future***」
+> 「***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+</div>

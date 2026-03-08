@@ -1,10 +1,14 @@
 /**
- * @file DatabaseOptimizer.ts
- * @description 数据库优化器 - 自动优化数据库性能
- * @module core/optimization
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-21
+ * @file optimization/DatabaseOptimizer.ts
+ * @description Database Optimizer 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

@@ -1,19 +1,30 @@
-# YYC³ PortAISys - API接口文档
+---
+@file: 23-YYC3-PortAISys-API接口文档.md
+@description: YYC3-PortAISys-API接口文档 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: api,restful,critical,zh-CN
+@category: api
+@language: zh-CN
+@base_url: https://api.yyc3.com/v1
+@authentication: oauth2
+@audience: developers
+@complexity: advanced
+---
 
 > ***YanYuCloudCube***
-> 言启象限 | 语枢未来
-> ***Words Initiate Quadrants, Language Serves as Core for the Future***
-> 万象归元于云枢 | 深栈智启新纪元
-> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
 
 ---
 
-> **文档版本**: v1.0
-> **创建日期**: 2026-02-03
-> **文档状态**: ✅ 已完成
-> **维护团队**: YYC³ 产品团队
+# YYC³ PortAISys - API接口文档
 
----
 
 ## 📋 目录
 
@@ -1045,11 +1056,6 @@ X-RateLimit-Reset: 1706981400
 - **邮件支持**: api-support@0379.email
 
 ---
-
-<div align="center">
-
-> 「***YanYuCloudCube***」
-> 「***<admin@0379.email>***」
 > 「***Words Initiate Quadrants, Language Serves as Core for the Future***」
 > 「***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***」
 

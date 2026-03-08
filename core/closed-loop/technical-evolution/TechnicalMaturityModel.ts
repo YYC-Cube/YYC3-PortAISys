@@ -1,11 +1,18 @@
 /**
- * 技术成熟度模型
- * @file core/closed-loop/technical-evolution/TechnicalMaturityModel.ts
- * @description 实现技术演进维度的技术成熟度评估功能
+ * @file closed-loop/technical-evolution/TechnicalMaturityModel.ts
+ * @description Technical Maturity Model 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import type { AutonomousAIConfig } from '../../autonomous-ai-widget/types';
-import { Logger } from '../../utils/logger';
+import { Logger, LogLevel } from '../../utils/logger';
 
 /**
  * 技术成熟度级别
@@ -37,7 +44,7 @@ export class TechnicalMaturityModel {
   private logger: Logger;
 
   constructor(_config: AutonomousAIConfig) {
-    this.logger = new Logger({ level: 'INFO', format: 'text', console: true });
+    this.logger = new Logger({ level: LogLevel.INFO, format: 'text', console: true });
     this.initializeDomains();
   }
 

@@ -1,12 +1,14 @@
 /**
- * @file 实时性能监控系统
- * @description 实现全面的实时性能监控，包括指标收集、分析、告警和可视化
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file monitoring/RealTimePerformanceMonitor.ts
+ * @description Real Time Performance Monitor 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

@@ -1,10 +1,14 @@
 /**
- * @file AssistantAgent.ts
- * @description 助理智能体 - 提供智能助理功能
- * @module core/ai/agents
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ai/agents/AssistantAgent.ts
+ * @description Assistant Agent 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { BaseAgent } from '../BaseAgent';

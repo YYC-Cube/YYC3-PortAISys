@@ -1,10 +1,14 @@
 /**
- * @file UI系统单元测试
- * @description 测试 UISystem 的核心功能
- * @module tests/unit/ui/UISystem.test.ts
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-05
+ * @file unit/ui/UISystem.test.ts
+ * @description Uisystem.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

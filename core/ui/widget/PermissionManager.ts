@@ -1,10 +1,14 @@
 /**
- * @file 权限管理器
- * @description 管理widget权限
- * @module ui/widget/PermissionManager
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-05
+ * @file ui/widget/PermissionManager.ts
+ * @description Permission Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -23,9 +27,9 @@ export class PermissionManager extends EventEmitter {
   }
 
   private initializeRoles(): void {
-    this.roles.set('admin', new Set(['read', 'write', 'execute', 'delete', 'admin']));
-    this.roles.set('user', new Set(['read', 'write', 'execute']));
-    this.roles.set('guest', new Set(['read']));
+    this.roles.set('admin', new Set<Permission>(['read', 'write', 'execute', 'delete', 'admin']));
+    this.roles.set('user', new Set<Permission>(['read', 'write', 'execute']));
+    this.roles.set('guest', new Set<Permission>(['read']));
   }
 
   grantPermission(userId: string, permission: Permission): void {

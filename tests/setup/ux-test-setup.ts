@@ -1,9 +1,14 @@
 /**
- * @file UX测试设置文件
- * @description 为需要浏览器API的UX测试提供mock
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
+ * @file setup/ux-test-setup.ts
+ * @description Ux Test Setup 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { vi } from 'vitest';

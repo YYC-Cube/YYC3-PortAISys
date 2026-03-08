@@ -1,11 +1,18 @@
 /**
- * 目标管理系统
- * @file core/closed-loop/value-creation/GoalManagementSystem.ts
- * @description 实现价值创造维度的目标管理功能
+ * @file closed-loop/value-creation/GoalManagementSystem.ts
+ * @description Goal Management System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import type { AutonomousAIConfig } from '../../autonomous-ai-widget/types';
-import { Logger } from '../../utils/logger';
+import { Logger, LogLevel } from '../../utils/logger';
 
 /**
  * 系统目标接口
@@ -27,7 +34,7 @@ export class GoalManagementSystem {
   private logger: Logger;
 
   constructor(_config: AutonomousAIConfig) {
-    this.logger = new Logger({ level: 'INFO', format: 'text', console: true });
+    this.logger = new Logger({ level: LogLevel.INFO, format: 'text', console: true });
     this.initializeGoals();
   }
 

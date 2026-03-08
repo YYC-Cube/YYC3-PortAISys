@@ -1,10 +1,14 @@
 /**
- * @file UI系统集成管理器
- * @description 整合所有UI组件，提供统一的系统级接口
- * @module ui/UISystem
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/UISystem.ts
+ * @description Uisystem 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -16,6 +20,10 @@ import { UIManager } from './UIManager';
 import { logger } from '../utils/logger';
 import {
   ChatMessage,
+  Tool,
+  Insight,
+  Workflow,
+  Modal,
 } from './types';
 
 export interface UISystemConfig {

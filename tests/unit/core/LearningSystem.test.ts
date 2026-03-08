@@ -1,10 +1,14 @@
 /**
- * @file LearningSystem 单元测试
- * @description 测试学习系统的核心功能
- * @module __tests__/unit/core/LearningSystem.test
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-01
+ * @file unit/core/LearningSystem.test.ts
+ * @description Learning System.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,core
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

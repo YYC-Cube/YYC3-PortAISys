@@ -1,11 +1,14 @@
 /**
- * @file 边缘情况处理系统
- * @description 提供全面的边缘情况处理和错误管理功能
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file error-handling/EdgeCaseHandler.ts
+ * @description Edge Case Handler 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

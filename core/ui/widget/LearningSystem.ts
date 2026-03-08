@@ -1,10 +1,14 @@
 /**
- * @file 学习系统
- * @description 实现三层学习架构（行为学习、策略学习、知识学习），支持自主学习和持续优化
- * @module LearningSystem
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-03
+ * @file ui/widget/LearningSystem.ts
+ * @description Learning System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -125,7 +129,7 @@ export interface LearningMetrics {
 }
 
 export class LearningSystem extends EventEmitter {
-  private config: Required<LearningConfig>;
+  private config: LearningConfig;
   private dataStore: LearningData[];
   private learningResults: LearningResult[];
   private models: Map<string, ModelInfo>;
@@ -145,7 +149,6 @@ export class LearningSystem extends EventEmitter {
   private trainingThreshold: number;
   private maxModelHistory: number;
   private abTestingEnabled: boolean;
-  private abTestDuration: number;
   private featureExtractor: FeatureExtractor;
   private modelTrainer: ModelTrainer;
   private patternDetector: PatternDetector;
@@ -180,6 +183,7 @@ export class LearningSystem extends EventEmitter {
     this.patterns = [];
     this.recommendations = [];
     this.abTests = new Map();
+    this.learningIntervalId = null;
 
     this.metrics = {
       totalLearningSessions: 0,
@@ -195,18 +199,17 @@ export class LearningSystem extends EventEmitter {
       learningHistory: [],
     };
 
-    this.enabled = this.config.enabled;
-    this.behavioralLearningEnabled = this.config.enableBehavioralLearning;
-    this.strategicLearningEnabled = this.config.enableStrategicLearning;
-    this.knowledgeLearningEnabled = this.config.enableKnowledgeLearning;
-    this.realTimeLearningEnabled = this.config.enableRealTimeLearning;
-    this.autoTrainingEnabled = this.config.enableAutoTraining;
-    this.dataRetentionDays = this.config.dataRetentionDays;
-    this.maxDataPoints = this.config.maxDataPoints;
-    this.trainingThreshold = this.config.trainingThreshold;
-    this.maxModelHistory = this.config.maxModelHistory;
-    this.abTestingEnabled = this.config.enableABTesting;
-    this.abTestDuration = this.config.abTestDuration;
+    this.enabled = this.config.enabled ?? true;
+    this.behavioralLearningEnabled = this.config.enableBehavioralLearning ?? true;
+    this.strategicLearningEnabled = this.config.enableStrategicLearning ?? true;
+    this.knowledgeLearningEnabled = this.config.enableKnowledgeLearning ?? true;
+    this.realTimeLearningEnabled = this.config.enableRealTimeLearning ?? true;
+    this.autoTrainingEnabled = this.config.enableAutoTraining ?? true;
+    this.dataRetentionDays = this.config.dataRetentionDays ?? 90;
+    this.maxDataPoints = this.config.maxDataPoints ?? 100000;
+    this.trainingThreshold = this.config.trainingThreshold ?? 100;
+    this.maxModelHistory = this.config.maxModelHistory ?? 50;
+    this.abTestingEnabled = this.config.enableABTesting ?? true;
 
     this.featureExtractor = new FeatureExtractor();
     this.modelTrainer = new ModelTrainer();

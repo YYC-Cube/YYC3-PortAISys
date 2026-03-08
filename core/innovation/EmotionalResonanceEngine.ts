@@ -1,11 +1,14 @@
 /**
- * @file 情感共鸣引擎
- * @description 实现情感智能核心算法，包括多模态情绪检测、情感记忆数据库和共鸣算法引擎
- * @module innovation
- * @author YYC
- * @version 1.0.0
- * @created 2024-10-15
- * @updated 2024-10-15
+ * @file innovation/EmotionalResonanceEngine.ts
+ * @description Emotional Resonance Engine 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 export interface EmotionalResonanceEngineConfig {

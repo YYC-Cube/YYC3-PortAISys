@@ -1,9 +1,14 @@
 /**
- * @file 公共工具函数库测试
- * @description 测试公共工具函数库的各项功能
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
+ * @file unit/utils/common-utils.test.ts
+ * @description Common Utils.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,utils
  */
 
 import { describe, it, expect } from 'vitest';

@@ -1,11 +1,14 @@
 /**
- * @file 全息交互界面
- * @description 实现增强现实工作台和脑机接口增强功能
- * @module innovation
- * @author YYC
- * @version 1.0.0
- * @created 2024-10-15
- * @updated 2024-10-15
+ * @file innovation/HolisticInteractionInterface.ts
+ * @description Holistic Interaction Interface 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 export interface ThreeDimensionalVisualization {

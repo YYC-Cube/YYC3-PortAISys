@@ -1,11 +1,14 @@
 /**
- * @file 多环境配置管理系统
- * @description 提供全面的多环境配置管理功能
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file config/MultiEnvironmentConfigManager.ts
+ * @description Multi Environment Config Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';
@@ -600,31 +603,34 @@ export class MultiEnvironmentConfigManager extends EventEmitter {
   }
 
   createTemplate(environment: Environment): EnvironmentConfig {
+    const variables = new Map<string, any>();
+    variables.set('PORT', 3201);
+    variables.set('HOST', 'localhost');
+    variables.set('TIMEOUT', 30000);
+
+    const features = new Map<string, boolean>();
+    features.set('feature1', false);
+    features.set('feature2', false);
+
+    const services = new Map<string, ServiceConfig>();
+    services.set('api', {
+      host: 'localhost',
+      port: 3201,
+      protocol: 'http',
+      timeout: 30000,
+      retries: 3,
+      enabled: true
+    });
+
     return {
       name: `${environment} Template`,
       environment,
       version: '1.0.0',
       description: `Template configuration for ${environment}`,
-      variables: new Map([
-        ['PORT', 3201],
-        ['HOST', 'localhost'],
-        ['TIMEOUT', 30000]
-      ]),
+      variables,
       secrets: new Map(),
-      features: new Map([
-        ['feature1', false],
-        ['feature2', false]
-      ]),
-      services: new Map([
-        ['api', {
-          host: 'localhost',
-          port: 3201,
-          protocol: 'http',
-          timeout: 30000,
-          retries: 3,
-          enabled: true
-        }]
-      ]),
+      features,
+      services,
       database: {
         host: 'localhost',
         port: 5432,

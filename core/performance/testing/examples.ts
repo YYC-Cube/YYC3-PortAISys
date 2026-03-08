@@ -1,10 +1,14 @@
 /**
- * @file 性能测试框架使用示例
- * @description 展示如何使用性能测试框架进行性能测试
- * @module performance-testing
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-07
+ * @file performance/testing/examples.ts
+ * @description Examples 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import {

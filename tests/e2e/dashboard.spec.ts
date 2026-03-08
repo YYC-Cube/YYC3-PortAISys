@@ -1,10 +1,14 @@
 /**
- * @file Web Dashboard E2E测试
- * @description 端到端测试Web Dashboard的核心功能
- * @module tests/e2e
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-21
+ * @file e2e/dashboard.spec.ts
+ * @description Dashboard.spec 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { test, expect } from '@playwright/test';

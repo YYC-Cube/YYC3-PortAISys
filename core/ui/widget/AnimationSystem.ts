@@ -1,13 +1,14 @@
 /**
- * @file 动画系统
- * @description 提供高性能动画支持，包括过渡动画、关键帧动画和缓动函数
- * @module ui/widget/AnimationSystem
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-03
- * @updated 2026-01-03
- * @copyright Copyright (c) 2026 YYC³
+ * @file ui/widget/AnimationSystem.ts
+ * @description Animation System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -84,7 +85,6 @@ export class AnimationSystem extends EventEmitter {
   private metrics: AnimationMetrics;
   private enabled: boolean;
   private maxConcurrent: number;
-  private performanceMonitoring: boolean;
   private autoCleanup: boolean;
   private cleanupDelay: number;
   private requestAnimationFrame: (callback: FrameRequestCallback) => number;
@@ -101,11 +101,11 @@ export class AnimationSystem extends EventEmitter {
       enablePerformanceMonitoring: true,
       enableAutoCleanup: true,
       cleanupDelay: 5000,
-      requestAnimationFrame: typeof window !== 'undefined' 
-        ? window.requestAnimationFrame.bind(window) 
+      requestAnimationFrame: typeof window !== 'undefined'
+        ? window.requestAnimationFrame.bind(window)
         : (cb: FrameRequestCallback) => setTimeout(cb, 16) as unknown as number,
-      cancelAnimationFrame: typeof window !== 'undefined' 
-        ? window.cancelAnimationFrame.bind(window) 
+      cancelAnimationFrame: typeof window !== 'undefined'
+        ? window.cancelAnimationFrame.bind(window)
         : (id: number) => clearTimeout(id),
       ...config,
     };
@@ -123,7 +123,6 @@ export class AnimationSystem extends EventEmitter {
     };
     this.enabled = this.config.enabled;
     this.maxConcurrent = this.config.maxConcurrentAnimations;
-    this.performanceMonitoring = this.config.enablePerformanceMonitoring;
     this.autoCleanup = this.config.enableAutoCleanup;
     this.cleanupDelay = this.config.cleanupDelay;
     this.requestAnimationFrame = this.config.requestAnimationFrame;
@@ -392,19 +391,19 @@ export class AnimationSystem extends EventEmitter {
     // 基于动画状态计算平滑度评分
     const runningAnimations = this.animations.size;
     const totalAnimations = this.metrics.totalAnimations;
-    
+
     // 如果没有动画，返回满分
     if (totalAnimations === 0) {
       return 1.0;
     }
-    
+
     // 基于运行动画数量和完成率计算评分
     const completionRate = this.metrics.completedAnimations / totalAnimations;
     const concurrencyFactor = Math.max(0, 1 - runningAnimations / this.maxConcurrent);
-    
+
     // 综合计算平滑度评分
     const smoothnessScore = (completionRate * 0.6) + (concurrencyFactor * 0.4);
-    
+
     return Math.min(1.0, Math.max(0, smoothnessScore));
   }
 
@@ -421,7 +420,7 @@ export class AnimationSystem extends EventEmitter {
 
   private completeAnimation(
     animationId: string,
-    element: HTMLElement,
+    _element: HTMLElement,
     fillMode: string
   ): void {
     const state = this.animations.get(animationId);
@@ -493,20 +492,20 @@ export class AnimationSystem extends EventEmitter {
   private applyProperty(element: HTMLElement, property: string, value: any): void {
     switch (property) {
       case 'opacity':
-        element.style.opacity = value.toString();
+        element.style.setProperty('opacity', value.toString());
         break;
       case 'transform':
-        element.style.transform = value;
+        element.style.setProperty('transform', value);
         break;
       case 'backgroundColor':
       case 'color':
-        element.style[property] = value;
+        element.style.setProperty(property, value);
         break;
       default:
         if (typeof value === 'number') {
-          element.style[property] = `${value}px`;
+          element.style.setProperty(property, `${value}px`);
         } else {
-          element.style[property] = value;
+          element.style.setProperty(property, value);
         }
     }
   }

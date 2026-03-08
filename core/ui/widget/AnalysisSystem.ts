@@ -1,13 +1,14 @@
 /**
- * @file AnalysisSystem 分析系统
- * @description 五维闭环系统中的分析维度，负责数据收集、用户行为分析、性能分析、模式识别和预测分析
- * @module core/ui/widget/analysis
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-03
- * @updated 2026-01-03
- * @copyright Copyright (c) 2026 YYC³
+ * @file ui/widget/AnalysisSystem.ts
+ * @description Analysis System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -132,7 +133,7 @@ export interface AnalysisMetrics {
 }
 
 export class AnalysisSystem extends EventEmitter {
-  private config: Required<AnalysisConfig>;
+  private config: AnalysisConfig;
   private dataStore: AnalysisData[];
   private analysisResults: AnalysisResult[];
   private detectedPatterns: DetectedPattern[];
@@ -182,11 +183,11 @@ export class AnalysisSystem extends EventEmitter {
       dataRetentionRate: 1.0,
     };
 
-    this.enabled = this.config.enabled;
-    this.realTimeAnalysisEnabled = this.config.enableRealTimeAnalysis;
-    this.dataRetentionDays = this.config.dataRetentionDays;
-    this.maxDataPoints = this.config.maxDataPoints;
-    this.samplingRate = this.config.samplingRate;
+    this.enabled = this.config.enabled ?? true;
+    this.realTimeAnalysisEnabled = this.config.enableRealTimeAnalysis ?? true;
+    this.dataRetentionDays = this.config.dataRetentionDays ?? 30;
+    this.maxDataPoints = this.config.maxDataPoints ?? 10000;
+    this.samplingRate = this.config.samplingRate ?? 1.0;
     this.analysisIntervalId = null;
 
     if (this.enabled) {
@@ -195,7 +196,7 @@ export class AnalysisSystem extends EventEmitter {
   }
 
   private initialize(): void {
-    if (this.config.enableRealTimeAnalysis && this.config.analysisInterval > 0) {
+    if (this.config.enableRealTimeAnalysis && (this.config.analysisInterval ?? 0) > 0) {
       this.startPeriodicAnalysis();
     }
 
@@ -1060,7 +1061,7 @@ export class AnalysisSystem extends EventEmitter {
   public setRealTimeAnalysis(enabled: boolean): void {
     this.realTimeAnalysisEnabled = enabled;
 
-    if (enabled && this.config.analysisInterval > 0) {
+    if (enabled && (this.config.analysisInterval ?? 0) > 0) {
       this.startPeriodicAnalysis();
     } else {
       this.stopPeriodicAnalysis();
@@ -1073,7 +1074,7 @@ export class AnalysisSystem extends EventEmitter {
     this.config = { ...this.config, ...config };
 
     if (config.analysisInterval !== undefined) {
-      if (this.config.enableRealTimeAnalysis && this.config.analysisInterval > 0) {
+      if (this.config.enableRealTimeAnalysis && (this.config.analysisInterval ?? 0) > 0) {
         this.startPeriodicAnalysis();
       } else {
         this.stopPeriodicAnalysis();

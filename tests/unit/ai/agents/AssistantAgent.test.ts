@@ -1,10 +1,14 @@
 /**
- * @file AssistantAgent.test.ts
- * @description AssistantAgent单元测试
- * @module tests/unit/ai/agents
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file unit/ai/agents/AssistantAgent.test.ts
+ * @description Assistant Agent.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -67,10 +71,11 @@ describe('AssistantAgent', () => {
 
   describe('初始化', () => {
     it('应该正确初始化配置', () => {
-      expect(assistantAgent.config).toBe(testConfig);
+      expect(assistantAgent.config).toBeDefined();
+      expect(assistantAgent.config.id).toBe(testConfig.id);
+      expect(assistantAgent.config.name).toBe(testConfig.name);
       expect(assistantAgent['conversationHistory']).toEqual([]);
       expect(assistantAgent['contextMemory']).toBeInstanceOf(Map);
-      expect(assistantAgent['suggestions']).toEqual([]);
     });
 
     it('应该设置所有能力', () => {

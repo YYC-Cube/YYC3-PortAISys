@@ -1,9 +1,14 @@
 /**
- * @file 综合测试报告生成器
- * @description 生成完整的测试报告，包括单元测试、集成测试、性能测试和安全测试结果
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-20
+ * @file generate-test-report.ts
+ * @description Generate Test Report 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import * as fs from 'fs/promises';

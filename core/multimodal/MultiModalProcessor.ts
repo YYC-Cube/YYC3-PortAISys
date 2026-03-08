@@ -1,13 +1,14 @@
 /**
- * @file MultiModalProcessor.ts
- * @description 多模态处理器 - 处理文本、图像、音频、视频
- * @module core/multimodal
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-21
- * @modified 2026-01-26
- * @copyright Copyright (c) 2025 YYC³
+ * @file multimodal/MultiModalProcessor.ts
+ * @description Multi Modal Processor 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';
@@ -462,7 +463,9 @@ export class MultiModalProcessor extends EventEmitter {
     if (this.cache.size >= this.config.maxCacheSize) {
       // 删除最旧的缓存项
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
     }
 
     this.cache.set(key, result);
@@ -502,30 +505,6 @@ export class MultiModalProcessor extends EventEmitter {
    */
   getModalityPriority(modality: ModalityType): number {
     return this.modalityPriorities.get(modality) || 0;
-  }
-
-  /**
-   * 处理队列
-   */
-  private async processQueue(): Promise<void> {
-    if (this.isProcessing || this.processingQueue.length === 0) {
-      return;
-    }
-
-    this.isProcessing = true;
-
-    while (this.processingQueue.length > 0) {
-      const item = this.processingQueue.shift()!;
-
-      try {
-        const result = await this.processModality(item.input);
-        item.resolve(result);
-      } catch (error) {
-        item.reject(error as Error);
-      }
-    }
-
-    this.isProcessing = false;
   }
 
   /**

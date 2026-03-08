@@ -1,10 +1,14 @@
 /**
- * @file 聊天界面组件实现
- * @description 实现IChatInterface接口，提供完整的聊天交互功能
- * @module ui/ChatInterface
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/ChatInterface.ts
+ * @description Chat Interface 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -41,13 +45,18 @@ import { logger } from '../utils/logger';
 export class ChatInterface extends EventEmitter implements IChatInterface {
   private sessions: Map<string, ChatSession>;
   private currentSessionId: string | null;
-  private isTyping: boolean;
+  public isTyping: boolean = false;
   private theme: ChatTheme;
   private layout: ChatLayout;
-  private themeConfig: ChatThemeConfig;
+  private themeConfig: ChatThemeConfig = {
+    primaryColor: '#007AFF',
+    backgroundColor: '#FFFFFF',
+    textColor: '#000000',
+    messageBackgroundColor: '#F0F0F0',
+    accentColor: '#007AFF',
+  };
   private visible: boolean;
   private minimized: boolean;
-  private messageQueue: Map<string, ChatMessage[]>;
   private errorHandler: ErrorHandler;
   private errorBoundary: ErrorBoundary;
   private modelAdapter: OpenAIModelAdapter;
@@ -56,20 +65,18 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
     super();
     this.sessions = new Map();
     this.currentSessionId = null;
-    this.isTyping = false;
     this.theme = 'auto';
     this.layout = 'default';
     this.visible = true;
     this.minimized = false;
-    this.messageQueue = new Map();
-    
+
     this.errorHandler = errorHandler || new ErrorHandler({ enableAutoRecovery: true });
     this.errorBoundary = new ErrorBoundary(this.errorHandler, {
       enableRecovery: true,
       maxRetries: 3,
       retryDelay: 1000
     });
-    
+
     // 初始化模型适配器
     const defaultConfig: AutonomousAIConfig = {
       apiKey: process.env.OPENAI_API_KEY || '',
@@ -88,7 +95,7 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
       theme: 'auto',
       language: 'zh-CN'
     };
-    
+
     this.modelAdapter = new OpenAIModelAdapter(modelConfig || defaultConfig, this.errorHandler);
     this.initializeDefaultTheme();
     this.setupErrorHandling();
@@ -145,20 +152,22 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
         throw error;
       }
     }, {
-      operation: 'sendMessage',
-      sessionId: this.currentSessionId,
-      messageId: message.id
+      context: {
+        operation: 'sendMessage',
+        sessionId: this.currentSessionId,
+        messageId: message.id
+      }
     });
   }
 
   private async processMessage(message: ChatMessage): Promise<string> {
     this.emit('message:processing', message);
-    
+
     try {
       // 构建模型请求
       const session = this.getCurrentSession();
       const messages = session ? session.messages.filter(m => m.role !== 'system') : [];
-      
+
       const request: ModelGenerationRequest = {
         prompt: message.content,
         messages: messages.map(m => ({
@@ -170,10 +179,10 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
           temperature: 0.7
         }
       };
-      
+
       // 调用模型适配器生成响应
       const result = await this.modelAdapter.generate(request);
-      
+
       // 构建响应消息
       const responseId = this.generateId();
       const response: ChatMessage = {
@@ -183,18 +192,18 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
         timestamp: Date.now(),
         status: 'sent',
       };
-      
+
       if (session) {
         session.messages.push(response);
         session.updatedAt = Date.now();
       }
-      
+
       this.emit('message:received', response);
       return result.content;
     } catch (error) {
       // 处理错误
       this.emit('error', { error, message });
-      
+
       // 生成错误响应
       const errorResponseId = this.generateId();
       const errorResponse: ChatMessage = {
@@ -204,13 +213,13 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
         timestamp: Date.now(),
         status: 'error',
       };
-      
+
       const session = this.getCurrentSession();
       if (session) {
         session.messages.push(errorResponse);
         session.updatedAt = Date.now();
       }
-      
+
       this.emit('message:received', errorResponse);
       return errorResponse.content;
     }
@@ -264,12 +273,12 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
       messages = messages.filter(m => m.role !== 'system');
     }
 
-    if (options?.before) {
-      messages = messages.filter(m => m.timestamp < options.before);
+    if (options?.before !== undefined) {
+      messages = messages.filter(m => m.timestamp < options.before!);
     }
 
-    if (options?.after) {
-      messages = messages.filter(m => m.timestamp > options.after);
+    if (options?.after !== undefined) {
+      messages = messages.filter(m => m.timestamp > options.after!);
     }
 
     if (options?.limit) {
@@ -315,7 +324,7 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
 
     this.sessions.set(sessionId, session);
     this.emit('session:created', session);
-    
+
     return sessionId;
   }
 
@@ -386,14 +395,14 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
   async translateMessage(messageId: string, targetLanguage: string): Promise<string> {
     const session = this.getCurrentSession();
     const message = session?.messages.find(m => m.id === messageId);
-    
+
     if (!message) {
       throw new NotFoundError('message', messageId);
     }
 
     const translatedContent = `[翻译到${targetLanguage}] ${message.content}`;
     this.emit('message:translated', { messageId, targetLanguage, translatedContent });
-    
+
     return translatedContent;
   }
 
@@ -405,7 +414,7 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
 
     const summary = `本次对话共包含 ${session.messages.length} 条消息，最后更新于 ${new Date(session.updatedAt).toLocaleString('zh-CN')}`;
     this.emit('conversation:summarized', { sessionId: session.id, summary });
-    
+
     return summary;
   }
 
@@ -418,7 +427,7 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
     }
 
     let content = '';
-    
+
     switch (format) {
       case 'json':
         content = JSON.stringify(session, null, 2);
@@ -552,7 +561,7 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d')?.drawImage(video, 0, 0);
-            
+
             canvas.toBlob((blob) => {
               stream.getTracks().forEach(track => track.stop());
               if (blob) {
@@ -600,7 +609,7 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
   markMessageAsRead(messageId: string): void {
     const session = this.getCurrentSession();
     const message = session?.messages.find(m => m.id === messageId);
-    
+
     if (message) {
       message.status = 'read';
       this.emit('message:read', messageId);
@@ -610,8 +619,8 @@ export class ChatInterface extends EventEmitter implements IChatInterface {
   getUnreadCount(): number {
     const session = this.getCurrentSession();
     if (!session) return 0;
-    
-    return session.messages.filter(m => 
+
+    return session.messages.filter(m =>
       m.role === 'assistant' && m.status !== 'read'
     ).length;
   }

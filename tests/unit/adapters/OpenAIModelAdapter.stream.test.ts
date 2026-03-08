@@ -1,10 +1,14 @@
 /**
- * @file OpenAI流式输出测试
- * @description 测试OpenAIModelAdapter的流式输出功能
- * @module tests/unit/adapters
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-21
+ * @file unit/adapters/OpenAIModelAdapter.stream.test.ts
+ * @description Open Aimodel Adapter.stream.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';

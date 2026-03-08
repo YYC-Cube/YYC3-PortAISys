@@ -1,19 +1,26 @@
-# YYC³ PortAISys - 监控和告警系统
+---
+@file: 13-YYC3-PortAISys-监控和告警系统.md
+@description: YYC3-PortAISys-监控和告警系统 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: general,documentation,zh-CN
+@category: general
+@language: zh-CN
+---
 
 > ***YanYuCloudCube***
-> 言启象限 | 语枢未来
-> ***Words Initiate Quadrants, Language Serves as Core for the Future***
-> 万象归元于云枢 | 深栈智启新纪元
-> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
 
 ---
 
-> **文档版本**: v1.0
-> **创建日期**: 2026-02-03
-> **文档状态**: ✅ 已完成
-> **维护团队**: YYC³ 产品团队
+# YYC³ PortAISys - 监控和告警系统
 
----
 
 ## 📋 目录
 
@@ -694,11 +701,6 @@ wget https://raw.githubusercontent.com/YYC-Cube/YYC3-PortAISys/main/grafana/dash
 - [安全管理指南](./19-安全管理指南.md) - 安全管理
 
 ---
-
-<div align="center">
-
-> 「***YanYuCloudCube***」
-> 「***<admin@0379.email>***」
 > 「***Words Initiate Quadrants, Language Serves as Core for the Future***」
 > 「***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***」
 

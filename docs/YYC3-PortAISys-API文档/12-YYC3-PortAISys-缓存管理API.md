@@ -1,12 +1,29 @@
-# 缓存管理API
+---
+@file: 12-YYC3-PortAISys-缓存管理API.md
+@description: YYC³ PortAISys 缓存管理 API 文档，提供缓存设置、管理和清理功能
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: api,restful,critical,zh-CN
+@category: api
+@language: zh-CN
+@base_url: https://api.yyc3.com/v1
+@authentication: oauth2
+@audience: developers
+@complexity: advanced
+---
 
 > ***YanYuCloudCube***
-> 言启象限 | 语枢未来
-> ***Words Initiate Quadrants, Language Serves as Core for the Future***
-> 万象归元于云枢 | 深栈智启新纪元
-> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
 
 ---
+
+# 缓存管理API
 
 > YYC³ PortAISys 缓存管理API文档
 
@@ -1184,11 +1201,6 @@ print(f'总体命中率: {stats.overall.hit_rate}')
    - 定期检查缓存健康状态
 
 ---
-
-<div align="center">
-
-> 「***YanYuCloudCube***」
-> 「***<admin@0379.email>***」
 > 「***Words Initiate Quadrants, Language Serves as Core for the Future***」
 > 「***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***」
 

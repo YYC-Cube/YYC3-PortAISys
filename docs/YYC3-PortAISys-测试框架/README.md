@@ -1,19 +1,26 @@
-# YYC³ PortAISys - 测试框架文档
+---
+@file: README.md
+@description: YYC³ PortAISys 文档目录，包含所有文档的索引和导航
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: general,documentation,zh-CN
+@category: general
+@language: zh-CN
+---
 
 > ***YanYuCloudCube***
-> 言启象限 | 语枢未来
-> ***Words Initiate Quadrants, Language Serves as Core for the Future***
-> 万象归元于云枢 | 深栈智启新纪元
-> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
 
 ---
 
-> **文档版本**: v1.0
-> **创建日期**: 2026-02-03
-> **文档状态**: ✅ 已完成
-> **维护团队**: YYC³ 测试团队
+# YYC³ PortAISys - 测试框架文档
 
----
 
 ## 📋 文档概述
 
@@ -352,11 +359,6 @@
 - [OWASP ZAP官方文档](https://www.zaproxy.org/docs/) - OWASP ZAP安全测试工具官方文档
 
 ---
-
-<div align="center">
-
-> 「***YanYuCloudCube***」
-> 「***<admin@0379.email>***」
 > 「***Words Initiate Quadrants, Language Serves as Core for the Future***」
 > 「***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***」
 

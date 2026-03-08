@@ -1,10 +1,14 @@
 /**
- * @file 高性能算法测试
- * @description 测试HighPerformanceAlgorithms的核心算法实现
- * @module tests/unit/algorithms
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-21
+ * @file unit/algorithms/HighPerformanceAlgorithms.test.ts
+ * @description High Performance Algorithms.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { describe, it, expect } from 'vitest';

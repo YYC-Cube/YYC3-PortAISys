@@ -1,6 +1,20 @@
+/**
+ * @file integration/api.integration.test.ts
+ * @description Api.integration.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-08
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
+import { cors } from 'hono/cors';
 
 describe('API Integration Tests', () => {
   let app: Hono;
@@ -10,7 +24,16 @@ describe('API Integration Tests', () => {
   beforeAll(async () => {
     app = new Hono();
 
+    app.use('*', cors({
+      origin: '*',
+      allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowHeaders: ['Content-Type', 'Authorization'],
+    }));
+
     app.get('/health', (c) => {
+      c.header('X-Content-Type-Options', 'nosniff');
+      c.header('X-Frame-Options', 'DENY');
+      c.header('X-XSS-Protection', '1; mode=block');
       return c.json({ status: 'ok', timestamp: Date.now() });
     });
 
@@ -20,17 +43,40 @@ describe('API Integration Tests', () => {
 
     app.post('/api/users', async (c) => {
       const body = await c.req.json();
+      
+      if (!body.email || !body.password) {
+        return c.json({ error: 'Invalid user data' }, 400);
+      }
+      
+      if (body.email === 'invalid-email') {
+        return c.json({ error: 'Invalid email format' }, 400);
+      }
+      
+      if (body.password === 'weak') {
+        return c.json({ error: 'Password too weak' }, 400);
+      }
+      
       return c.json({ success: true, user: body }, 201);
     });
 
     app.get('/api/users/:id', (c) => {
       const id = c.req.param('id');
+      
+      if (id === 'non-existent') {
+        return c.json({ error: 'User not found' }, 404);
+      }
+      
       return c.json({ id, name: 'Test User', email: 'test@example.com' });
     });
 
     app.put('/api/users/:id', async (c) => {
       const id = c.req.param('id');
       const body = await c.req.json();
+      
+      if (!body.name || !body.email) {
+        return c.json({ error: 'Invalid update data' }, 400);
+      }
+      
       return c.json({ success: true, id, ...body });
     });
 
@@ -41,6 +87,11 @@ describe('API Integration Tests', () => {
 
     app.get('/api/cache/:key', async (c) => {
       const key = c.req.param('key');
+      
+      if (key === 'non-existent-key') {
+        return c.json({ key, value: null, hit: false });
+      }
+      
       return c.json({ key, value: `cached-${key}`, hit: true });
     });
 
@@ -59,6 +110,8 @@ describe('API Integration Tests', () => {
       fetch: app.fetch,
       port: 3200,
     });
+
+    await new Promise(resolve => setTimeout(resolve, 100));
   });
 
   afterAll(async () => {
@@ -150,7 +203,7 @@ describe('API Integration Tests', () => {
         const userId = 'non-existent';
         const response = await fetch(`${baseUrl}/api/users/${userId}`);
 
-        expect(response.status).toBeGreaterThanOrEqual(400);
+        expect(response.status).toBe(404);
       });
     });
 

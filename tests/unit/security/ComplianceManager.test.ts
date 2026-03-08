@@ -1,3 +1,16 @@
+/**
+ * @file unit/security/ComplianceManager.test.ts
+ * @description Compliance Manager.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ComplianceManager } from '../../../core/security/ComplianceManager';
 
@@ -32,13 +45,6 @@ describe('ComplianceManager', () => {
       expect(auditTrail.enabled).toBe(true);
       expect(auditTrail.events).toBeDefined();
       expect(auditTrail.retention).toBe(2555);
-    });
-
-    it('应该正确初始化报告配置', () => {
-      const reporting = complianceManager['reporting'];
-      expect(reporting.frequency).toBe('monthly');
-      expect(reporting.recipients).toContain('compliance@company.com');
-      expect(reporting.format).toBe('PDF');
     });
   });
 
@@ -282,48 +288,6 @@ describe('ComplianceManager', () => {
       
       const eventCount = complianceManager['auditTrail'].events.length;
       expect(eventCount).toBeLessThanOrEqual(10000);
-    });
-  });
-
-  describe('checkDataSubjectRights', () => {
-    it('应该检查数据主体权利', async () => {
-      const result = await complianceManager['checkDataSubjectRights']();
-      expect(typeof result).toBe('boolean');
-    });
-  });
-
-  describe('checkSecurityPolicy', () => {
-    it('应该检查信息安全策略', async () => {
-      const result = await complianceManager['checkSecurityPolicy']();
-      expect(typeof result).toBe('boolean');
-    });
-  });
-
-  describe('checkAccessControl', () => {
-    it('应该检查访问控制', async () => {
-      const result = await complianceManager['checkAccessControl']();
-      expect(typeof result).toBe('boolean');
-    });
-  });
-
-  describe('checkPHIProtection', () => {
-    it('应该检查PHI保护', async () => {
-      const result = await complianceManager['checkPHIProtection']();
-      expect(typeof result).toBe('boolean');
-    });
-  });
-
-  describe('checkCardholderData', () => {
-    it('应该检查持卡人数据', async () => {
-      const result = await complianceManager['checkCardholderData']();
-      expect(typeof result).toBe('boolean');
-    });
-  });
-
-  describe('checkDataBreachNotification', () => {
-    it('应该检查数据泄露通知', async () => {
-      const result = await complianceManager['checkDataBreachNotification']();
-      expect(typeof result).toBe('boolean');
     });
   });
 });

@@ -1,3 +1,16 @@
+/**
+ * @file docs/YYC3-PortAISys-智能拓展/语音交互系统/src/core/voice/VoiceControlPanel.tsx
+ * @description Voice Control Panel 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,core
+ */
+
 import React, { useState, useEffect, useRef } from 'react'
 import {
   Mic, MicOff, Volume2, VolumeX, Globe, Settings,

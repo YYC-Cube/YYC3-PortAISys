@@ -1,10 +1,14 @@
 /**
- * @file 反馈管理系统
- * @description 管理用户反馈，包括评分、评论和反馈分析
- * @module ui/widget/FeedbackManager
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/widget/FeedbackManager.ts
+ * @description Feedback Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -26,7 +30,6 @@ interface Feedback {
 }
 
 export class FeedbackManager extends EventEmitter {
-  private widget: any;
   private enableRating: boolean;
   private enableComments: boolean;
   private enableAnalytics: boolean;
@@ -35,7 +38,6 @@ export class FeedbackManager extends EventEmitter {
 
   constructor(config: FeedbackManagerConfig) {
     super();
-    this.widget = config.widget;
     this.enableRating = config.enableRating || true;
     this.enableComments = config.enableComments || true;
     this.enableAnalytics = config.enableAnalytics || true;

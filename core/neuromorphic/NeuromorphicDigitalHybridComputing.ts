@@ -1,11 +1,14 @@
 /**
- * @file NeuromorphicDigitalHybridComputing.ts
- * @description 神经形态-数字混合计算模块 - 结合神经形态计算与传统数字计算优势
- * @module neuromorphic
- * @author YYC
- * @version 1.0.0
- * @created 2025-01-05
- * @updated 2025-01-05
+ * @file neuromorphic/NeuromorphicDigitalHybridComputing.ts
+ * @description Neuromorphic Digital Hybrid Computing 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 export interface ComputationalDivision {

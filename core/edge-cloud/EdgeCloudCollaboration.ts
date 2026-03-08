@@ -1,3 +1,16 @@
+/**
+ * @file edge-cloud/EdgeCloudCollaboration.ts
+ * @description Edge Cloud Collaboration 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 export interface EdgeComputing {
   edgeDevices: {
     deployment: any;
@@ -34,7 +47,7 @@ export interface CloudComputing {
   };
 }
 
-export interface EdgeCloudCollaboration {
+export interface EdgeCloudCollaborationConfig {
   dataSynchronization: {
     bidirectional: any;
     conflictResolution: any;
@@ -93,7 +106,7 @@ export class EdgeCloudCollaboration {
     };
   }
 
-  async edgeCloudCollaboration(): Promise<EdgeCloudCollaboration> {
+  async edgeCloudCollaboration(): Promise<EdgeCloudCollaborationConfig> {
     return {
       dataSynchronization: {
         bidirectional: await this.implementBidirectionalSync(),

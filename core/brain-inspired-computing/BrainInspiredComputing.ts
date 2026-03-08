@@ -1,10 +1,14 @@
 /**
- * @file 脑启发计算模块
- * @description 实现受生物大脑启发的计算模型和算法
- * @module brain-inspired-computing
- * @author YYC
- * @version 1.0.0
- * @created 2024-10-15
+ * @file brain-inspired-computing/BrainInspiredComputing.ts
+ * @description Brain Inspired Computing 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

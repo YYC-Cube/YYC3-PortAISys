@@ -1,11 +1,14 @@
 /**
- * @file 动态认知神经图谱
- * @description 实现认知行为网络和潜意识需求挖掘，构建客户动态认知模型
- * @module innovation
- * @author YYC
- * @version 1.0.0
- * @created 2024-10-15
- * @updated 2024-10-15
+ * @file innovation/DynamicCognitiveNeurograph.ts
+ * @description Dynamic Cognitive Neurograph 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 export interface DynamicCognitiveNeurographConfig {

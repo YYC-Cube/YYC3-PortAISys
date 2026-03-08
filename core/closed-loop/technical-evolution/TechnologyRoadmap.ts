@@ -1,11 +1,18 @@
 /**
- * 技术路线图
- * @file core/closed-loop/technical-evolution/TechnologyRoadmap.ts
- * @description 实现技术演进维度的技术路线图规划和管理功能
+ * @file closed-loop/technical-evolution/TechnologyRoadmap.ts
+ * @description Technology Roadmap 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import type { AutonomousAIConfig } from '../../autonomous-ai-widget/types';
-import { Logger } from '../../utils/logger';
+import { Logger, LogLevel } from '../../utils/logger';
 
 /**
  * 技术里程碑接口
@@ -39,7 +46,7 @@ export class TechnologyRoadmap {
   private logger: Logger;
 
   constructor(_config: AutonomousAIConfig) {
-    this.logger = new Logger({ level: 'INFO', format: 'text', console: true });
+    this.logger = new Logger({ level: LogLevel.INFO, format: 'text', console: true });
     this.currentPhase = RoadmapPhase.FOUNDATION;
     this.initializeMilestones();
   }

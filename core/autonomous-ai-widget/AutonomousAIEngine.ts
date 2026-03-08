@@ -1,10 +1,14 @@
 /**
- * @file 自治AI引擎
- * @description 实现完全自治的AI引擎，支持自主决策、学习、记忆和工具使用
- * @module autonomous-ai-engine
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file autonomous-ai-widget/AutonomousAIEngine.ts
+ * @description Autonomous Aiengine 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { MessageBus, Message } from '../message-bus/MessageBus';

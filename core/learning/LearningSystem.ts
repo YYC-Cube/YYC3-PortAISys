@@ -1,11 +1,14 @@
 /**
- * @file 学习系统实现
- * @description 实现AI系统的自主学习能力，包括交互记录、模式识别和性能评估
- * @module learning/LearningSystem
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
- * @updated 2025-01-30
+ * @file learning/LearningSystem.ts
+ * @description Learning System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { AutonomousAIConfig } from '../autonomous-ai-widget/types';

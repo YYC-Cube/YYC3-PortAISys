@@ -1,13 +1,14 @@
 /**
- * @file ExecutionSystem 执行系统
- * @description 五维闭环系统中的执行维度，负责任务调度、命令执行、工作流管理和资源协调
- * @module core/ui/widget/execution
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-03
- * @updated 2026-01-03
- * @copyright Copyright (c) 2026 YYC³
+ * @file ui/widget/ExecutionSystem.ts
+ * @description Execution System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -105,7 +106,7 @@ export interface ResourceAllocation {
 }
 
 export class ExecutionSystem extends EventEmitter {
-  private config: Required<ExecutionConfig>;
+  private config: ExecutionConfig;
   private taskQueue: Task[];
   private runningTasks: Map<string, Task>;
   private completedTasks: Map<string, Task>;
@@ -117,12 +118,12 @@ export class ExecutionSystem extends EventEmitter {
   private maxConcurrentTasks: number;
   private taskTimeout: number;
   private enableRetry: boolean;
-  private maxRetries: number;
+  private _maxRetries: number;
   private retryDelay: number;
   private enablePriorityQueue: boolean;
   private enableTaskDependencies: boolean;
   private enableWorkflow: boolean;
-  private enableResourceManagement: boolean;
+  private _enableResourceManagement: boolean;
   private abortControllers: Map<string, AbortController>;
   private executionHistory: Map<string, number[]>;
 
@@ -166,16 +167,16 @@ export class ExecutionSystem extends EventEmitter {
       currentRunningTasks: 0,
     };
 
-    this.enabled = this.config.enabled;
-    this.maxConcurrentTasks = this.config.maxConcurrentTasks;
-    this.taskTimeout = this.config.taskTimeout;
-    this.enableRetry = this.config.enableRetry;
-    this.maxRetries = this.config.maxRetries;
-    this.retryDelay = this.config.retryDelay;
-    this.enablePriorityQueue = this.config.enablePriorityQueue;
-    this.enableTaskDependencies = this.config.enableTaskDependencies;
-    this.enableWorkflow = this.config.enableWorkflow;
-    this.enableResourceManagement = this.config.enableResourceManagement;
+    this.enabled = this.config.enabled ?? true;
+    this.maxConcurrentTasks = this.config.maxConcurrentTasks ?? 10;
+    this.taskTimeout = this.config.taskTimeout ?? 30000;
+    this.enableRetry = this.config.enableRetry ?? true;
+    this._maxRetries = this.config.maxRetries ?? 3;
+    this.retryDelay = this.config.retryDelay ?? 1000;
+    this.enablePriorityQueue = this.config.enablePriorityQueue ?? true;
+    this.enableTaskDependencies = this.config.enableTaskDependencies ?? true;
+    this.enableWorkflow = this.config.enableWorkflow ?? true;
+    this._enableResourceManagement = this.config.enableResourceManagement ?? true;
 
     if (this.enabled) {
       this.initialize();
@@ -672,7 +673,7 @@ export class ExecutionSystem extends EventEmitter {
     }
 
     if (config.maxRetries !== undefined) {
-      this.maxRetries = config.maxRetries;
+      this._maxRetries = config.maxRetries;
     }
 
     if (config.retryDelay !== undefined) {
@@ -695,7 +696,7 @@ export class ExecutionSystem extends EventEmitter {
     }
 
     if (config.enableResourceManagement !== undefined) {
-      this.enableResourceManagement = config.enableResourceManagement;
+      this._enableResourceManagement = config.enableResourceManagement;
     }
 
     this.emit('config:updated', this.config);
@@ -719,5 +720,13 @@ export class ExecutionSystem extends EventEmitter {
 
     this.removeAllListeners();
     this.emit('destroyed');
+  }
+
+  getMaxRetries(): number {
+    return this._maxRetries;
+  }
+
+  isResourceManagementEnabled(): boolean {
+    return this._enableResourceManagement;
   }
 }

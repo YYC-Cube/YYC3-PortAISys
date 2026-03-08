@@ -1,12 +1,14 @@
 /**
- * @file 自动化部署和监控系统
- * @description 实现全面的自动化部署和监控流程，包括CI/CD流水线、环境管理和监控集成
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file deployment/AutomatedDeploymentManager.ts
+ * @description Automated Deployment Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

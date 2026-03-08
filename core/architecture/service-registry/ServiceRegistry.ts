@@ -1,12 +1,14 @@
 /**
- * @file 服务注册与发现机制
- * @description 实现微服务的注册、发现、健康检查等功能
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file architecture/service-registry/ServiceRegistry.ts
+ * @description Service Registry 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { logger } from '../../utils/logger';

@@ -1,10 +1,14 @@
 /**
- * @file 工具注册表
- * @description 用于管理AI工具注册、执行和推荐的核心组件
- * @module core/tools/ToolRegistry
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2025-01-30
+ * @file tools/ToolRegistry.ts
+ * @description Tool Registry 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { NotFoundError, InternalError } from '../error-handler/ErrorTypes';
@@ -64,9 +68,10 @@ export class ToolRegistry {
       
       return result;
     } catch (error) {
-      throw new InternalError(`Tool execution failed: ${error.message}`, {
-        additionalData: { toolName, parameters, error: error.message }
-      }, error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new InternalError(`Tool execution failed: ${errorMessage}`, {
+        additionalData: { toolName, parameters, error: errorMessage }
+      }, error instanceof Error ? error : undefined);
     }
   }
   
@@ -90,9 +95,18 @@ export class ToolRegistry {
       }
     }
     
-    return relevantTools.sort((a, b) => 
-      this.calculateToolRelevance(b, context) - this.calculateToolRelevance(a, context)
-    ).slice(0, 5); // 返回前5个最相关的工具
+    const toolRelevancePairs = await Promise.all(
+      Array.from(this.tools.values()).map(async (tool) => ({
+        tool,
+        relevance: await this.calculateToolRelevance(tool, context)
+      }))
+    );
+    
+    return toolRelevancePairs
+      .filter(({ relevance }) => relevance > 0.7)
+      .sort((a, b) => b.relevance - a.relevance)
+      .slice(0, 5)
+      .map(({ tool }) => tool); // 返回前5个最相关的工具
   }
   
   private async recordToolUsage(toolName: string, parameters: any, result: ToolResult): Promise<void> {

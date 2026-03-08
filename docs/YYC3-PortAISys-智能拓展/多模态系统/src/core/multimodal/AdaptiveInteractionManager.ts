@@ -1,6 +1,14 @@
 /**
- * @file AdaptiveInteractionManager.ts
- * @description 自适应交互模式管理器 - 根据用户行为和上下文调整交互方式
+ * @file docs/YYC3-PortAISys-智能拓展/多模态系统/src/core/multimodal/AdaptiveInteractionManager.ts
+ * @description Adaptive Interaction Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,core
  */
 
 import { InputModality, ContextState } from './MultimodalProtocol'

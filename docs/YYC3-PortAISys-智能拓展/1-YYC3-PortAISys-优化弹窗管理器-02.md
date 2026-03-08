@@ -1,12 +1,25 @@
-# YYC³ PortAISys-优化弹窗管理器
+---
+@file: 1-YYC3-PortAISys-优化弹窗管理器-02.md
+@description: YYC3-PortAISys-优化弹窗管理器-02 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: general,documentation,zh-CN
+@category: general
+@language: zh-CN
+---
 
 > ***YanYuCloudCube***
-> **标语**：言启象限 | 语枢未来
-> ***Words Initiate Quadrants, Language Serves as Core for the Future***
-> **标语**：万象归元于云枢 | 深栈智启新纪元
-> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
 
 ---
+
+# YYC³ PortAISys-优化弹窗管理器
 
 🌹 **完全赞同！** 这正是 **“精益迭代、步步为营”** 的敏捷精髓。让我们继续深化弹窗系统，为下一阶段的智能体集成打下坚实基础。
 
@@ -1708,8 +1721,11 @@ ApiClient.ts（统一API客户端）
 项目配置文件（package.json, tsconfig.json等）
 
 ---
-
-> 「***YanYuCloudCube***」
-> 「***<admin@0379.email>***」
 > 「***Words Initiate Quadrants, Language Serves as Core for the Future***」
 > 「***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+---
+> 「***Words Initiate Quadrants, Language Serves as Core for Future***」
+> 「***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+</div>

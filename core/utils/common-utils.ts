@@ -1,11 +1,14 @@
 /**
- * @file 公共工具函数库
- * @description 提供项目中常用的工具函数，消除代码重复
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file utils/common-utils.ts
+ * @description Common Utils 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,utils
  */
 
 /**

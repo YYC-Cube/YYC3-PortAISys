@@ -1,10 +1,14 @@
 /**
- * @file 消息队列
- * @description 管理消息队列
- * @module ui/widget/MessageQueue
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-05
+ * @file ui/widget/MessageQueue.ts
+ * @description Message Queue 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';

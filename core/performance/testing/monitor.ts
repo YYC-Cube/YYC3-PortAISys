@@ -1,10 +1,14 @@
 /**
- * @file 性能监控器实现
- * @description 实现性能监控器，用于收集和监控性能指标
- * @module performance-testing
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-07
+ * @file performance/testing/monitor.ts
+ * @description Monitor 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

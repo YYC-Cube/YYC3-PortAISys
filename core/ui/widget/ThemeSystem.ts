@@ -1,13 +1,14 @@
 /**
- * @file 主题系统
- * @description 管理主题切换、自定义主题创建和主题持久化
- * @module ui/widget/ThemeSystem
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-03
- * @updated 2026-01-03
- * @copyright Copyright (c) 2026 YYC³
+ * @file ui/widget/ThemeSystem.ts
+ * @description Theme System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -130,7 +131,7 @@ export type ThemeChangeEvent = {
 export class ThemeSystem extends EventEmitter {
   private config: Required<ThemeSystemConfig>;
   private themes: Map<string, Theme>;
-  private currentTheme: Theme;
+  private currentTheme!: Theme;
   private previousTheme: Theme | null;
   private autoMode: boolean;
   private transitionEnabled: boolean;
@@ -144,6 +145,8 @@ export class ThemeSystem extends EventEmitter {
   constructor(config: ThemeSystemConfig = {}) {
     super();
 
+    const onThemeChange = config.onThemeChange || (() => {});
+
     this.config = {
       defaultTheme: 'light',
       enableAutoMode: true,
@@ -153,6 +156,7 @@ export class ThemeSystem extends EventEmitter {
       enablePersistence: true,
       persistenceKey: 'yyc3-widget-theme',
       customThemes: [],
+      onThemeChange,
       ...config,
     };
 
@@ -354,7 +358,7 @@ export class ThemeSystem extends EventEmitter {
     if (typeof window === 'undefined' || !window.matchMedia) return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
+
     this.systemThemeListener = (e: MediaQueryListEvent) => {
       if (this.autoMode) {
         const systemTheme = e.matches ? 'dark' : 'light';
@@ -377,7 +381,7 @@ export class ThemeSystem extends EventEmitter {
 
   unmount(): void {
     this.rootElement = null;
-    
+
     if (this.systemThemeListener) {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       mediaQuery.removeEventListener('change', this.systemThemeListener);
@@ -627,7 +631,7 @@ export class ThemeSystem extends EventEmitter {
   importTheme(themeJson: string): Theme {
     try {
       const theme: Theme = JSON.parse(themeJson);
-      
+
       if (!theme.id || !theme.name || !theme.config) {
         throw new Error('Invalid theme format');
       }
@@ -637,7 +641,8 @@ export class ThemeSystem extends EventEmitter {
 
       return theme;
     } catch (error) {
-      throw new Error(`Failed to import theme: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to import theme: ${errorMessage}`);
     }
   }
 

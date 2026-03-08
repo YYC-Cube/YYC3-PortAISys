@@ -1,3 +1,16 @@
+/**
+ * @file error-handler/ErrorHandler.ts
+ * @description Error Handler 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import EventEmitter from 'eventemitter3'
 import {
   YYC3Error,
@@ -366,7 +379,7 @@ export class ErrorHandler extends EventEmitter {
 
   private logError(error: YYC3Error, context: Record<string, any>): void {
     const logMethod = this.getLogMethod(error.severity)
-    logMethod(`[${error.code}] ${error.message}`, {
+    logMethod(`[${error.code}] ${error.message}`, 'ErrorHandler', {
       category: error.category,
       severity: error.severity,
       retryable: error.retryable,

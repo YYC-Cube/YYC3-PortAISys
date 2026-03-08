@@ -1,13 +1,14 @@
 /**
- * @file 学习系统类型定义
- * @description 定义学习系统的核心类型接口
- * @module learning/types
- * @author YYC³
- * @version 1.0.0
- * @created 2025-12-30
- * @updated 2025-12-30
- * @copyright Copyright (c) 2025 YYC³
+ * @file learning/types.ts
+ * @description Types 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 // 学习系统配置

@@ -1,10 +1,14 @@
 /**
- * @file 提示通知管理系统
- * @description 管理toast通知的显示、隐藏和队列
- * @module ui/widget/ToastManager
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/widget/ToastManager.ts
+ * @description Toast Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -26,7 +30,6 @@ export interface Toast {
 }
 
 export class ToastManager extends EventEmitter {
-  private widget: any;
   private maxToasts: number;
   private defaultDuration: number;
   private enableAnimations: boolean;
@@ -35,7 +38,6 @@ export class ToastManager extends EventEmitter {
 
   constructor(config: ToastManagerConfig) {
     super();
-    this.widget = config.widget;
     this.maxToasts = config.maxToasts || 5;
     this.defaultDuration = config.defaultDuration || 3000;
     this.enableAnimations = config.enableAnimations || true;

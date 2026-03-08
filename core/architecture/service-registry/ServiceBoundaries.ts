@@ -1,12 +1,14 @@
 /**
- * @file 微服务边界定义
- * @description 明确各个微服务之间的边界和职责，包含服务通信协议和依赖关系管理
- * @author YYC³ Team
- * @version 2.0.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file architecture/service-registry/ServiceBoundaries.ts
+ * @description Service Boundaries 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 export interface ServiceDependency {

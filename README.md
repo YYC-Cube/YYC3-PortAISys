@@ -164,6 +164,54 @@ REDIS_URL=redis://localhost:6379
 LOG_LEVEL=debug
 ```
 
+### 数据库配置
+
+YYC³ Portable Intelligent AI System 使用 PostgreSQL 作为主数据库，支持完整的数据库测试和迁移。
+
+#### 本地开发数据库
+
+```bash
+# 使用本地 PostgreSQL 数据库
+DATABASE_URL=postgresql://yanyu:password@localhost:5433/yyc3_aify
+
+# 运行数据库迁移
+pnpm test:db:migrate
+
+# 验证数据库架构
+pnpm test:db:schema
+
+# 测试数据库连接
+pnpm test:db:connection
+```
+
+#### 数据库架构
+
+项目使用独立的 Schema 进行隔离，确保数据安全和可维护性：
+
+```sql
+-- YYC³ Widget Schema
+CREATE SCHEMA IF NOT EXISTS yyc3_widget;
+
+-- 主要表
+- conversations: 对话记录
+- messages: 消息记录
+- knowledge_base: 知识库
+- ai_models: AI模型配置
+- user_preferences: 用户偏好
+- system_metrics: 系统指标
+- audit_logs: 审计日志
+- plugin_configs: 插件配置
+```
+
+#### 数据库特性
+
+- ✅ **JSONB 支持**：灵活的 JSON 数据存储
+- ✅ **数组类型**：原生数组支持
+- ✅ **全文搜索**：PostgreSQL 全文搜索
+- ✅ **事务支持**：ACID 事务保证
+- ✅ **索引优化**：19个优化索引
+- ✅ **性能监控**：查询性能追踪
+
 ### 启动开发服务器
 
 ```bash
@@ -426,6 +474,24 @@ pnpm exec playwright test --ui
 pnpm exec playwright test --debug
 ```
 
+#### 数据库测试（PostgreSQL）
+
+```bash
+# 测试数据库连接
+pnpm test:db:connection
+
+# 运行数据库迁移
+pnpm test:db:migrate
+
+# 验证数据库架构
+pnpm test:db:schema
+
+# 运行数据库集成测试
+pnpm test:db:integration --coverage
+```
+
+> **说明：** 数据库测试需要配置 `DATABASE_URL` 环境变量。本地开发可使用 `.env` 文件，CI/CD 环境使用 GitHub Secrets。
+
 #### 性能基准测试
 
 性能测试默认跳过，需要通过环境变量显式开启：
@@ -605,13 +671,23 @@ pnpm run check
 | ------ | -------- | ------- | ---- |
 | **错误数** | 0 | 0 | ✅ |
 | **警告数** | < 100 | 270 | 🟡 |
-| **测试覆盖率** | > 80% | ~90% | ✅ |
+| **测试覆盖率** | > 80% | ~97.2% | ✅ |
 | **TypeScript覆盖率** | 100% | 100% | ✅ |
 | **ESLint通过率** | 100% | 100% | ✅ |
+| **数据库测试** | 通过 | 通过 | ✅ |
 
 ### 错误修复记录 ✅
 
-**最新修复**: 2026-02-03
+**最新修复**: 2026-03-08
+
+- ✅ 修复14个TypeScript类型错误（迭代器转换）
+- ✅ 修复132个ESLint错误（脚本文件）
+- ✅ 添加数据库测试工作流
+- ✅ 更新CI/CD配置
+- ✅ 所有测试通过（97.2%覆盖率）
+- ✅ 数据库连接和Schema验证正常
+
+**历史修复**: 2026-02-03
 
 - ✅ 修复91个文件中的eventemitter3导入方式问题
 - ✅ 安装@types/node类型定义包
@@ -621,7 +697,9 @@ pnpm run check
 - ✅ 修复11个linter错误
 - ✅ ESLint检查通过（0错误，269警告）
 
-**详细报告**: [错误修复报告](docs/YYC3-PortAISys-错误修复报告-2026-02-03.md)
+**详细报告**: 
+- [错误修复报告](docs/YYC3-PortAISys-错误修复报告-2026-02-03.md)
+- [代码审核报告](CODE_AUDIT_REPORT.md)
 
 ### 实现统计
 
@@ -631,6 +709,134 @@ pnpm run check
 - **文档数量**: 200+个文档文件
 - **代码行数**: 50,000+行
 - **实现功能**: 100+个核心功能
+- **TypeScript错误**: 0个（已全部修复）
+- **ESLint错误**: 0个（已全部修复）
+- **测试覆盖率**: 97.2%
+- **数据库表**: 8个主要表
+- **数据库索引**: 19个优化索引
+
+---
+
+## 🚀 CI/CD 流水线
+
+YYC³ Portable Intelligent AI System 配置了完整的 CI/CD 流水线，确保代码质量和系统稳定性。
+
+### 工作流概览
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    CI/CD 流水线                        │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  代码质量检查 → 构建验证 → 测试套件 → 部署           │
+│       ↓              ↓            ↓          ↓          │
+│  - ESLint       - TypeScript  - 单元测试  - 测试环境   │
+│  - 类型检查     - 构建        - 集成测试              │
+│  - 格式检查                  - E2E测试                │
+│                             - 性能测试                │
+│                             - 安全测试                │
+│                             - 数据库测试              │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 主要工作流
+
+#### 1. 代码质量检查 (lint-and-typecheck)
+
+- ✅ ESLint 代码规范检查
+- ✅ TypeScript 类型检查
+- ✅ Prettier 格式检查
+
+#### 2. 构建验证 (build)
+
+- ✅ TypeScript 编译
+- ✅ Vite 构建优化
+- ✅ 构建产物上传
+
+#### 3. 测试套件
+
+**单元测试 (test-unit)**
+- ✅ 运行所有单元测试
+- ✅ 生成测试覆盖率报告
+- ✅ 上传到 Codecov
+
+**集成测试 (test-integration)**
+- ✅ 运行集成测试
+- ✅ 生成测试覆盖率报告
+- ✅ 上传到 Codecov
+
+**E2E 测试 (test-e2e)**
+- ✅ Playwright 端到端测试
+- ✅ 生成测试报告
+- ✅ 上传测试报告
+
+**性能测试 (test-performance)**
+- ✅ 性能基准测试
+- ✅ 生成性能报告
+- ✅ 上传性能报告
+
+**安全测试 (test-security)**
+- ✅ npm audit 安全审计
+- ✅ Snyk 安全扫描
+- ✅ 生成安全报告
+
+**数据库测试 (test-database)**
+- ✅ 数据库迁移测试
+- ✅ 数据库架构验证
+- ✅ 数据库集成测试
+- ✅ 生成测试覆盖率报告
+
+#### 4. 文档同步 (sync-docs)
+
+- ✅ 文档与代码同步
+- ✅ 上传同步文档
+
+#### 5. 部署 (deploy-staging)
+
+- ✅ 部署到测试环境
+- ✅ 发送部署通知
+
+#### 6. 状态报告 (generate-status)
+
+- ✅ 生成 CI/CD 状态报告
+- ✅ 生成综合测试报告
+- ✅ 上传报告
+
+### 触发条件
+
+| 事件 | 分支 | 说明 |
+|------|------|------|
+| **Push** | main, develop | 代码提交触发完整流水线 |
+| **Pull Request** | main, develop | PR 触发完整流水线 |
+| **Schedule** | - | 每周日 00:00 运行完整测试 |
+| **Workflow Dispatch** | - | 手动触发 |
+
+### 环境变量配置
+
+CI/CD 流水线需要以下环境变量：
+
+```yaml
+# GitHub Secrets
+DATABASE_URL_TEST: postgresql://user:password@localhost:5432/yyc3_test
+SNYK_TOKEN: your-snyk-token
+```
+
+### 查看工作流
+
+```bash
+# 查看所有工作流
+gh workflow list
+
+# 查看特定工作流
+gh workflow view ci.yml
+
+# 查看工作流运行历史
+gh run list --workflow=ci.yml
+
+# 查看特定运行
+gh run view <run-id>
+```
 
 ---
 

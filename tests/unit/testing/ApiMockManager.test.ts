@@ -1,10 +1,14 @@
 /**
- * @file API模拟管理器单元测试
- * @description 测试ApiMockManager的功能可靠性和正确性
- * @module tests/unit/testing/ApiMockManager
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file unit/testing/ApiMockManager.test.ts
+ * @description Api Mock Manager.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';

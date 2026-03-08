@@ -1,13 +1,14 @@
 /**
- * @file LearningAgent.ts
- * @description 学习Agent - 具备自主学习能力
- * @module core/ai/agents
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-21
- * @modified 2026-01-26
- * @copyright Copyright (c) 2025 YYC³
+ * @file ai/agents/LearningAgent.ts
+ * @description Learning Agent 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { BaseAgent } from '../BaseAgent'

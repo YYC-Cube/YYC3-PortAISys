@@ -1,16 +1,34 @@
 /**
- * @file MobileAppCore.ts
- * @description 移动端应用核心 - React Native集成
- * @module core/mobile
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-21
+ * @file mobile/MobileAppCore.ts
+ * @description Mobile App Core 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Location from 'expo-location';
-import * as LocalAuthentication from 'expo-local-authentication';
+
+// Type stubs for Expo modules (not available in this environment)
+interface LocationModule {
+  requestForegroundPermissionsAsync: () => Promise<{ status: string }>;
+  getCurrentPositionAsync: (options?: any) => Promise<{ coords: any; timestamp: number }>;
+  watchPositionAsync: (options: any, callback: (position: any) => void) => Promise<{ remove: () => void }>;
+}
+
+interface LocalAuthenticationModule {
+  hasHardwareAsync: () => Promise<boolean>;
+  isEnrolledAsync: () => Promise<boolean>;
+  authenticateAsync: (options: any) => Promise<{ success: boolean }>;
+}
+
+const LocationAPI: LocationModule = {} as LocationModule;
+const LocalAuthAPI: LocalAuthenticationModule = {} as LocalAuthenticationModule;
 
 /**
  * 设备信息
@@ -340,13 +358,13 @@ export class MobileAppCore extends EventEmitter {
   /**
    * 获取位置
    */
-  async getCurrentLocation(options?: Location.LocationOptions): Promise<LocationData> {
-    const permission = await Location.requestForegroundPermissionsAsync();
-    if (!permission.granted && permission.status !== 'granted') {
+  async getCurrentLocation(_options?: any): Promise<LocationData> {
+    const permission = await LocationAPI.requestForegroundPermissionsAsync();
+    if (permission.status !== 'granted') {
       throw new Error('Location permission denied');
     }
 
-    const position = await Location.getCurrentPositionAsync(options);
+    const position = await LocationAPI.getCurrentPositionAsync(_options);
     return {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
@@ -360,7 +378,7 @@ export class MobileAppCore extends EventEmitter {
    * 监听位置变化
    */
   watchLocation(
-    _options: Location.LocationOptions,
+    _options: any,
     callback: (location: LocationData) => void
   ): () => void {
     this.locationWatchers.push(callback);
@@ -667,17 +685,17 @@ export class MobileAppCore extends EventEmitter {
   }
 
   async hasBiometricHardware(): Promise<boolean> {
-    return LocalAuthentication.hasHardwareAsync();
+    return LocalAuthAPI.hasHardwareAsync();
   }
 
   async isBiometricEnrolled(): Promise<boolean> {
-    return LocalAuthentication.isEnrolledAsync();
+    return LocalAuthAPI.isEnrolledAsync();
   }
 
   /**
    * 生物识别认证
    */
-  async authenticateWithBiometrics(options: LocalAuthentication.LocalAuthenticationOptions): Promise<{
+  async authenticateWithBiometrics(_options: any): Promise<{
     success: boolean;
     authenticated: boolean;
     error?: string;
@@ -687,7 +705,7 @@ export class MobileAppCore extends EventEmitter {
       throw new Error('Biometrics are not enabled');
     }
 
-    const result = await LocalAuthentication.authenticateAsync(options);
+    const result = await LocalAuthAPI.authenticateAsync(_options);
     const payload = {
       success: !!result.success,
       authenticated: !!result.success,

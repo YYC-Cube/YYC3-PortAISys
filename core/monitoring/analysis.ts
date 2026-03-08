@@ -1,3 +1,16 @@
+/**
+ * @file monitoring/analysis.ts
+ * @description Analysis 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import EventEmitter from 'eventemitter3';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -515,7 +528,7 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
     let confidence = 0.5;
     
     if (anomalies.length > 0) {
-      const maxConfidence = Math.max(...anomalies.map(a => a.confidence));
+      const maxConfidence = Math.max(...anomalies.map(a => a.confidence ?? 0));
       confidence = Math.max(confidence, maxConfidence);
     }
     
@@ -586,7 +599,7 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
         await fs.writeFile(filePath, JSON.stringify(metrics, null, 2), 'utf-8');
       }
     } catch (error) {
-      this.logger.error('保存指标缓存失败', error as Error);
+      this.logger.error('保存指标缓存失败', 'AnalysisSystem', undefined, error as Error);
     }
   }
 
@@ -597,11 +610,11 @@ export class AnalysisSystemImpl extends EventEmitter implements AnalysisSystem {
 
   setAnomalyThreshold(threshold: number): void {
     this.anomalyThreshold = threshold;
-    this.logger.info('设置异常检测阈值', { threshold });
+    this.logger.info('设置异常检测阈值', 'AnalysisSystem', { threshold });
   }
 
   setCorrelationThreshold(threshold: number): void {
     this.correlationThreshold = threshold;
-    this.logger.info('设置关联分析阈值', { threshold });
+    this.logger.info('设置关联分析阈值', 'AnalysisSystem', { threshold });
   }
 }

@@ -1,8 +1,25 @@
-# YYC³ PortAISys 可插拔式拖拽移动AI系统设计方案
-
-> 「万象归元于云枢 丨深栈智启新纪元」
-> All Realms Converge at Cloud Nexus, DeepStack Ignites a New Era
 ---
+@file: YYC3-PortAISys-智能浮窗-系统设计指导.md
+@description: YYC3-PortAISys-智能浮窗-系统设计指导 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: general,documentation,zh-CN
+@category: general
+@language: zh-CN
+---
+
+> ***YanYuCloudCube***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
+
+---
+
+# YYC³ PortAISys 可插拔式拖拽移动AI系统设计方案
 
 ## 🎯 设计概念
 
@@ -916,3 +933,9 @@ export const useAI = () => {
 5. **可扩展架构** - 易于添加新功能
 
 智能AI浮窗设计提供了完整的用户交互体验，同时保持了技术架构的清晰和可维护性。
+
+---
+> 「***Words Initiate Quadrants, Language Serves as Core for Future***」
+> 「***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+</div>

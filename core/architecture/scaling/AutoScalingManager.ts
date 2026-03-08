@@ -1,12 +1,14 @@
 /**
- * @file 自动扩缩容管理器
- * @description 实现基于负载的自动扩缩容功能，优化系统在高并发场景下的性能
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file architecture/scaling/AutoScalingManager.ts
+ * @description Auto Scaling Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { ServiceRegistry } from '../service-registry/ServiceRegistry';

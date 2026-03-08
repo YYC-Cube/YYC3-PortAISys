@@ -1,3 +1,16 @@
+/**
+ * @file unit/core/ErrorContextCollector.test.ts
+ * @description Error Context Collector.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,core
+ */
+
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ErrorContextCollector, ErrorContextCollectorConfig } from '../../../core/error-handler/ErrorContextCollector';
 import { ErrorContext } from '../../../core/error-handler/ErrorTypes';

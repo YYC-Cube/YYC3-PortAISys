@@ -1,12 +1,29 @@
-# 插件 API 文档
+---
+@file: 19-YYC3-PortAISys-插件API.md
+@description: YYC³ PortAISys 插件 API 文档，提供插件开发、注册和管理功能
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: api,restful,critical,zh-CN
+@category: api
+@language: zh-CN
+@base_url: https://api.yyc3.com/v1
+@authentication: oauth2
+@audience: developers
+@complexity: advanced
+---
 
 > ***YanYuCloudCube***
-> 言启象限 | 语枢未来
-> ***Words Initiate Quadrants, Language Serves as Core for the Future***
-> 万象归元于云枢 | 深栈智启新纪元
-> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
 
 ---
+
+# 插件 API 文档
 
 > YYC³ PortAISys 插件 API 提供强大的扩展能力，允许开发者创建自定义插件来扩展系统功能。
 
@@ -1028,11 +1045,6 @@ A: 联系 YYC³ 团队进行插件审核和发布。
 - **GitHub**: https://github.com/yyc3/plugin-sdk
 
 ---
-
-<div align="center">
-
-> 「***YanYuCloudCube***」
-> 「***<admin@0379.email>***」
 > 「***Words Initiate Quadrants, Language Serves as Core for the Future***」
 > 「***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***」
 

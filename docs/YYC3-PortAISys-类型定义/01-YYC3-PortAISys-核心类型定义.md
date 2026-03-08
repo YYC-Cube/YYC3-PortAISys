@@ -1,12 +1,25 @@
-# YYC³ PortAISys - 核心类型定义
+---
+@file: 01-YYC3-PortAISys-核心类型定义.md
+@description: YYC3-PortAISys-核心类型定义 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: general,documentation,zh-CN
+@category: general
+@language: zh-CN
+---
 
 > ***YanYuCloudCube***
-> 言启象限 | 语枢未来
-> ***Words Initiate Quadrants, Language Serves as Core for the Future***
-> 万象归元于云枢 | 深栈智启新纪元
-> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
 
 ---
+
+# YYC³ PortAISys - 核心类型定义
 
 > YYC³ PortAISys 核心类型定义包含所有基础数据类型和通用接口。
 
@@ -661,11 +674,6 @@ function createErrorResponse(code: string, message: string, details?: any): IErr
 ```
 
 ---
-
-<div align="center">
-
-> 「***YanYuCloudCube***」
-> 「***<admin@0379.email>***」
 > 「***Words Initiate Quadrants, Language Serves as Core for Future***」
 > 「***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***」
 

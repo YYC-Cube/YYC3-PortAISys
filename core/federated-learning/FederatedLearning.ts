@@ -1,10 +1,14 @@
 /**
- * @file 联邦学习模块
- * @description 实现分布式机器学习框架，支持跨设备、跨组织的协作训练
- * @module federated-learning
- * @author YYC
- * @version 1.0.0
- * @created 2024-10-15
+ * @file federated-learning/FederatedLearning.ts
+ * @description Federated Learning 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

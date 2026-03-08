@@ -1,3 +1,16 @@
+/**
+ * @file optimization/QueryRewriter.ts
+ * @description Query Rewriter 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 export class QueryRewriter {
   private rewriteRules: Map<string, (query: string) => string> = new Map();
   private rewriteStats: Map<string, { original: string; rewritten: string; count: number }> = new Map();
@@ -46,7 +59,7 @@ export class QueryRewriter {
 
   private optimizeSubqueries(query: string): string {
     return query.replace(/SELECT\s+\*\s+FROM\s+\((.+)\)\s+AS\s+(\w+)/gi, 
-      (match, subquery, alias) => {
+      (_match, subquery, alias) => {
         const optimized = this.rewrite(subquery);
         return `SELECT * FROM (${optimized}) AS ${alias}`;
       });
@@ -54,7 +67,7 @@ export class QueryRewriter {
 
   private optimizeWhereClauses(query: string): string {
     return query.replace(/WHERE\s+(.+)/gi, 
-      (match, conditions) => {
+      (_match, conditions) => {
         const optimized = this.reorderConditions(conditions);
         return `WHERE ${optimized}`;
       });
@@ -62,7 +75,7 @@ export class QueryRewriter {
 
   private optimizeOrderBy(query: string): string {
     return query.replace(/ORDER BY\s+(.+)\s+(ASC|DESC)/gi, 
-      (match, columns, direction) => {
+      (_match, columns, direction) => {
         const optimized = this.reorderColumns(columns);
         return `ORDER BY ${optimized} ${direction}`;
       });
@@ -101,7 +114,7 @@ export class QueryRewriter {
   private optimizeInClauses(query: string): string {
     return query.replace(/IN\s*\(([^)]+)\)/gi, 
       (match, values) => {
-        const valueList = values.split(',').map(v => v.trim());
+        const valueList = values.split(',').map((v: string) => v.trim());
         if (valueList.length > 10) {
           return `IN (SELECT value FROM temp_values WHERE value IN (${values}))`;
         }

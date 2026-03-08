@@ -1,11 +1,14 @@
 /**
- * @file 用户体验优化系统
- * @description 提供全面的用户体验优化功能，包括响应式设计、可访问性、动画效果等
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file ui/UXOptimizationSystem.ts
+ * @description Uxoptimization System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';

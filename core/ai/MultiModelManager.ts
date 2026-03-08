@@ -1,10 +1,14 @@
 /**
- * @file MultiModelManager.ts
- * @description 多模型管理器 - 管理和协调多个AI模型
- * @module core/ai
- * @author YYC³
- * @version 2.1.0
- * @created 2026-01-21
+ * @file ai/MultiModelManager.ts
+ * @description Multi Model Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';
@@ -167,8 +171,8 @@ export class MultiModelManager extends EventEmitter {
   private rateLimits: Map<string, RateLimitConfig> = new Map();
   private quotas: Map<string, QuotaConfig> = new Map();
   private quotaUsage: Map<string, { tokens: number; requests: number; lastReset: number }> = new Map();
-  private auditLogs: Array<{ timestamp: number; prompt: string; modelUsed: string }> = [];
-  private requestLogs: Array<{ timestamp: number; prompt: string; modelUsed: string; provider?: string; latency: number; tokens?: number; success?: boolean }> = [];
+  private auditLogs: Array<{ timestamp: number; prompt?: string; modelUsed?: string }> = [];
+  private requestLogs: Array<{ timestamp: number; prompt?: string; modelUsed?: string; provider?: string; latency: number; tokens?: number; success?: boolean }> = [];
   private abTests: Map<string, ABTestConfig> = new Map();
   private abTestResults: Map<string, Array<{ variant: string; result: any }>> = new Map();
   private fineTuneJobs: Map<string, FineTuneJob> = new Map();
@@ -359,7 +363,7 @@ export class MultiModelManager extends EventEmitter {
       if (cached) return { ...cached, fromCache: true };
     }
 
-    if (request.semanticCache) {
+    if (request.semanticCache && request.prompt) {
       const match = this.findSemanticMatch(request.prompt);
       if (match) return { ...match, fromCache: true, semanticMatch: true };
     }
@@ -379,7 +383,7 @@ export class MultiModelManager extends EventEmitter {
       const now = Date.now();
       const oneMinuteAgo = now - 60000;
       const recent = this.requestLogs.filter(log =>
-        log.timestamp > oneMinuteAgo && log.modelUsed.includes(provider)
+        log.timestamp > oneMinuteAgo && log.modelUsed && log.modelUsed.includes(provider)
       );
 
       if (recent.length < rpm) {
@@ -511,13 +515,13 @@ export class MultiModelManager extends EventEmitter {
   }
 
   private preparePromptForGeneration(request: GenerateRequest): { promptToUse: string; originalTokens: number; compressedTokens: number } {
-    let promptToUse = request.prompt;
-    const originalTokens = this.estimateTokens(request.prompt);
+    const promptToUse = request.prompt || '';
+    const originalTokens = this.estimateTokens(promptToUse);
     let compressedTokens = originalTokens;
 
-    if (request.compressPrompt) {
-      promptToUse = this.compressPrompt(request.prompt);
-      compressedTokens = this.estimateTokens(promptToUse);
+    if (request.compressPrompt && promptToUse) {
+      const compressed = this.compressPrompt(promptToUse);
+      compressedTokens = this.estimateTokens(compressed);
     }
 
     return { promptToUse, originalTokens, compressedTokens };
@@ -553,22 +557,22 @@ export class MultiModelManager extends EventEmitter {
       this.auditLogs.push({
         timestamp: Date.now(),
         prompt: request.prompt,
-        modelUsed: modelToUse,
+        modelUsed: modelToUse ?? '',
       });
     }
 
     this.requestLogs.push({
       timestamp: Date.now(),
       prompt: request.prompt,
-      modelUsed: modelToUse,
-      provider: selected.provider,
+      modelUsed: modelToUse ?? '',
+      provider: selected.provider ?? '',
       latency,
     });
   }
 
   private updateMetrics(selected: any, modelToUse: string, originalTokens: number, latency: number): void {
     this.detectPerformanceDegradation(selected.provider, latency);
-    this.recordMetrics(selected.provider, modelToUse, selected.estimatedCost || 0);
+    this.recordMetrics(selected.provider, modelToUse, selected.estimatedCost ?? 0);
     this.updateQuotaUsage(selected.provider, originalTokens);
   }
 
@@ -585,7 +589,7 @@ export class MultiModelManager extends EventEmitter {
       text: result.text || 'Generated response',
       modelUsed: modelToUse,
       tokensUsed: 100,
-      cost: selected.estimatedCost,
+      cost: selected.estimatedCost ?? 0,
       latency,
     };
 
@@ -616,14 +620,14 @@ export class MultiModelManager extends EventEmitter {
       this.cache.set(cacheKey, response);
     }
 
-    if (request.semanticCache) {
+    if (request.semanticCache && request.prompt) {
       this.semanticCache.set(request.prompt, response);
     }
 
     if (request.abTest) {
       const results = this.abTestResults.get(request.abTest) || [];
       results.push({
-        variant: modelToUse.includes('gpt-4') ? 'A' : 'B',
+        variant: (modelToUse ?? '').includes('gpt-4') ? 'A' : 'B',
         result: response,
       });
       this.abTestResults.set(request.abTest, results);
@@ -737,7 +741,7 @@ export class MultiModelManager extends EventEmitter {
   private detectPerformanceDegradation(provider: string, _latency: number): void {
     const threshold = 2000;
     const recent = this.requestLogs
-      .filter(log => (log.provider === provider) || log.modelUsed.includes(provider))
+      .filter(log => (log.provider === provider) || (log.modelUsed && log.modelUsed.includes(provider)))
       .slice(-10);
     const avgLatency = recent.length > 0 
       ? recent.reduce((a, b) => a + b.latency, 0) / recent.length 
@@ -988,7 +992,7 @@ export class MultiModelManager extends EventEmitter {
     this.emit('custom-model:registered', { modelId: config.id });
   }
 
-  getAuditLogs(): Array<{ timestamp: number; prompt: string; modelUsed: string }> {
+  getAuditLogs(): Array<{ timestamp: number; prompt?: string; modelUsed?: string }> {
     return this.auditLogs;
   }
 

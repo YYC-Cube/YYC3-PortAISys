@@ -1,12 +1,29 @@
-# Webhook API 文档
+---
+@file: 18-YYC3-PortAISys-Webhook API.md
+@description: YYC³ PortAISys Webhook API 文档，提供 Webhook 配置、管理和事件推送功能
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: api,restful,critical,zh-CN
+@category: api
+@language: zh-CN
+@base_url: https://api.yyc3.com/v1
+@authentication: oauth2
+@audience: developers
+@complexity: advanced
+---
 
 > ***YanYuCloudCube***
-> 言启象限 | 语枢未来
-> ***Words Initiate Quadrants, Language Serves as Core for the Future***
-> 万象归元于云枢 | 深栈智启新纪元
-> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
 
 ---
+
+# Webhook API 文档
 
 > YYC³ PortAISys Webhook API 提供事件驱动的通知机制，允许您订阅系统事件并接收实时通知。
 
@@ -845,11 +862,6 @@ A: 查看 Webhook 日志和使用测试功能验证端点配置。
 - **GitHub**: https://github.com/yyc3/portaisys
 
 ---
-
-<div align="center">
-
-> 「***YanYuCloudCube***」
-> 「***<admin@0379.email>***」
 > 「***Words Initiate Quadrants, Language Serves as Core for the Future***」
 > 「***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***」
 

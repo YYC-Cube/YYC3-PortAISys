@@ -1,13 +1,14 @@
 /**
- * @file 错误处理系统
- * @description 统一的错误处理、错误恢复和错误报告系统
- * @module core/ui/widget/ErrorHandlingSystem
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-03
- * @updated 2026-01-03
- * @copyright Copyright (c) 2026 YYC³
+ * @file ui/widget/ErrorHandlingSystem.ts
+ * @description Error Handling System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -45,7 +46,7 @@ export interface ErrorInfo {
   resolvedAt?: number;
 }
 
-export type ErrorType = 
+export type ErrorType =
   | 'runtime'
   | 'network'
   | 'validation'
@@ -57,20 +58,20 @@ export type ErrorType =
   | 'system'
   | 'custom';
 
-export type ErrorSeverity = 
+export type ErrorSeverity =
   | 'info'
   | 'warning'
   | 'error'
   | 'critical';
 
-export type UserImpact = 
+export type UserImpact =
   | 'none'
   | 'low'
   | 'medium'
   | 'high'
   | 'critical';
 
-export type RecoveryStatus = 
+export type RecoveryStatus =
   | 'pending'
   | 'attempting'
   | 'recovering'
@@ -95,7 +96,7 @@ export interface ErrorRecoveryStrategy {
   cooldownPeriod: number;
 }
 
-export type RecoveryAction = 
+export type RecoveryAction =
   | 'retry'
   | 'restart_component'
   | 'reset_state'
@@ -143,19 +144,16 @@ export interface ErrorMetrics {
 }
 
 export class ErrorHandlingSystem extends EventEmitter {
-  private config: Required<ErrorHandlingConfig>;
+  private config: ErrorHandlingConfig;
   private errors: ErrorInfo[];
   private criticalErrors: CriticalError[];
   private recoveryStrategies: Map<string, ErrorRecoveryStrategy>;
   private metrics: ErrorMetrics;
   private enabled: boolean;
   private autoRecoveryEnabled: boolean;
-  private errorReportingEnabled: boolean;
   private errorLoggingEnabled: boolean;
   private errorAlertingEnabled: boolean;
-  private maxErrorHistory: number;
   private errorRetentionDays: number;
-  private recoveryAttempts: number;
   private recoveryDelay: number;
   private activeRecoveries: Map<string, NodeJS.Timeout>;
 
@@ -190,15 +188,12 @@ export class ErrorHandlingSystem extends EventEmitter {
       recoverySuccessRate: 0,
     };
 
-    this.enabled = this.config.enabled;
-    this.autoRecoveryEnabled = this.config.enableAutoRecovery;
-    this.errorReportingEnabled = this.config.enableErrorReporting;
-    this.errorLoggingEnabled = this.config.enableErrorLogging;
-    this.errorAlertingEnabled = this.config.enableErrorAlerting;
-    this.maxErrorHistory = this.config.maxErrorHistory;
-    this.errorRetentionDays = this.config.errorRetentionDays;
-    this.recoveryAttempts = this.config.recoveryAttempts;
-    this.recoveryDelay = this.config.recoveryDelay;
+    this.enabled = this.config.enabled ?? true;
+    this.autoRecoveryEnabled = this.config.enableAutoRecovery ?? true;
+    this.errorLoggingEnabled = this.config.enableErrorLogging ?? true;
+    this.errorAlertingEnabled = this.config.enableErrorAlerting ?? true;
+    this.errorRetentionDays = this.config.errorRetentionDays ?? 30;
+    this.recoveryDelay = this.config.recoveryDelay ?? 1000;
 
     this.initializeDefaultStrategies();
     this.startErrorCleanup();
@@ -271,7 +266,7 @@ export class ErrorHandlingSystem extends EventEmitter {
 
   private cleanupOldErrors(): void {
     const cutoffTime = Date.now() - (this.errorRetentionDays * 24 * 60 * 60 * 1000);
-    
+
     this.errors = this.errors.filter(error => error.timestamp > cutoffTime);
     this.criticalErrors = this.criticalErrors.filter(error => error.timestamp > cutoffTime);
   }
@@ -282,7 +277,7 @@ export class ErrorHandlingSystem extends EventEmitter {
     }
 
     const errorInfo = this.createErrorInfo(error, component, context);
-    
+
     this.errors.push(errorInfo);
     this.metrics.totalErrors++;
     this.metrics.lastErrorTime = Date.now();
@@ -598,9 +593,9 @@ export class ErrorHandlingSystem extends EventEmitter {
 
   private updateRecoveryMetrics(recoveryTime: number): void {
     const totalRecoveries = this.metrics.recoveredErrors + this.metrics.failedRecoveries;
-    
+
     if (totalRecoveries > 0) {
-      this.metrics.averageRecoveryTime = 
+      this.metrics.averageRecoveryTime =
         (this.metrics.averageRecoveryTime * (totalRecoveries - 1) + recoveryTime) / totalRecoveries;
     }
 
@@ -615,13 +610,13 @@ export class ErrorHandlingSystem extends EventEmitter {
 
     switch (logLevel) {
       case 'error':
-        logger.error(logMessage, errorInfo);
+        logger.error(logMessage, undefined, { ...errorInfo });
         break;
       case 'warn':
-        logger.warn(logMessage, errorInfo);
+        logger.warn(logMessage, undefined, { ...errorInfo });
         break;
       default:
-        logger.info(logMessage, errorInfo);
+        logger.info(logMessage, undefined, { ...errorInfo });
     }
   }
 
@@ -668,11 +663,13 @@ export class ErrorHandlingSystem extends EventEmitter {
 
     const errorCounts = new Map<string, number>();
 
-    Object.values<ErrorType>('runtime', 'network', 'validation', 'authentication', 'authorization', 'resource', 'configuration', 'dependency', 'system', 'custom').forEach(type => {
+    const errorTypes: ErrorType[] = ['runtime', 'network', 'validation', 'authentication', 'authorization', 'resource', 'configuration', 'dependency', 'system', 'custom'];
+    errorTypes.forEach(type => {
       byType[type] = 0;
     });
 
-    Object.values<ErrorSeverity>('info', 'warning', 'error', 'critical').forEach(severity => {
+    const errorSeverities: ErrorSeverity[] = ['info', 'warning', 'error', 'critical'];
+    errorSeverities.forEach(severity => {
       bySeverity[severity] = 0;
     });
 

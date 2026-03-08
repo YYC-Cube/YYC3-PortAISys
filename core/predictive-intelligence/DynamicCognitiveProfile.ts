@@ -1,3 +1,16 @@
+/**
+ * @file predictive-intelligence/DynamicCognitiveProfile.ts
+ * @description Dynamic Cognitive Profile 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 export interface CognitiveDimensions {
   logicalReasoning: CognitiveDimension;
   creativeThinking: CognitiveDimension;
@@ -228,12 +241,10 @@ export interface DynamicCognitiveProfileConfig {
 }
 
 export class DynamicCognitiveProfile {
-  private config: DynamicCognitiveProfileConfig;
   private profiles: Map<string, CognitiveProfileData>;
   private evolutionHistory: Map<string, EvolutionEvent[]>;
 
-  constructor(config: DynamicCognitiveProfileConfig) {
-    this.config = config;
+  constructor(_config: DynamicCognitiveProfileConfig) {
     this.profiles = new Map();
     this.evolutionHistory = new Map();
   }
@@ -548,7 +559,7 @@ export class DynamicCognitiveProfile {
     };
   }
 
-  private calculateChangeMagnitude(profile: CognitiveProfileData, updates: Partial<CognitiveProfileData>): number {
+  private calculateChangeMagnitude(_profile: CognitiveProfileData, updates: Partial<CognitiveProfileData>): number {
     let totalChange = 0;
     let changeCount = 0;
 

@@ -1,10 +1,14 @@
 /**
- * @file OpenAI模型适配器实现
- * @description 实现OpenAI API的模型适配器
- * @module adapters/OpenAIModelAdapter
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file adapters/OpenAIModelAdapter.ts
+ * @description Open Aimodel Adapter 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { ModelAdapter, ModelGenerationRequest, ModelGenerationResponse } from './ModelAdapter';

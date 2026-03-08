@@ -1,12 +1,14 @@
 /**
- * @file 增强型文档与代码同步管理器
- * @description 实现智能文档与代码同步机制，包含冲突解决、版本控制、质量检查等功能
- * @author YYC³ Team
- * @version 2.0.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file tools/doc-code-sync/src/enhanced-sync-manager.ts
+ * @description Enhanced Sync Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import * as fs from 'fs';

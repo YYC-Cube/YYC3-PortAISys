@@ -1,10 +1,14 @@
 /**
- * @file 自治AI引擎核心实现
- * @description 实现可插拔式拖拽移动AI系统的核心引擎，支持模块化组件和热插拔
- * @module core/pluggable/AutonomousAIEngine
- * @author YYC³
- * @version 1.0.0
- * @created 2025-12-30
+ * @file pluggable/AutonomousAIEngine.ts
+ * @description Autonomous Aiengine 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';
@@ -122,7 +126,7 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
 
     for (const [name, subsystem] of this.subsystems) {
       try {
-        await subsystem.start({});
+        await subsystem.start();
         this.subsystemStatus.set(name, {
           name,
           status: EngineStatus.RUNNING,
@@ -225,11 +229,12 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
       return response;
     } catch (error) {
       this.metrics.errorRate++;
-      this.emit('error', error);
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      this.emit('error', errorObj);
       return {
         id: this.generateId(),
         messageId: input.id,
-        content: { error: error.message },
+        content: { error: errorObj.message },
         success: false,
         timestamp: new Date()
       };
@@ -331,7 +336,7 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
       return result;
     } catch (error) {
       result.status = TaskStatus.FAILED;
-      result.error = error;
+      result.error = error instanceof Error ? error : new Error(String(error));
       result.endTime = new Date();
       result.duration = result.endTime.getTime() - result.startTime.getTime();
       
@@ -612,8 +617,9 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
         }
       };
     } catch (error) {
-      errors.push(error as Error);
-      this.log('error', `Subsystem coordination failed for task: ${task.id} - ${error.message}`);
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      errors.push(errorObj);
+      this.log('error', `Subsystem coordination failed for task: ${task.id} - ${errorObj.message}`);
 
       return {
         success: false,
@@ -658,7 +664,7 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
             subsystemName: suitableSubsystem.name,
             tasks: [],
             estimatedDuration: 0,
-            priority: task.priority
+            priority: 0
           });
         }
 
@@ -703,7 +709,7 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
     return { nodes, edges };
   }
 
-  private planExecutionOrder(dependencies: DependencyGraph): string[] {
+  private planExecutionOrder(graph: DependencyGraph): string[] {
     const visited = new Set<string>();
     const order: string[] = [];
 
@@ -711,16 +717,16 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
       if (visited.has(nodeId)) return;
 
       visited.add(nodeId);
-      const dependencies = dependencies.edges.get(nodeId) || [];
+      const nodeDependencies = graph.edges.get(nodeId) || [];
 
-      for (const depId of dependencies) {
+      for (const depId of nodeDependencies) {
         visit(depId);
       }
 
       order.push(nodeId);
     };
 
-    for (const nodeId of dependencies.nodes.keys()) {
+    for (const nodeId of graph.nodes.keys()) {
       visit(nodeId);
     }
 
@@ -759,7 +765,8 @@ export class AutonomousAIEngine extends EventEmitter implements IAutonomousAIEng
           const result = await this.executeTaskById(taskId);
           results.set(taskId, result);
         } catch (error) {
-          results.set(taskId, { error: error.message });
+          const errorObj = error instanceof Error ? error : new Error(String(error));
+          results.set(taskId, { error: errorObj.message });
         }
       });
 

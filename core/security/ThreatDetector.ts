@@ -1,3 +1,16 @@
+/**
+ * @file security/ThreatDetector.ts
+ * @description Threat Detector 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import {
   ThreatDetectionResult,
   Threat,
@@ -9,18 +22,13 @@ import EventEmitter from 'eventemitter3';
 
 export class ThreatDetector extends EventEmitter implements IThreatDetector {
   private threatDatabase: Map<string, Threat>;
-  private patternDatabase: ThreatPattern[];
   private detectionRules: DetectionRule[];
-  private config: any;
 
-  constructor(config?: any) {
+  constructor(_config?: any) {
     super();
-    this.config = config || {};
     this.threatDatabase = new Map();
-    this.patternDatabase = [];
     this.detectionRules = [];
     this.initializeThreatDatabase();
-    this.initializePatternDatabase();
     this.initializeDetectionRules();
   }
 
@@ -54,13 +62,15 @@ export class ThreatDetector extends EventEmitter implements IThreatDetector {
     const patterns: ThreatPattern[] = [];
     const patternFrequency = new Map<string, number>();
 
-    for (const threat of this.threatDatabase.values()) {
+    const threats = Array.from(this.threatDatabase.values());
+    for (const threat of threats) {
       const pattern = this.extractPattern(threat);
       const currentCount = patternFrequency.get(pattern) || 0;
       patternFrequency.set(pattern, currentCount + 1);
     }
 
-    for (const [pattern, frequency] of patternFrequency.entries()) {
+    const patternEntries = Array.from(patternFrequency.entries());
+    for (const [pattern, frequency] of patternEntries) {
       const riskScore = this.calculatePatternRisk(pattern, frequency);
       patterns.push({
         pattern,
@@ -70,7 +80,6 @@ export class ThreatDetector extends EventEmitter implements IThreatDetector {
     }
 
     patterns.sort((a, b) => b.riskScore - a.riskScore);
-    this.patternDatabase = patterns;
 
     return patterns;
   }
@@ -197,26 +206,6 @@ export class ThreatDetector extends EventEmitter implements IThreatDetector {
     });
   }
 
-  private initializePatternDatabase(): void {
-    this.patternDatabase = [
-      {
-        pattern: 'repeated_login_failures',
-        frequency: 15,
-        riskScore: 75
-      },
-      {
-        pattern: 'sql_injection_attempts',
-        frequency: 3,
-        riskScore: 90
-      },
-      {
-        pattern: 'xss_payload_detection',
-        frequency: 5,
-        riskScore: 80
-      }
-    ];
-  }
-
   private initializeDetectionRules(): void {
     this.detectionRules = [
       {
@@ -313,7 +302,7 @@ export class ThreatDetector extends EventEmitter implements IThreatDetector {
     return `${type}_pattern`;
   }
 
-  private calculatePatternRisk(pattern: string, frequency: number): number {
+  private calculatePatternRisk(_pattern: string, frequency: number): number {
     const baseRisk = 50;
     const frequencyMultiplier = Math.min(frequency * 5, 50);
     return baseRisk + frequencyMultiplier;

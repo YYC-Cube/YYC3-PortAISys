@@ -1,11 +1,17 @@
 /**
- * @file UI组件类型定义
- * @description 定义YYC³ AI系统所有UI组件的接口和类型
- * @module ui/types
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/types.ts
+ * @description Types 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
+
+import type { JSX } from 'react';
 
 export interface ChatMessage {
   id: string;

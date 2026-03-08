@@ -1,10 +1,14 @@
 /**
- * @file 键盘快捷键管理系统
- * @description 管理键盘快捷键的注册、触发和处理
- * @module ui/widget/KeyboardShortcutManager
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/widget/KeyboardShortcutManager.ts
+ * @description Keyboard Shortcut Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -25,7 +29,6 @@ export interface KeyboardShortcut {
 }
 
 export class KeyboardShortcutManager extends EventEmitter {
-  private widget: any;
   private enableDefaultShortcuts: boolean;
   private enableCustomShortcuts: boolean;
   private shortcuts: Map<string, KeyboardShortcut>;
@@ -34,7 +37,6 @@ export class KeyboardShortcutManager extends EventEmitter {
 
   constructor(config: KeyboardShortcutManagerConfig) {
     super();
-    this.widget = config.widget;
     this.enableDefaultShortcuts = config.enableDefaultShortcuts || true;
     this.enableCustomShortcuts = config.enableCustomShortcuts || true;
     this.shortcuts = new Map();
@@ -169,7 +171,8 @@ export class KeyboardShortcutManager extends EventEmitter {
   }
 
   private checkShortcuts(): void {
-    for (const shortcut of this.shortcuts.values()) {
+    const shortcuts = Array.from(this.shortcuts.values());
+    for (const shortcut of shortcuts) {
       if (!shortcut.enabled) {
         continue;
       }

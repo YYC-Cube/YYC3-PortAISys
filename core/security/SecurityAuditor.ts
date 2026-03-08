@@ -1,3 +1,16 @@
+/**
+ * @file security/SecurityAuditor.ts
+ * @description Security Auditor 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import EventEmitter from 'eventemitter3';
 
 export interface AuditConfig {
@@ -209,7 +222,8 @@ export class SecurityAuditor extends EventEmitter {
     const findings: AuditFinding[] = [];
     const recommendations: string[] = [];
 
-    for (const [id, check] of this.complianceChecks) {
+    const checks = Array.from(this.complianceChecks.entries());
+    for (const [id, check] of checks) {
       const result = await this.performComplianceCheck(check);
       findings.push({
         id: `compliance-${Date.now()}-${id}`,
@@ -382,7 +396,8 @@ export class SecurityAuditor extends EventEmitter {
     }
 
     const allAudits: AuditResult[] = [];
-    for (const history of this.auditHistory.values()) {
+    const histories = Array.from(this.auditHistory.values());
+    for (const history of histories) {
       allAudits.push(...history);
     }
 
@@ -399,7 +414,8 @@ export class SecurityAuditor extends EventEmitter {
     byType: Record<string, number>;
   } {
     const allAudits: AuditResult[] = [];
-    for (const history of this.auditHistory.values()) {
+    const histories = Array.from(this.auditHistory.values());
+    for (const history of histories) {
       allAudits.push(...history);
     }
 
@@ -407,8 +423,8 @@ export class SecurityAuditor extends EventEmitter {
     const passedAudits = allAudits.filter(a => a.status === 'passed').length;
     const failedAudits = allAudits.filter(a => a.status === 'failed').length;
     const warningAudits = allAudits.filter(a => a.status === 'warning').length;
-    const averageScore = totalAudits > 0 
-      ? allAudits.reduce((sum, a) => sum + a.score, 0) / totalAudits 
+    const averageScore = totalAudits > 0
+      ? allAudits.reduce((sum, a) => sum + a.score, 0) / totalAudits
       : 0;
 
     const byType: Record<string, number> = {};
@@ -440,7 +456,8 @@ export class SecurityAuditor extends EventEmitter {
 
   generateAuditReport(auditId: string): string {
     const allAudits: AuditResult[] = [];
-    for (const history of this.auditHistory.values()) {
+    const histories = Array.from(this.auditHistory.values());
+    for (const history of histories) {
       allAudits.push(...history);
     }
 

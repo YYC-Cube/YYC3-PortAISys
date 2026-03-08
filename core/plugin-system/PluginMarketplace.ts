@@ -1,10 +1,14 @@
 /**
- * @file PluginMarketplace.ts
- * @description 插件市场 - 插件发现和分发平台
- * @module core/plugin-system
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-21
+ * @file plugin-system/PluginMarketplace.ts
+ * @description Plugin Marketplace 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

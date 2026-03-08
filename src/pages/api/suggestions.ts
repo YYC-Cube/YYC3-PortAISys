@@ -1,10 +1,14 @@
 /**
- * @file 建议回复API接口
- * @description 提供智能回复建议
- * @module api/suggestions
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file pages/api/suggestions.ts
+ * @description Suggestions 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,api
  */
 
 import { NextApiRequest, NextApiResponse } from 'next';

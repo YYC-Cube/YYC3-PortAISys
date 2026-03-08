@@ -1,10 +1,14 @@
 /**
- * @file 智能AI浮窗组件
- * @description 提供可拖拽、可调整大小的智能AI交互界面，集成多模块功能
- * @module ui/IntelligentAIWidget
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/IntelligentAIWidget.ts
+ * @description Intelligent Aiwidget 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -107,11 +111,10 @@ export class IntelligentAIWidget extends EventEmitter {
   private themeSystem: ThemeSystem;
   private animationSystem: AnimationSystem;
 
-  private chatInterface: ChatInterface;
-  private toolPanel: ToolboxPanel;
-  private workflowDesigner: WorkflowDesigner;
-  private knowledgeViewer: any;
-  private insightsDashboard: InsightsDashboard;
+  private chatInterface: ChatInterface | null;
+  private toolPanel: ToolboxPanel | null;
+  private workflowDesigner: WorkflowDesigner | null;
+  private insightsDashboard: InsightsDashboard | null;
 
   private state: WidgetState;
   private persistence: StatePersistence;
@@ -197,7 +200,9 @@ export class IntelligentAIWidget extends EventEmitter {
       enableTransitions: true,
       enablePersistence: true,
     });
-    this.animationSystem = new AnimationSystem(this.config.animationEnabled!);
+    this.animationSystem = new AnimationSystem({
+      enabled: this.config.animationEnabled ?? true,
+    });
 
     this.uiSystem = new UISystem({
       enableChatInterface: true,
@@ -275,7 +280,7 @@ export class IntelligentAIWidget extends EventEmitter {
         this.uiSystem.initialize(),
         this.setupPerformanceMonitoring(),
       ]);
-      
+
       this.chatInterface = this.uiSystem.getChatInterface()!;
       this.toolPanel = this.uiSystem.getToolboxPanel()!;
       this.insightsDashboard = this.uiSystem.getInsightsDashboard()!;
@@ -344,7 +349,7 @@ export class IntelligentAIWidget extends EventEmitter {
       this.initialized = true;
       const initializationTime = Date.now() - initializationStartTime;
       this.performance.loadTime = initializationTime;
-      
+
       this.emit('initialized', { initializationTime });
       logger.info(`IntelligentAIWidget initialized successfully in ${initializationTime}ms`, 'IntelligentAIWidget');
     } catch (error) {
@@ -707,7 +712,7 @@ export class IntelligentAIWidget extends EventEmitter {
   private toggleTheme(): void {
     const currentTheme = this.getTheme();
     let newTheme: WidgetTheme;
-    
+
     switch (currentTheme) {
       case 'light':
         newTheme = 'dark';
@@ -721,12 +726,16 @@ export class IntelligentAIWidget extends EventEmitter {
       default:
         newTheme = 'light';
     }
-    
+
     this.setTheme(newTheme);
   }
 
   private async handleChatMessage(data: any): Promise<void> {
     try {
+      if (!this.chatInterface) {
+        throw new Error('Chat interface not initialized');
+      }
+
       const message: ChatMessage = {
         id: data.id,
         role: data.role,
@@ -744,6 +753,9 @@ export class IntelligentAIWidget extends EventEmitter {
 
   private async handleToolMessage(data: any): Promise<void> {
     try {
+      if (!this.toolPanel) {
+        throw new Error('Tool panel not initialized');
+      }
       await this.toolPanel.executeTool(data.toolId, data.params);
     } catch (error) {
       logger.error('Failed to handle tool message:', 'IntelligentAIWidget', { error }, error as Error);
@@ -753,6 +765,9 @@ export class IntelligentAIWidget extends EventEmitter {
 
   private async handleWorkflowMessage(data: any): Promise<void> {
     try {
+      if (!this.workflowDesigner) {
+        throw new Error('Workflow designer not initialized');
+      }
       const workflow = this.workflowDesigner.loadWorkflow(data.workflowId);
       await this.workflowDesigner.executeWorkflow(workflow);
     } catch (error) {
@@ -789,6 +804,9 @@ export class IntelligentAIWidget extends EventEmitter {
 
   async sendMessage(message: ChatMessage): Promise<string> {
     try {
+      if (!this.chatInterface) {
+        throw new Error('Chat interface not initialized');
+      }
       return this.chatInterface.sendMessage(message);
     } catch (error) {
       this.emit('error', error);
@@ -798,6 +816,9 @@ export class IntelligentAIWidget extends EventEmitter {
 
   async executeTool(toolId: string, params: any): Promise<any> {
     try {
+      if (!this.toolPanel) {
+        throw new Error('Tool panel not initialized');
+      }
       return this.toolPanel.executeTool(toolId, params);
     } catch (error) {
       this.emit('error', error);
@@ -807,6 +828,9 @@ export class IntelligentAIWidget extends EventEmitter {
 
   async executeWorkflow(workflowId: string): Promise<any> {
     try {
+      if (!this.workflowDesigner) {
+        throw new Error('Workflow designer not initialized');
+      }
       const workflow = this.workflowDesigner.loadWorkflow(workflowId);
       return this.workflowDesigner.executeWorkflow(workflow);
     } catch (error) {
@@ -861,19 +885,19 @@ export class IntelligentAIWidget extends EventEmitter {
     return { ...this.performance };
   }
 
-  getChatInterface(): ChatInterface {
+  getChatInterface(): ChatInterface | null {
     return this.chatInterface;
   }
 
-  getToolPanel(): ToolboxPanel {
+  getToolPanel(): ToolboxPanel | null {
     return this.toolPanel;
   }
 
-  getInsightsDashboard(): InsightsDashboard {
+  getInsightsDashboard(): InsightsDashboard | null {
     return this.insightsDashboard;
   }
 
-  getWorkflowDesigner(): WorkflowDesigner {
+  getWorkflowDesigner(): WorkflowDesigner | null {
     return this.workflowDesigner;
   }
 

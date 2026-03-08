@@ -1,10 +1,14 @@
 /**
- * @file 核心引擎MVP实现
- * @description 实现自治AI引擎的最小可行产品（MVP）
- * @module core/AutonomousAIEngine
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2025-12-30
+ * @file AutonomousAIEngine.ts
+ * @description Autonomous Aiengine 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { logger } from './utils/logger';

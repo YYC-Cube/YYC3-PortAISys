@@ -1,10 +1,14 @@
 /**
- * @file 流程设计器组件实现
- * @description 实现IWorkflowDesigner接口，提供工作流设计和管理功能
- * @module ui/WorkflowDesigner
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/WorkflowDesigner.ts
+ * @description Workflow Designer 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -29,14 +33,14 @@ import {
 export class WorkflowDesigner extends EventEmitter implements IWorkflowDesigner {
   private workflows: Map<string, Workflow>;
   private currentWorkflowId: string | null;
-  private visible: boolean;
+  private _visible: boolean;
   private nodeTypes: Map<string, WorkflowNode>;
 
   constructor() {
     super();
     this.workflows = new Map();
     this.currentWorkflowId = null;
-    this.visible = true;
+    this._visible = true;
     this.nodeTypes = new Map();
     this.initializeNodeTypes();
   }
@@ -528,12 +532,12 @@ export class WorkflowDesigner extends EventEmitter implements IWorkflowDesigner 
   }
 
   show(): void {
-    this.visible = true;
+    this._visible = true;
     this.emit('visibility:changed', { visible: true });
   }
 
   hide(): void {
-    this.visible = false;
+    this._visible = false;
     this.emit('visibility:changed', { visible: false });
   }
 
@@ -548,6 +552,10 @@ export class WorkflowDesigner extends EventEmitter implements IWorkflowDesigner 
   listWorkflows(): Workflow[] {
     return Array.from(this.workflows.values())
       .sort((a, b) => b.updatedAt - a.updatedAt);
+  }
+
+  isVisible(): boolean {
+    return this._visible;
   }
 
   private generateId(): string {

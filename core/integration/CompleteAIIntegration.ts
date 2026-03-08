@@ -1,8 +1,21 @@
+/**
+ * @file integration/CompleteAIIntegration.ts
+ * @description Complete Aiintegration 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 // integration/CompleteAIIntegration.ts
 import { CallingWorkflowEngine } from '../workflows/intelligent-calling/CallingWorkflowEngine';
 import { AIAnalyticsEngine } from '../analytics/AIAnalyticsEngine';
-import { AICoachingSystem } from '../coaching/AICoachingSystem';
-import { AICampaignManager } from '../campaign/AICampaignManager';
+import { AICoachingSystem } from '../education/AICoachingSystem';
+import { AICampaignManager } from '../marketing/AICampaignManager';
 
 interface AISystemDeployment {
   intelligentCalling: any;
@@ -67,10 +80,10 @@ export class CompleteAIIntegration {
 
     // 集成所有组件
     return {
-      intelligentCalling: await callingAI.initialize(),
-      smartAnalytics: await analyticsAI.initialize(),
-      aiEducation: await coachingAI.initialize(),
-      marketingAutomation: await marketingAI.initialize(),
+      intelligentCalling: callingAI,
+      smartAnalytics: analyticsAI,
+      aiEducation: coachingAI,
+      marketingAutomation: marketingAI,
       mobileAI: await this.integrateMobileAI(),
 
       // 工作流编排

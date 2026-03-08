@@ -1,10 +1,14 @@
 /**
- * @file 任务调度器
- * @description 实现智能任务调度系统，支持任务优先级、依赖管理、并发控制等功能
- * @module task-scheduler
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file task-scheduler/TaskScheduler.ts
+ * @description Task Scheduler 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';
@@ -38,7 +42,7 @@ export interface TaskPlan {
   id: string;
   name: string;
   tasks: Task[];
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  status: 'pending' | 'in_progress' | 'completed' | 'failed' | 'cancelled';
   createdAt: number;
   startedAt?: number;
   completedAt?: number;
@@ -180,7 +184,7 @@ export class TaskScheduler extends EventEmitter {
 
     try {
       const result = await this.executeWithTimeout(task);
-      
+
       task.status = 'completed';
       task.completedAt = Date.now();
       task.result = result;
@@ -214,15 +218,15 @@ export class TaskScheduler extends EventEmitter {
     const task = this.tasks.get(taskId);
     if (!task) {
       throw new NotFoundError('task', taskId, {
-        additionalData: { 
+        additionalData: {
           availableTasks: Array.from(this.tasks.keys()).slice(0, 10)
         }
       });
     }
 
     if (task.status === 'running') {
-      throw new ConflictError(`Cannot cancel running task: ${taskId}`, 'taskStatus', {
-        additionalData: { 
+      throw new ConflictError(`Cannot cancel running task: ${taskId}`, {
+        additionalData: {
           taskId,
           currentStatus: task.status,
           allowedStatuses: ['pending', 'failed']
@@ -241,7 +245,7 @@ export class TaskScheduler extends EventEmitter {
     const plan = this.taskPlans.get(planId);
     if (!plan) {
       throw new NotFoundError('plan', planId, {
-        additionalData: { 
+        additionalData: {
           availablePlans: Array.from(this.taskPlans.keys())
         }
       });
@@ -261,7 +265,7 @@ export class TaskScheduler extends EventEmitter {
     const task = this.tasks.get(taskId);
     if (!task) {
       throw new NotFoundError('task', taskId, {
-        additionalData: { 
+        additionalData: {
           availableTasks: Array.from(this.tasks.keys()).slice(0, 10)
         }
       });
@@ -328,7 +332,7 @@ export class TaskScheduler extends EventEmitter {
       return;
     }
 
-    while (this.taskQueue.length > 0 && 
+    while (this.taskQueue.length > 0 &&
            this.runningTasks.size < this.config.maxConcurrentTasks) {
       const task = this.taskQueue.shift()!;
       this.executeTask(task.id).catch(error => {
@@ -359,8 +363,10 @@ export class TaskScheduler extends EventEmitter {
   private async executeWithTimeout(task: Task): Promise<any> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new TimeoutError(`Task timeout: ${task.id}`, task.timeout, { taskId: task.id }));
-      }, task.timeout);
+        reject(new TimeoutError(`Task timeout: ${task.id}`, task.timeout || 60000, {
+          additionalData: { taskId: task.id }
+        }));
+      }, task.timeout || 60000);
 
       task.execute()
         .then(result => {
@@ -369,11 +375,11 @@ export class TaskScheduler extends EventEmitter {
         })
         .catch(error => {
           clearTimeout(timeout);
-          
+
           if (task.retryCount! < task.maxRetries!) {
             task.retryCount!++;
             this.emit('task_retry', { task, attempt: task.retryCount });
-            
+
             setTimeout(() => {
               this.executeWithTimeout(task).then(resolve).catch(reject);
             }, 1000 * task.retryCount!);
@@ -404,9 +410,9 @@ export class TaskScheduler extends EventEmitter {
 
     const elapsed = Date.now() - task.startedAt;
     const progress = this.calculateProgress(task);
-    
+
     if (progress === 0) return undefined;
-    
+
     const estimatedTotal = (elapsed / progress) * 100;
     return Math.max(0, estimatedTotal - elapsed);
   }
@@ -426,8 +432,8 @@ export class TaskScheduler extends EventEmitter {
     const executionTime = task.completedAt - task.startedAt;
     const current = this.metrics.averageExecutionTime;
     const count = this.metrics.completedTasks;
-    
-    this.metrics.averageExecutionTime = 
+
+    this.metrics.averageExecutionTime =
       (current * (count - 1) + executionTime) / count;
   }
 

@@ -1,3 +1,16 @@
+/**
+ * @file security/InputValidator.ts
+ * @description Input Validator 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import { z } from 'zod';
 
 export interface ValidationResult {
@@ -295,7 +308,7 @@ export class InputValidator {
       return { success: true, data: validated };
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errors = error.errors.map(e => ({
+        const errors = error.issues.map((e: any) => ({
           field: e.path.join('.'),
           message: e.message,
           code: 'VALIDATION_ERROR',
@@ -312,7 +325,25 @@ export class InputValidator {
         return { success: false, errors };
       }
 
-      throw error;
+      if (error instanceof Error) {
+        return {
+          success: false,
+          errors: [{
+            field: 'input',
+            message: error.message,
+            code: 'VALIDATION_ERROR',
+          }],
+        };
+      }
+
+      return {
+        success: false,
+        errors: [{
+          field: 'input',
+          message: 'Unknown validation error',
+          code: 'VALIDATION_ERROR',
+        }],
+      };
     }
   }
 

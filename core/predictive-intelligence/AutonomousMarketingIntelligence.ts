@@ -1,3 +1,16 @@
+/**
+ * @file predictive-intelligence/AutonomousMarketingIntelligence.ts
+ * @description Autonomous Marketing Intelligence 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 export interface AutonomousMarketingEcosystem {
   marketAnalysis: MarketAnalysis;
   customerSegmentation: CustomerSegmentation;
@@ -152,6 +165,13 @@ export interface AutomatedCampaign {
   content: CampaignContent[];
   triggers: CampaignTrigger[];
   performanceMetrics: CampaignMetrics;
+}
+
+export interface TimeSlot {
+  start: Date;
+  end: Date;
+  score: number;
+  reason: string;
 }
 
 export interface CampaignSchedule {
@@ -613,12 +633,10 @@ export interface AutonomousMarketingIntelligenceConfig {
 export class AutonomousMarketingIntelligence {
   private config: AutonomousMarketingIntelligenceConfig;
   private ecosystem: AutonomousMarketingEcosystem;
-  private learningHistory: Map<string, LearningEvent[]>;
 
   constructor(config: AutonomousMarketingIntelligenceConfig) {
     this.config = config;
     this.ecosystem = this.initializeEcosystem();
-    this.learningHistory = new Map();
   }
 
   async analyzeMarket(): Promise<MarketAnalysis> {

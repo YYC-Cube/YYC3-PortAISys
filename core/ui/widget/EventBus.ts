@@ -1,10 +1,14 @@
 /**
- * @file 事件总线
- * @description 管理事件总线
- * @module ui/widget/EventBus
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-05
+ * @file ui/widget/EventBus.ts
+ * @description Event Bus 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -19,8 +23,8 @@ export class EventBus extends EventEmitter {
     this.maxHistorySize = maxHistorySize;
   }
 
-  override emit(event: string, ...args: any[]): boolean {
-    this.recordEvent(event, args);
+  override emit(event: string | symbol, ...args: any[]): boolean {
+    this.recordEvent(String(event), args);
     return super.emit(event, ...args);
   }
 

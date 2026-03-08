@@ -1,11 +1,26 @@
 /**
- * @file types.ts
- * @description 插件系统类型定义
- * @module core/plugin-system
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-22
+ * @file plugin-system/types.ts
+ * @description Types 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
+
+/**
+ * 插件状态
+ */
+export enum PluginStatus {
+  UNINSTALLED = 'uninstalled',
+  INSTALLED = 'installed',
+  ENABLED = 'enabled',
+  DISABLED = 'disabled',
+  ERROR = 'error'
+}
 
 /**
  * 插件清单

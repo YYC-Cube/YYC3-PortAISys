@@ -1,11 +1,14 @@
 /**
- * @file MLOpsPipeline.ts
- * @description MLOps实践模块 - 机器学习运维流水线与生命周期管理
- * @module mlops
- * @author YYC
- * @version 1.0.0
- * @created 2025-01-05
- * @updated 2025-01-05
+ * @file mlops/MLOpsPipeline.ts
+ * @description Mlops Pipeline 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 export interface ModelLifecycleManagement {

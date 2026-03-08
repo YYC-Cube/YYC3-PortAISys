@@ -1,9 +1,14 @@
 /**
- * @file 实时性能监控系统测试
- * @description 测试实时性能监控系统的各项功能
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
+ * @file unit/monitoring/RealTimePerformanceMonitor.test.ts
+ * @description Real Time Performance Monitor.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

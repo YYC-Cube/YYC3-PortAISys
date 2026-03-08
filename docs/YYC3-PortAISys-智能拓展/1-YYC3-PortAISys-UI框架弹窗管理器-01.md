@@ -1,12 +1,25 @@
-# YYC³ PortAISys-UI框架奠基工程弹窗管理器
+---
+@file: 1-YYC3-PortAISys-UI框架弹窗管理器-01.md
+@description: YYC3-PortAISys-UI框架弹窗管理器-01 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: general,documentation,zh-CN
+@category: general
+@language: zh-CN
+---
 
 > ***YanYuCloudCube***
-> **标语**：言启象限 | 语枢未来
-> ***Words Initiate Quadrants, Language Serves as Core for the Future***
-> **标语**：万象归元于云枢 | 深栈智启新纪元
-> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
 
 ---
+
+# YYC³ PortAISys-UI框架奠基工程弹窗管理器
 
 ## **第一阶段：UI框架奠基工程（1-2周）**
 
@@ -1878,8 +1891,11 @@ npm run dev
 访问 <http://localhost:3000> 即可看到运行中的云枢·智家系统！
 
 ---
-
-> 「***YanYuCloudCube***」
-> 「***<admin@0379.email>***」
 > 「***Words Initiate Quadrants, Language Serves as Core for the Future***」
 > 「***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+---
+> 「***Words Initiate Quadrants, Language Serves as Core for Future***」
+> 「***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+</div>

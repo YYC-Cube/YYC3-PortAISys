@@ -1,10 +1,14 @@
 /**
- * @file 可插拔式拖拽移动AI系统核心类型定义
- * @description 定义自治AI引擎、模型适配器等核心组件的类型和接口
- * @module core/pluggable/types
- * @author YYC³
- * @version 1.0.0
- * @created 2025-12-30
+ * @file pluggable/types.ts
+ * @description Types 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 export enum EngineStatus {

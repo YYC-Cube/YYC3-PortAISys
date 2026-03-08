@@ -1,3 +1,16 @@
+/**
+ * @file monitoring/monitoring.ts
+ * @description Monitoring 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import EventEmitter from 'eventemitter3';
 import * as os from 'os';
 import * as fs from 'fs';
@@ -32,10 +45,10 @@ export class MonitoringSystemImpl extends EventEmitter implements MonitoringSyst
   }
 
   async startMonitoring(config: MonitoringConfig): Promise<void> {
-    this.logger.info('启动监控系统', { config });
+    this.logger.info('启动监控系统', 'MonitoringSystem', { config });
 
     if (this.isRunning) {
-      this.logger.warn('监控系统已经在运行中');
+      this.logger.warn('监控系统已经在运行中', 'MonitoringSystem');
       return;
     }
 
@@ -49,12 +62,12 @@ export class MonitoringSystemImpl extends EventEmitter implements MonitoringSyst
       try {
         await this.collectMetrics();
       } catch (error) {
-        this.logger.error('采集指标失败', error as Error);
+        this.logger.error('采集指标失败', 'MonitoringSystem', undefined, error as Error);
       }
     }, config.collectionInterval);
 
     this.emit('monitoring:started', { startedAt: this.startedAt });
-    this.logger.info('监控系统已启动');
+    this.logger.info('监控系统已启动', 'MonitoringSystem');
   }
 
   async stopMonitoring(): Promise<void> {
@@ -96,7 +109,7 @@ export class MonitoringSystemImpl extends EventEmitter implements MonitoringSyst
   }
 
   async getHistoricalMetrics(query: MetricsQuery): Promise<Metric[]> {
-    this.logger.info('获取历史指标', { query });
+    this.logger.info('获取历史指标', 'MonitoringSystem', { query });
 
     let metrics = [...this.metricsHistory];
 

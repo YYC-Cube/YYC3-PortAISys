@@ -1,10 +1,14 @@
 /**
- * @file 高级拖拽系统
- * @description 提供高性能、可配置的拖拽功能，支持边界限制和拖拽约束
- * @module ui/widget/AdvancedDragSystem
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/widget/AdvancedDragSystem.ts
+ * @description Advanced Drag System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -445,7 +449,9 @@ export class AdvancedDragSystem extends EventEmitter {
       const newY = startY + velocityY * easeOut;
 
       this.currentPosition = { x: newX, y: newY };
-      this.element.style.transform = `translate(${newX}px, ${newY}px)`;
+      if (this.element) {
+        this.element.style.transform = `translate(${newX}px, ${newY}px)`;
+      }
 
       if (progress < 1) {
         this.inertiaRafId = requestAnimationFrame(animate);

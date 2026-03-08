@@ -1,10 +1,14 @@
 /**
- * @file 数据洞察仪表板组件实现
- * @description 实现IInsightsDashboard接口，提供数据可视化和洞察功能
- * @module ui/InsightsDashboard
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/InsightsDashboard.ts
+ * @description Insights Dashboard 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -21,8 +25,8 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
   private metrics: Map<string, MetricData>;
   private charts: Map<string, ChartData>;
   private insights: Map<string, Insight>;
-  private visible: boolean;
-  private autoRefresh: boolean;
+  private _visible: boolean;
+  private _autoRefresh: boolean;
   private refreshInterval: number | null;
 
   constructor() {
@@ -30,8 +34,8 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
     this.metrics = new Map();
     this.charts = new Map();
     this.insights = new Map();
-    this.visible = true;
-    this.autoRefresh = false;
+    this._visible = true;
+    this._autoRefresh = false;
     this.refreshInterval = null;
     this.initializeDefaultMetrics();
   }
@@ -80,7 +84,7 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
 
   addMetric(metric: MetricData): void {
     const existing = this.metrics.get(metric.id);
-    
+
     if (existing) {
       metric.change = metric.value - existing.value;
       if (metric.change > 0) {
@@ -155,7 +159,7 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
 
   async refresh(): Promise<void> {
     this.emit('refreshing');
-    
+
     await Promise.all([
       this.refreshMetrics(),
       this.refreshCharts(),
@@ -166,20 +170,21 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
   }
 
   private async refreshMetrics(): Promise<void> {
-    for (const metric of this.metrics.values()) {
+    const metrics = Array.from(this.metrics.values());
+    for (const metric of metrics) {
       const newValue = await this.fetchMetricValue(metric.id);
       if (newValue !== undefined) {
         const oldValue = metric.value;
         metric.value = newValue;
         metric.change = newValue - oldValue;
         metric.timestamp = Date.now();
-        
+
         if (metric.change > 0) {
           metric.trend = 'up';
         } else if (metric.change < 0) {
           metric.trend = 'down';
         }
-        
+
         this.emit('metric:updated', metric);
       }
     }
@@ -190,7 +195,8 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
   }
 
   private async refreshCharts(): Promise<void> {
-    for (const chart of this.charts.values()) {
+    const charts = Array.from(this.charts.values());
+    for (const chart of charts) {
       const newData = await this.fetchChartData(chart.id);
       if (newData) {
         chart.data = newData;
@@ -311,17 +317,17 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
   }
 
   show(): void {
-    this.visible = true;
+    this._visible = true;
     this.emit('visibility:changed', { visible: true });
   }
 
   hide(): void {
-    this.visible = false;
+    this._visible = false;
     this.emit('visibility:changed', { visible: false });
   }
 
   startAutoRefresh(intervalMs: number = 30000): void {
-    this.autoRefresh = true;
+    this._autoRefresh = true;
     if (this.refreshInterval) {
       clearInterval(this.refreshInterval);
     }
@@ -332,12 +338,20 @@ export class InsightsDashboard extends EventEmitter implements IInsightsDashboar
   }
 
   stopAutoRefresh(): void {
-    this.autoRefresh = false;
+    this._autoRefresh = false;
     if (this.refreshInterval) {
       clearInterval(this.refreshInterval);
       this.refreshInterval = null;
     }
     this.emit('autoRefresh:stopped');
+  }
+
+  isVisible(): boolean {
+    return this._visible;
+  }
+
+  isAutoRefresh(): boolean {
+    return this._autoRefresh;
   }
 
   private generateId(): string {

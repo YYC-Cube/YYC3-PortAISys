@@ -1,10 +1,14 @@
 /**
- * @file 状态管理器
- * @description 实现系统状态管理，支持状态持久化、快照、恢复等功能
- * @module state-manager
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file state-manager/StateManager.ts
+ * @description State Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';
@@ -251,7 +255,7 @@ export class StateManager extends EventEmitter {
       return state.map(item => this.cloneState(item));
     }
 
-    const cloned = Array.isArray(state) ? [] : {};
+    const cloned: Record<string, any> = {};
     for (const key in state) {
       if (state.hasOwnProperty(key)) {
         cloned[key] = this.cloneState(state[key]);

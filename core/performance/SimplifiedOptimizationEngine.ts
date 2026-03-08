@@ -1,12 +1,14 @@
 /**
- * @file 简化型性能优化引擎
- * @description 实现模块化、低复杂度的性能优化系统，遵循单一职责原则
- * @author YYC³ Team
- * @version 2.0.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file performance/SimplifiedOptimizationEngine.ts
+ * @description Simplified Optimization Engine 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

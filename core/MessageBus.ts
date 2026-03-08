@@ -1,10 +1,14 @@
 /**
- * @file 消息总线实现
- * @description 实现发布-订阅模式的消息总线，支持消息队列和重试机制
- * @module core/MessageBus
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2025-12-30
+ * @file MessageBus.ts
+ * @description Message Bus 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { EventEmitter } from 'node:events';

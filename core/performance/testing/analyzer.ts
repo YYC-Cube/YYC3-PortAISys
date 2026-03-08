@@ -1,10 +1,14 @@
 /**
- * @file 性能分析器实现
- * @description 实现性能分析器，用于分析性能测试结果并生成报告
- * @module performance-testing
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-07
+ * @file performance/testing/analyzer.ts
+ * @description Analyzer 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

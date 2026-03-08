@@ -1,8 +1,27 @@
+---
+@file: 01-YYC3-PortAISys-智能浮窗-核心架构.md
+@description: YYC3-PortAISys-智能浮窗-核心架构 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: technical,code,documentation,zh-CN
+@category: technical
+@language: zh-CN
+@audience: developers
+@complexity: advanced
+---
+
+> ***YanYuCloudCube***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
+
+---
+
 # YYC³ PortAISys 可插拔式拖拽移动AI系统：基于“五标五高五化”的多维度深化设计指导
-
-**YYC³可插拔式拖拽移动AI系统完整代码实施方案**
-
-## 第一章：核心架构组件深度设计
 
 - **AutonomousAIEngine**：处理消息流程和核心决策的顶级组件
 - **ModelAdapter**：支持多模型切换的适配层组件
@@ -1284,3 +1303,9 @@ export class AdvancedDragSystem {
   // 7. 动画曲线
   // 8. 性能优化
 }
+
+---
+> 「***Words Initiate Quadrants, Language Serves as Core for Future***」
+> 「***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+</div>

@@ -1,13 +1,14 @@
 /**
- * @file OptimizationSystem 优化系统
- * @description 五维闭环系统中的优化维度，负责性能优化、资源优化、自动调优和智能推荐
- * @module core/ui/widget/optimization
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-03
- * @updated 2026-01-03
- * @copyright Copyright (c) 2026 YYC³
+ * @file ui/widget/OptimizationSystem.ts
+ * @description Optimization System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -135,7 +136,6 @@ export class OptimizationSystem extends EventEmitter {
   private enabled: boolean;
   private autoOptimizationEnabled: boolean;
   private optimizationInterval: number;
-  private optimizationThreshold: number;
   private optimizationIntervalId: NodeJS.Timeout | null;
   private maxOptimizationHistory: number;
   private optimizationStrategies: Map<string, OptimizationStrategy[]>;
@@ -184,7 +184,6 @@ export class OptimizationSystem extends EventEmitter {
     this.enabled = this.config.enabled;
     this.autoOptimizationEnabled = this.config.enableAutoOptimization;
     this.optimizationInterval = this.config.optimizationInterval;
-    this.optimizationThreshold = this.config.optimizationThreshold;
     this.maxOptimizationHistory = this.config.maxOptimizationHistory;
     this.optimizationIntervalId = null;
 
@@ -287,7 +286,7 @@ export class OptimizationSystem extends EventEmitter {
     this.emit('metrics:recorded', metrics);
 
     if (this.autoOptimizationEnabled) {
-      this.checkForOptimizationOpportunities(metrics);
+      this.checkForOptimizationOpportunities();
     }
   }
 
@@ -775,10 +774,6 @@ export class OptimizationSystem extends EventEmitter {
       if (this.autoOptimizationEnabled) {
         this.startAutoOptimization();
       }
-    }
-
-    if (config.optimizationThreshold !== undefined) {
-      this.optimizationThreshold = config.optimizationThreshold;
     }
 
     if (config.maxOptimizationHistory !== undefined) {

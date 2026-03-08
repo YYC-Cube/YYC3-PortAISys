@@ -1,12 +1,14 @@
 /**
- * @file 增强型监控告警系统
- * @description 实现智能监控告警系统，包含多维度指标监控、智能告警、自动恢复等功能
- * @author YYC³ Team
- * @version 2.0.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file monitoring/EnhancedMonitoringAlertSystem.ts
+ * @description Enhanced Monitoring Alert System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';

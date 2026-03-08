@@ -1,10 +1,14 @@
 /**
- * @file 结构化日志系统
- * @description 提供企业级日志记录功能，支持多种输出方式和日志级别
- * @module utils/logger
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2025-12-30
+ * @file utils/logger.ts
+ * @description Logger 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,utils
  */
 
 import { createWriteStream } from 'node:fs';

@@ -1,10 +1,14 @@
 /**
- * @file 核心工具集定义
- * @description 提供系统核心工具集，包括搜索、计算器、代码解释器等基础工具
- * @module tools/core-tools
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file tools/core-tools.ts
+ * @description Core Tools 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { AITool } from './types';

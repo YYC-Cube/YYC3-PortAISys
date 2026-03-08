@@ -1,10 +1,14 @@
 /**
- * @file LearningAgent.test.ts
- * @description LearningAgent单元测试
- * @module tests/unit/ai/agents
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-23
+ * @file unit/ai/agents/LearningAgent.test.ts
+ * @description Learning Agent.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'

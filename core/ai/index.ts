@@ -1,13 +1,14 @@
 /**
- * @file 智能体系统入口
- * @description 智能体系统的统一入口，提供智能体创建、管理和通信功能
- * @module core/ai/index
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
- * @updated 2025-01-30
- * @copyright Copyright (c) 2025 YYC³
+ * @file ai/index.ts
+ * @description Index 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { AgentManager, AgentManagerConfig } from './AgentManager';

@@ -1,12 +1,14 @@
 /**
- * @file 增强型自动扩缩容管理器
- * @description 实现基于机器学习的智能自动扩缩容功能，包含预测性扩缩容、资源优化和智能调度
- * @author YYC³ Team
- * @version 2.0.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file architecture/scaling/EnhancedAutoScalingManager.ts
+ * @description Enhanced Auto Scaling Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { ServiceRegistry } from '../service-registry/ServiceRegistry';
@@ -654,10 +656,10 @@ export class EnhancedAutoScalingManager {
     const rules = config.scalingRules;
     const reasons: string[] = [];
 
-    const shouldScaleUp = this.checkScaleUpConditions(currentMetrics, rules, prediction, reasons);
+    const shouldScaleUp = this.checkScaleUpConditions(currentMetrics, rules, reasons, prediction);
     const shouldScaleDown = this.checkScaleDownConditions(currentMetrics, rules, reasons);
 
-    const action = this.determineScalingAction(shouldScaleUp, shouldScaleDown, currentInstances, config, reasons);
+    const action = this.determineScalingAction(shouldScaleUp, shouldScaleDown, currentInstances, config);
     const targetInstances = action === 'no_action' ? currentInstances : this.calculateTargetInstances(action, currentInstances, config, currentMetrics);
     const costImpact = this.calculateCostImpact(action, currentInstances, targetInstances, config);
 
@@ -676,9 +678,9 @@ export class EnhancedAutoScalingManager {
 
   private checkScaleUpConditions(
     metrics: ServiceMetrics,
-    rules: ScalingRules,
-    prediction?: ScalingPrediction,
-    reasons: string[]
+    rules: AutoScalingConfig['scalingRules'],
+    reasons: string[],
+    _prediction?: ScalingPrediction
   ): boolean {
     let shouldScaleUp = false;
 
@@ -725,7 +727,7 @@ export class EnhancedAutoScalingManager {
     return shouldScaleUp;
   }
 
-  private checkScaleDownConditions(metrics: ServiceMetrics, rules: ScalingRules, reasons: string[]): boolean {
+  private checkScaleDownConditions(metrics: ServiceMetrics, rules: AutoScalingConfig['scalingRules'], reasons: string[]): boolean {
     let shouldScaleDown = false;
     const scaleDownThresholdFactor = 0.7;
 

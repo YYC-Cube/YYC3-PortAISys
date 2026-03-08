@@ -1,3 +1,16 @@
+/**
+ * @file industries/business-management/BusinessManagementAI.ts
+ * @description Business Management Ai 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import type { AIWidgetInstance } from '../../autonomous-ai-widget/types';
 import { createAIWidget } from '../../index';
 

@@ -1,9 +1,14 @@
 /**
- * @file 用户价值主张系统测试
- * @description 测试用户价值主张系统的各项功能
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
+ * @file unit/value/UserValuePropositionSystem.test.ts
+ * @description User Value Proposition System.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

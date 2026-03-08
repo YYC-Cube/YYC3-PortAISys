@@ -1,15 +1,14 @@
 /**
- * @file optimization-validation.test.ts
- * @description 性能优化验证测试 - 验证优化效果
- *
- * 运行方式：
- * - 跳过：默认行为（pnpm test）
- * - 执行：RUN_PERF=true pnpm test tests/performance/
- *
- * @module tests/performance
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-21
+ * @file performance/optimization-validation.test.ts
+ * @description Optimization Validation.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'

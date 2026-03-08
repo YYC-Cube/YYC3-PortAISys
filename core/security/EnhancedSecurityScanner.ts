@@ -1,12 +1,14 @@
 /**
- * @file 增强型安全漏洞扫描器
- * @description 实现全面的安全漏洞扫描功能，包括静态代码分析、依赖漏洞检测、配置安全检查等
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file security/EnhancedSecurityScanner.ts
+ * @description Enhanced Security Scanner 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import * as fs from 'fs';

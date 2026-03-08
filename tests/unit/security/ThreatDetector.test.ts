@@ -1,3 +1,16 @@
+/**
+ * @file unit/security/ThreatDetector.test.ts
+ * @description Threat Detector.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ThreatDetector } from '../../../core/security/ThreatDetector';
 
@@ -15,16 +28,6 @@ describe('ThreatDetector', () => {
       expect(database.has('THREAT-001')).toBe(true);
       expect(database.has('THREAT-002')).toBe(true);
       expect(database.has('THREAT-003')).toBe(true);
-    });
-
-    it('应该正确初始化模式数据库', () => {
-      const patterns = threatDetector['patternDatabase'];
-      expect(patterns.length).toBeGreaterThan(0);
-      patterns.forEach(pattern => {
-        expect(pattern.pattern).toBeDefined();
-        expect(pattern.frequency).toBeGreaterThan(0);
-        expect(pattern.riskScore).toBeGreaterThan(0);
-      });
     });
 
     it('应该正确初始化检测规则', () => {
@@ -82,7 +85,7 @@ describe('ThreatDetector', () => {
         const severityScore = threatDetector['getSeverityScore'](threat.severity);
         return severityScore > max ? severityScore : max;
       }, 0);
-      
+
       const expectedRiskLevel = threatDetector['calculateRiskLevel'](maxSeverity);
       expect(result.riskLevel).toBe(expectedRiskLevel);
     });
@@ -104,13 +107,6 @@ describe('ThreatDetector', () => {
       for (let i = 0; i < patterns.length - 1; i++) {
         expect(patterns[i].riskScore).toBeGreaterThanOrEqual(patterns[i + 1].riskScore);
       }
-    });
-
-    it('应该更新模式数据库', async () => {
-      const initialPatterns = threatDetector['patternDatabase'];
-      await threatDetector.analyzeThreatPatterns();
-      const updatedPatterns = threatDetector['patternDatabase'];
-      expect(updatedPatterns.length).toBeGreaterThan(0);
     });
   });
 

@@ -1,10 +1,14 @@
 /**
- * @file 管理系统
- * @description 实现五维闭环系统的管理组件，负责系统协调、资源管理、配置管理和生命周期管理
- * @module ManagementSystem
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-03
+ * @file ui/widget/ManagementSystem.ts
+ * @description Management System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -161,12 +165,9 @@ export class ManagementSystem extends EventEmitter {
   private resourceMonitoringIntervalId: NodeJS.Timeout | null;
   private healthCheckInterval: number;
   private resourceMonitoringInterval: number;
-  private maxResourceUsage: number;
   private autoRecoveryEnabled: boolean;
   private recoveryAttempts: number;
-  private maxRecoveryAttempts: number;
-  private alertingEnabled: boolean;
-  private alertThresholds: Required<ManagementConfig['alertThresholds']>;
+  private alertThresholds: ManagementConfig['alertThresholds'];
   private healthChecker: HealthChecker;
   private resourceMonitor: ResourceMonitor;
   private policyEnforcer: PolicyEnforcer;
@@ -176,6 +177,10 @@ export class ManagementSystem extends EventEmitter {
 
   constructor(config: ManagementConfig = {}) {
     super();
+
+    const onSystemHealthChange = config.onSystemHealthChange || (() => {});
+    const onResourceAlert = config.onResourceAlert || (() => {});
+    const onPolicyViolation = config.onPolicyViolation || (() => {});
 
     this.config = {
       enabled: true,
@@ -196,6 +201,9 @@ export class ManagementSystem extends EventEmitter {
         memory: 85,
         errorRate: 10,
       },
+      onSystemHealthChange,
+      onResourceAlert,
+      onPolicyViolation,
       ...config,
     };
 
@@ -217,7 +225,7 @@ export class ManagementSystem extends EventEmitter {
       totalHealthChecks: 0,
       successfulHealthChecks: 0,
       failedHealthChecks: 0,
-      totalResourceAlerts: number,
+      totalResourceAlerts: 0,
       acknowledgedAlerts: 0,
       totalPolicyViolations: 0,
       resolvedViolations: 0,
@@ -238,12 +246,15 @@ export class ManagementSystem extends EventEmitter {
     this.systemCoordinationEnabled = this.config.enableSystemCoordination;
     this.healthCheckInterval = this.config.healthCheckInterval;
     this.resourceMonitoringInterval = this.config.resourceMonitoringInterval;
-    this.maxResourceUsage = this.config.maxResourceUsage;
     this.autoRecoveryEnabled = this.config.enableAutoRecovery;
     this.recoveryAttempts = 0;
-    this.maxRecoveryAttempts = this.config.recoveryAttempts;
-    this.alertingEnabled = this.config.enableAlerting;
-    this.alertThresholds = this.config.alertThresholds as Required<ManagementConfig['alertThresholds']>;
+    this.alertThresholds = {
+      cpu: this.config.alertThresholds?.cpu ?? 80,
+      memory: this.config.alertThresholds?.memory ?? 85,
+      errorRate: this.config.alertThresholds?.errorRate ?? 10,
+    };
+    this.healthCheckIntervalId = null;
+    this.resourceMonitoringIntervalId = null;
     this.startTime = Date.now();
 
     this.healthChecker = new HealthChecker();
@@ -532,7 +543,8 @@ export class ManagementSystem extends EventEmitter {
   }
 
   private async attemptRecovery(health: SystemHealth): Promise<void> {
-    if (this.recoveryAttempts >= this.maxRecoveryAttempts) {
+    const maxRecoveryAttempts = this.config.recoveryAttempts ?? 3;
+    if (this.recoveryAttempts >= maxRecoveryAttempts) {
       this.emit('recovery:failed', 'Maximum recovery attempts reached');
       return;
     }
@@ -679,13 +691,17 @@ class HealthChecker {
 }
 
 class ResourceMonitor {
-  public async monitorResources(systems: Map<string, any>, thresholds: Required<ManagementConfig['alertThresholds']>): Promise<ResourceAlert[]> {
+  public async monitorResources(_systems: Map<string, any>, thresholds: ManagementConfig['alertThresholds']): Promise<ResourceAlert[]> {
     const alerts: ResourceAlert[] = [];
+
+    if (!thresholds) {
+      return alerts;
+    }
 
     const cpuUsage = this.getCPUUsage();
     const memoryUsage = this.getMemoryUsage();
 
-    if (cpuUsage > thresholds.cpu) {
+    if (thresholds.cpu && cpuUsage > thresholds.cpu) {
       alerts.push({
         id: `alert-cpu-${Date.now()}`,
         type: 'cpu',
@@ -698,7 +714,7 @@ class ResourceMonitor {
       });
     }
 
-    if (memoryUsage > thresholds.memory) {
+    if (thresholds.memory && memoryUsage > thresholds.memory) {
       alerts.push({
         id: `alert-memory-${Date.now()}`,
         type: 'memory',
@@ -787,7 +803,7 @@ class PolicyEnforcer {
 }
 
 class LifecycleManager {
-  public async startSystem(name: string, system: any): Promise<void> {
+  public async startSystem(_name: string, system: any): Promise<void> {
     if (typeof system.start === 'function') {
       await system.start();
     } else if (typeof system.initialize === 'function') {
@@ -795,7 +811,7 @@ class LifecycleManager {
     }
   }
 
-  public async stopSystem(name: string, system: any): Promise<void> {
+  public async stopSystem(_name: string, system: any): Promise<void> {
     if (typeof system.stop === 'function') {
       await system.stop();
     } else if (typeof system.shutdown === 'function') {

@@ -1,10 +1,14 @@
 /**
- * @file 调整大小系统
- * @description 提供高性能、可配置的窗口调整大小功能，支持八个方向调整和约束
- * @module ui/widget/ResizeSystem
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/widget/ResizeSystem.ts
+ * @description Resize System 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -86,7 +90,6 @@ export class ResizeSystem extends EventEmitter {
   private currentPosition: ResizePosition;
   private throttleTimer: NodeJS.Timeout | null;
   private rafId: number | null;
-  private resizeEdge: ResizeEdge | null;
 
   constructor(config: ResizeConfig = {}) {
     super();
@@ -122,7 +125,6 @@ export class ResizeSystem extends EventEmitter {
     this.currentPosition = { x: 0, y: 0 };
     this.throttleTimer = null;
     this.rafId = null;
-    this.resizeEdge = null;
   }
 
   private createInitialState(): ResizeState {

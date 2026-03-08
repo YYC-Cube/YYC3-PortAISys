@@ -1,10 +1,14 @@
 /**
- * @file 知识库系统测试
- * @description 测试知识库的各项功能，包括增删改查、索引、持久化等
- * @module __tests__/unit/core/KnowledgeBase.test
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file unit/core/KnowledgeBase.test.ts
+ * @description Knowledge Base.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,core
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';

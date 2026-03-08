@@ -1,6 +1,14 @@
 /**
- * @file SpeechRecognitionEngine.ts
- * @description 语音识别引擎 - 支持多语言实时语音识别
+ * @file docs/YYC3-PortAISys-智能拓展/语音交互系统/src/core/voice/SpeechRecognitionEngine.ts
+ * @description Speech Recognition Engine 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,core
  */
 
 export interface SpeechRecognitionConfig {

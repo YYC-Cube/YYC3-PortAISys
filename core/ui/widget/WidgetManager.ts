@@ -1,10 +1,14 @@
 /**
- * @file Widget管理器
- * @description 管理widget的状态、模块和生命周期
- * @module ui/widget/WidgetManager
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/widget/WidgetManager.ts
+ * @description Widget Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';

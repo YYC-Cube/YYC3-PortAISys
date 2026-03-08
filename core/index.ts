@@ -1,13 +1,14 @@
 /**
- * @file YYC³ 自治AI浮窗系统主入口
- * @description 导出所有核心功能和组件
- * @module index
- * @author YYC³
- * @version 1.0.0
- * @created 2025-12-30
- * @updated 2025-12-30
- * @copyright Copyright (c) 2025 YYC³
+ * @file index.ts
+ * @description Index 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import type { AutonomousAIConfig, AIWidgetInstance } from './autonomous-ai-widget/types';

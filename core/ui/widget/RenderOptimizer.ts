@@ -1,10 +1,14 @@
 /**
- * @file 渲染优化器
- * @description 优化渲染性能
- * @module ui/widget/RenderOptimizer
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-05
+ * @file ui/widget/RenderOptimizer.ts
+ * @description Render Optimizer 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -15,7 +19,7 @@ export class RenderOptimizer extends EventEmitter {
   private cacheHitRate: number;
   private frameCount: number;
   private lastFrameTime: number;
-  private cache: Map<string, any>;
+  private _cache: Map<string, any>;
   private maxCacheSize: number;
 
   constructor(maxCacheSize: number = 1000) {
@@ -25,7 +29,7 @@ export class RenderOptimizer extends EventEmitter {
     this.cacheHitRate = 0;
     this.frameCount = 0;
     this.lastFrameTime = Date.now();
-    this.cache = new Map();
+    this._cache = new Map();
     this.maxCacheSize = maxCacheSize;
   }
 
@@ -60,16 +64,18 @@ export class RenderOptimizer extends EventEmitter {
     return this.cacheHitRate;
   }
 
-  cache(key: string, value: any): void {
-    if (this.cache.size >= this.maxCacheSize) {
-      const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+  setCache(key: string, value: any): void {
+    if (this._cache.size >= this.maxCacheSize) {
+      const firstKey = this._cache.keys().next().value;
+      if (firstKey !== undefined) {
+        this._cache.delete(firstKey);
+      }
     }
-    this.cache.set(key, value);
+    this._cache.set(key, value);
   }
 
   getCached(key: string): any {
-    const value = this.cache.get(key);
+    const value = this._cache.get(key);
     if (value !== undefined) {
       this.cacheHitRate = (this.cacheHitRate * 0.9) + (1 * 0.1);
     } else {
@@ -79,7 +85,7 @@ export class RenderOptimizer extends EventEmitter {
   }
 
   clearCache(): void {
-    this.cache.clear();
+    this._cache.clear();
     this.cacheHitRate = 0;
   }
 

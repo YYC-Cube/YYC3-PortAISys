@@ -1,10 +1,14 @@
 /**
- * @file 工具箱面板组件实现
- * @description 实现IToolboxPanel接口，提供工具管理和执行功能
- * @module ui/ToolboxPanel
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/ToolboxPanel.ts
+ * @description Toolbox Panel 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -249,7 +253,8 @@ export class ToolboxPanel extends EventEmitter implements IToolboxPanel {
     const toolExecutions: Record<string, number> = {};
     let totalExecutions = 0;
 
-    for (const [id, tool] of this.tools.entries()) {
+    const tools = Array.from(this.tools.entries());
+    for (const [id, tool] of tools) {
       const count = tool.usageCount || 0;
       toolExecutions[id] = count;
       totalExecutions += count;
@@ -284,7 +289,8 @@ export class ToolboxPanel extends EventEmitter implements IToolboxPanel {
     let successfulExecutions = 0;
     let failedExecutions = 0;
 
-    for (const tool of this.tools.values()) {
+    const tools = Array.from(this.tools.values());
+    for (const tool of tools) {
       const count = tool.usageCount || 0;
       totalExecutions += count;
       successfulExecutions += count;

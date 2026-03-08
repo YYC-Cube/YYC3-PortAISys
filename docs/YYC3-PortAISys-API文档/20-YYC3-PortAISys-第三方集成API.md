@@ -1,12 +1,29 @@
-# 第三方集成 API 文档
+---
+@file: 20-YYC3-PortAISys-第三方集成API.md
+@description: YYC³ PortAISys 第三方集成 API 文档，提供与主流第三方服务和平台的集成能力
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: api,restful,critical,zh-CN
+@category: api
+@language: zh-CN
+@base_url: https://api.yyc3.com/v1
+@authentication: oauth2
+@audience: developers
+@complexity: advanced
+---
 
 > ***YanYuCloudCube***
-> 言启象限 | 语枢未来
-> ***Words Initiate Quadrants, Language Serves as Core for the Future***
-> 万象归元于云枢 | 深栈智启新纪元
-> ***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
 
 ---
+
+# 第三方集成 API 文档
 
 > YYC³ PortAISys 第三方集成 API 提供与主流第三方服务和平台的集成能力，实现无缝的数据交换和功能扩展。
 
@@ -1202,11 +1219,6 @@ A: 使用健康检查和监控指标跟踪集成状态。
 - **GitHub**: https://github.com/yyc3/integrations
 
 ---
-
-<div align="center">
-
-> 「***YanYuCloudCube***」
-> 「***<admin@0379.email>***」
 > 「***Words Initiate Quadrants, Language Serves as Core for the Future***」
 > 「***All things converge in the cloud pivot; Deep stacks ignite a new era of intelligence***」
 

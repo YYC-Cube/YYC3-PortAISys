@@ -1,38 +1,25 @@
+---
+@file: README.md
+@description: YYC³ PortAISys 文档目录，包含所有文档的索引和导航
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: general,documentation,zh-CN
+@category: general
+@language: zh-CN
+---
+
+> ***YanYuCloudCube***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
+
+---
+
 # ![YYC³ 智能应用](public/github.png)  
-# 星云操作系统 - 企业级 AI 智能管理平台
-
-<p align="center">
-  <img src="public/github.png" alt="星云操作系统 Logo" width="120" />
-</p>
-
-<p align="center">
-  <strong>星云操作系统 - 企业级 AI 智能管理平台</strong><br/>
-  <em>万象归元于云枢，深栈智启新纪元。</em>
-</p>
-
-<p align="center">
-  <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-16-blue?logo=next.js" alt="Next.js 16" /></a>
-  <a href="https://react.dev"><img src="https://img.shields.io/badge/React-19.2-blue?logo=react" alt="React 19.2" /></a>
-  <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript" alt="TypeScript 5.0" /></a>
-  <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/TailwindCSS-3.3-blue?logo=tailwindcss" alt="Tailwind CSS" /></a>
-  <a href="https://github.com/shadcn/ui"><img src="https://img.shields.io/badge/shadcn/ui-组件库-blueviolet" alt="shadcn/ui" /></a>
-  <a href="https://github.com/YYC-Cube/yyc3-Futuristic-Dashboard"><img src="https://img.shields.io/github/stars/YYC-Cube/yyc3-Futuristic-Dashboard?style=social" alt="GitHub Stars" /></a>
-</p>
-
-<p align="center">
-  <a href="https://vercel.com"><img src="https://img.shields.io/badge/部署-Vercel-black?logo=vercel" alt="Vercel" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/环境变量-已配置-green" alt="Env Ready" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/权限系统-RBAC-orange" alt="RBAC" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/AI引擎-已集成-brightgreen" alt="AI Engine" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/响应式-移动端支持-blue" alt="Responsive" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/语言-中文支持-red" alt="中文支持" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License" /></a>
-</p>
-
-
-📦 项目特性
-
-### 核心功能
 
 - **AI 智能分析引擎** - 实时数据预测、异常检测和智能建议
 - **多租户权限管理** - 基于 RBAC 的细粒度权限控制系统
@@ -423,3 +410,9 @@ Fork 仓库：https://github.com/YYC-Cube/yyc3-Futuristic-Dashboard.git
 ---
 
 **星云操作系统** - 打造下一代企业级智能管理平台
+
+---
+> 「***Words Initiate Quadrants, Language Serves as Core for Future***」
+> 「***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+</div>

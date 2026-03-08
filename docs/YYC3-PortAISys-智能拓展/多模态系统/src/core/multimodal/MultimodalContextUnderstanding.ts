@@ -1,6 +1,14 @@
 /**
- * @file MultimodalContextUnderstanding.ts
- * @description 多模态上下文理解器 - 理解多种输入模式的上下文
+ * @file docs/YYC3-PortAISys-智能拓展/多模态系统/src/core/multimodal/MultimodalContextUnderstanding.ts
+ * @description Multimodal Context Understanding 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,core
  */
 
 import { InputEvent, FusedInput, ContextState, InputModality } from './MultimodalProtocol'

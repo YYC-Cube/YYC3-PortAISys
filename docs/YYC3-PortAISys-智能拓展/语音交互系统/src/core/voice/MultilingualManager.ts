@@ -1,6 +1,14 @@
 /**
- * @file MultilingualManager.ts
- * @description 多语言管理器 - 统一管理语音识别和合成的语言设置
+ * @file docs/YYC3-PortAISys-智能拓展/语音交互系统/src/core/voice/MultilingualManager.ts
+ * @description Multilingual Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,core
  */
 
 export interface LanguageInfo {

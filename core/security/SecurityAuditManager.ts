@@ -1,10 +1,14 @@
 /**
- * @file 安全审计管理器
- * @description 提供企业级安全审计和渗透测试功能
- * @module security/SecurityAuditManager
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2025-12-30
+ * @file security/SecurityAuditManager.ts
+ * @description Security Audit Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { logger } from '../utils/logger';
@@ -149,7 +153,8 @@ export class SecurityAuditManager {
         }
       }
     } catch (error) {
-      logger.error('初始化安全报告目录失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('初始化安全报告目录失败', 'SecurityAudit', { error: errorMessage });
     }
   }
 
@@ -184,7 +189,8 @@ export class SecurityAuditManager {
       issues.push(...networkIssues);
 
     } catch (error) {
-      logger.error('漏洞扫描失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('漏洞扫描失败', 'SecurityAudit', { error: errorMessage });
     }
 
     const endTime = new Date();
@@ -237,7 +243,8 @@ export class SecurityAuditManager {
       issues.push(...infoLeakIssues);
 
     } catch (error) {
-      logger.error('渗透测试失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('渗透测试失败', 'SecurityAudit', { error: errorMessage });
     }
 
     const endTime = new Date();
@@ -286,7 +293,8 @@ export class SecurityAuditManager {
       issues.push(...policyIssues);
 
     } catch (error) {
-      logger.error('合规检查失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('合规检查失败', 'SecurityAudit', { error: errorMessage });
     }
 
     const endTime = new Date();
@@ -331,7 +339,8 @@ export class SecurityAuditManager {
       issues.push(...complianceResult.issues);
 
     } catch (error) {
-      logger.error('安全评估失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('安全评估失败', 'SecurityAudit', { error: errorMessage });
     }
 
     const endTime = new Date();
@@ -381,7 +390,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('扫描依赖项漏洞失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('扫描依赖项漏洞失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -431,7 +441,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('扫描代码漏洞失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('扫描代码漏洞失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -463,7 +474,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('扫描配置漏洞失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('扫描配置漏洞失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -495,7 +507,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('扫描API漏洞失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('扫描API漏洞失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -527,7 +540,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('扫描网络漏洞失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('扫描网络漏洞失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -561,7 +575,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('测试认证绕过失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('测试认证绕过失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -593,7 +608,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('测试授权缺陷失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('测试授权缺陷失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -625,7 +641,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('测试注入攻击失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('测试注入攻击失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -657,7 +674,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('测试跨站攻击失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('测试跨站攻击失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -689,7 +707,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('测试敏感信息泄露失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('测试敏感信息泄露失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -723,7 +742,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('检查OWASP Top 10合规性失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('检查OWASP Top 10合规性失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -755,7 +775,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('检查CWE Top 25合规性失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('检查CWE Top 25合规性失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -787,7 +808,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('检查行业标准合规性失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('检查行业标准合规性失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -819,7 +841,8 @@ export class SecurityAuditManager {
         });
       }
     } catch (error) {
-      logger.error('检查内部安全策略合规性失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('检查内部安全策略合规性失败', 'SecurityAudit', { error: errorMessage });
     }
 
     return issues;
@@ -904,7 +927,8 @@ export class SecurityAuditManager {
       metrics.increment('security.audit.executed', 1, { type: result.type });
 
     } catch (error) {
-      logger.error('保存审计结果失败', 'SecurityAudit', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('保存审计结果失败', 'SecurityAudit', { error: errorMessage });
     }
   }
 

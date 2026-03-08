@@ -1,6 +1,27 @@
-# 🎯 Tracing 快速开始指南
+---
+@file: YYC3-PortAISys-OpenTelemetry-快速开始.md
+@description: YYC3-PortAISys-OpenTelemetry-快速开始 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: technical,code,documentation,zh-CN
+@category: technical
+@language: zh-CN
+@audience: developers
+@complexity: advanced
+---
 
-## ⚡ 5分钟快速上手
+> ***YanYuCloudCube***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
+
+---
+
+# 🎯 Tracing 快速开始指南
 
 ### 1️⃣ 打开 AI Toolkit Trace Viewer
 
@@ -146,3 +167,9 @@ async function myFunction() {
 ```bash
 npm run example:tracing
 ```
+
+---
+> 「***Words Initiate Quadrants, Language Serves as Core for Future***」
+> 「***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+</div>

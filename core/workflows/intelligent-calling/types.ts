@@ -1,10 +1,14 @@
 /**
- * @file 智能呼叫工作流类型定义
- * @description 定义智能呼叫相关的类型和接口
- * @module workflows/intelligent-calling/types
- * @author YYC³ Team
- * @version 1.0.0
- * @created 2025-12-30
+ * @file workflows/intelligent-calling/types.ts
+ * @description Types 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 /**

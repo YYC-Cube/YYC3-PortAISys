@@ -1,8 +1,25 @@
+---
+@file: YYC3-PortAISys-智能浮窗-自治模块指导.md
+@description: YYC3-PortAISys-智能浮窗-自治模块指导 文档
+@author: YanYuCloudCube Team <admin@0379.email>
+@version: v1.0.0
+@created: 2026-03-07
+@updated: 2026-03-07
+@status: stable
+@tags: general,documentation,zh-CN
+@category: general
+@language: zh-CN
+---
+
+> ***YanYuCloudCube***
+> *言启象限 | 语枢未来*
+> ***Words Initiate Quadrants, Language Serves as Core for Future***
+> *万象归元于云枢 | 深栈智启新纪元*
+> ***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***
+
+---
+
 # # YYC³ PortAISys 可插拔式拖拽移动AI系统自治模块
-
-**完全自治的智能AI浮窗系统**，具备独立运行、模块复用、自主学习等高级能力。
-
-## 🏗️ 架构升级：自治AI浮窗系统
 
 ### 1. 独立模块架构设计
 
@@ -799,3 +816,9 @@ export * as ADAPTERS from './adapters';
 4. **多租户系统** - 独立的AI实例管理
 
 这个强化版本提供了企业级的自治AI浮窗系统，具备完整的独立性、可扩展性和学习能力，可以无缝集成到任何项目中。
+
+---
+> 「***Words Initiate Quadrants, Language Serves as Core for Future***」
+> 「***All things converge in cloud pivot; Deep stacks ignite a new era of intelligence***」
+
+</div>

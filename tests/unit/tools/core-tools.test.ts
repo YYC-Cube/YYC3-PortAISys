@@ -1,10 +1,14 @@
 /**
- * @file 核心工具集测试
- * @description 测试搜索、计算器、代码解释器等核心工具的功能
- * @module __tests__/unit/tools/core-tools.test
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file unit/tools/core-tools.test.ts
+ * @description Core Tools.test 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';

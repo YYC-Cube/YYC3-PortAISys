@@ -1,10 +1,14 @@
 /**
- * @file PluginManager.ts
- * @description 插件管理器 - 管理插件生命周期
- * @module core/plugin-system
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-21
+ * @file plugin-system/PluginManager.ts
+ * @description Plugin Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3';
@@ -680,7 +684,7 @@ export class PluginManager extends EventEmitter {
     for (const [id, registration] of this.plugins) {
       try {
         const latestVersion = await this.fetchLatestVersion(id);
-        const currentVersion = registration.plugin.metadata.version;
+        const currentVersion = registration.plugin?.metadata.version;
 
         if (latestVersion > currentVersion) {
           this.emit('plugin:update:available', {
@@ -735,7 +739,7 @@ export class PluginManager extends EventEmitter {
    */
   async publishToMarketplace(plugin: IPlugin): Promise<void> {
     // 1. 验证插件
-    this.validatePlugin(plugin);
+    this.validateIPlugin(plugin);
     
     // 2. 打包插件
     // 3. 上传到市场
@@ -747,6 +751,22 @@ export class PluginManager extends EventEmitter {
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     this.emit('plugin:marketplace:publish:completed', { id: plugin.metadata.id });
+  }
+
+  /**
+   * 验证IPlugin
+   */
+  private validateIPlugin(plugin: IPlugin): void {
+    const { id, name, version } = plugin.metadata;
+
+    if (!id || !name || !version) {
+      throw new Error('Plugin metadata is incomplete');
+    }
+
+    // 验证版本格式
+    if (!/^\d+\.\d+\.\d+/.test(version)) {
+      throw new Error(`Invalid version format: ${version}`);
+    }
   }
 
   /**

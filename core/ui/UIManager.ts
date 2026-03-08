@@ -1,10 +1,14 @@
 /**
- * @file UI管理器实现
- * @description 实现IUIManager接口，提供动态交互系统功能
- * @module ui/UIManager
- * @author YYC³
- * @version 1.0.0
- * @created 2025-01-30
+ * @file ui/UIManager.ts
+ * @description Uimanager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -104,7 +108,8 @@ export class UIManager extends EventEmitter implements IUIManager {
 
     const handlers = this.eventHandlers.get(event.type);
     if (handlers) {
-      for (const handler of handlers) {
+      const handlerArray = Array.from(handlers);
+      for (const handler of handlerArray) {
         try {
           handler(event);
         } catch (error) {

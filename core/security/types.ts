@@ -1,3 +1,16 @@
+/**
+ * @file security/types.ts
+ * @description Types 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
+ */
+
 export interface ThreatDetector {
   detectThreats(): Promise<ThreatDetectionResult>;
   analyzeThreatPatterns(): Promise<ThreatPattern[]>;
@@ -452,6 +465,15 @@ export interface ComplianceReporting {
   frequency: string;
   recipients: string[];
   format: string;
+}
+
+export interface ComplianceRule {
+  id: string;
+  framework: string;
+  requirement: string;
+  description: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  checkFunction: string;
 }
 
 export interface DataPrivacy {

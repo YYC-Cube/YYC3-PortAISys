@@ -1,12 +1,14 @@
 /**
- * @file 文档同步管理器
- * @description 实现代码与文档的双向同步机制，确保文档与代码保持一致
- * @author YYC³ Team
- * @version 1.1.0
- * @created 2026-01-25
- * @updated 2026-01-25
- * @copyright Copyright (c) 2026 YYC³
+ * @file documentation/DocumentSyncManager.ts
+ * @description Document Sync Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import * as fs from 'fs';
@@ -290,7 +292,7 @@ export class DocumentSyncManager {
         options
       });
 
-      for (const entry of entriesToSync.values()) {
+      for (const [_codePath, entry] of entriesToSync) {
         try {
           const syncStatus = await this.syncFile(entry, options);
           entry.syncStatus = syncStatus;

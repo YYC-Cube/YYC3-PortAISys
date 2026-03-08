@@ -1,10 +1,14 @@
 /**
- * @file 全局错误处理器
- * @description 实现系统级错误捕获、分类、恢复和预防机制
- * @module error-handler
- * @author YYC³
- * @version 1.0.0
- * @created 2025-12-30
+ * @file error-handler/GlobalErrorHandler.ts
+ * @description Global Error Handler 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
+ * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript
  */
 
 import EventEmitter from 'eventemitter3'

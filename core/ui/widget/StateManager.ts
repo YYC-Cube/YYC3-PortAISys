@@ -1,13 +1,14 @@
 /**
- * @file 状态管理系统
- * @description 统一的状态管理、状态同步和状态持久化系统
- * @module core/ui/widget/StateManager
- * @author YYC³
- * @version 1.0.0
- * @created 2026-01-03
- * @updated 2026-01-03
- * @copyright Copyright (c) 2026 YYC³
+ * @file ui/widget/StateManager.ts
+ * @description State Manager 模块
+ * @author YanYuCloudCube Team <admin@0379.email>
+ * @version v1.0.0
+ * @created 2026-03-07
+ * @updated 2026-03-07
+ * @status stable
  * @license MIT
+ * @copyright Copyright (c) 2026 YanYuCloudCube Team
+ * @tags typescript,ui
  */
 
 import EventEmitter from 'eventemitter3';
@@ -137,7 +138,6 @@ export class StateManager extends EventEmitter {
   private optimizationEnabled: boolean;
   private persistenceKey: string;
   private syncInterval: number;
-  private maxStateHistory: number;
   private stateRetentionDays: number;
   private syncTimer: NodeJS.Timeout | null;
   private stateVersion: string;
@@ -191,7 +191,6 @@ export class StateManager extends EventEmitter {
     this.optimizationEnabled = this.config.enableOptimization;
     this.persistenceKey = this.config.persistenceKey;
     this.syncInterval = this.config.syncInterval;
-    this.maxStateHistory = this.config.maxStateHistory;
     this.stateRetentionDays = this.config.stateRetentionDays;
 
     this.initialize();
