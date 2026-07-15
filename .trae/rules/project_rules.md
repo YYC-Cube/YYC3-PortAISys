@@ -5,10 +5,12 @@
 YYC³（YanYuCloudCube）PortAISys（Portable Intelligent AI System） 是一个基于云原生架构的便携式智能AI系统，旨在为企业提供高性能、高可靠性、高安全性、高扩展性和高可维护性的AI解决方案。
 
 ## 项目文档
-/Users/my/yyc3-Portable-Intelligent-AI-System/docs
+
+`docs/` 目录（项目根下）
 
 ## 模版规范
-/Users/my/yyc3-Portable-Intelligent-AI-System/docs/YYC3-PortAISys-模版规范
+
+`docs/YYC3-PortAISys-模版规范/` 目录
 
 ## 代码文档审核整理要求
 

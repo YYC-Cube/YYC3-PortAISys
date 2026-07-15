@@ -29,7 +29,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 11.10.0   # 需要 v11+ 才能识别 pnpm-workspace.yaml 的 overrides
           
       - name: Setup pnpm cache
         uses: actions/cache@v4
@@ -75,7 +75,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 11.10.0   # 需要 v11+ 才能识别 pnpm-workspace.yaml 的 overrides
           
       - name: Setup pnpm cache
         uses: actions/cache@v4
@@ -130,7 +130,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 11.10.0   # 需要 v11+ 才能识别 pnpm-workspace.yaml 的 overrides
           
       - name: Setup pnpm cache
         uses: actions/cache@v4
@@ -179,7 +179,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 11.10.0   # 需要 v11+ 才能识别 pnpm-workspace.yaml 的 overrides
           
       - name: Install dependencies
         run: pnpm install
@@ -209,7 +209,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 11.10.0   # 需要 v11+ 才能识别 pnpm-workspace.yaml 的 overrides
           
       - name: Install dependencies
         run: pnpm install
@@ -243,7 +243,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 11.10.0   # 需要 v11+ 才能识别 pnpm-workspace.yaml 的 overrides
           
       - name: Install dependencies
         run: pnpm install
@@ -274,8 +274,8 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
-          
+          version: 11.10.0   # 与本地一致；pnpm-workspace.yaml 的 overrides/onlyBuiltDependencies 需要 v11+
+
       - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
@@ -283,7 +283,7 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
-      
+
       - name: Setup node modules cache
         uses: actions/cache@v4
         with:
@@ -291,22 +291,23 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-node-
-      
+
       - name: Install dependencies
         run: pnpm install
-        
-      - name: npm audit
-        run: npm audit --audit-level=moderate
-        continue-on-error: true
-        
+
+      # 安全门禁：高危及以上的漏洞将阻断流水线（可通过 --audit-level 调整阈值）
+      # 注意：必须使用官方 registry，npmmirror 不支持 audit 端点
+      - name: 依赖漏洞审计（high+ 阻断）
+        run: pnpm audit --audit-level=high --registry=https://registry.npmjs.org
+
       - name: 运行安全测试
         run: pnpm test:security
-        
+
       - name: 代码安全扫描
         uses: snyk/actions/node@master
         with:
           command: test
-        continue-on-error: true
+        continue-on-error: true   # Snyk 仅作参考，不阻断（无 token 或配额限制时不影响 CI）
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         
@@ -335,7 +336,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 11.10.0   # 需要 v11+ 才能识别 pnpm-workspace.yaml 的 overrides
           
       - name: Install dependencies
         run: pnpm install
@@ -367,7 +368,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 11.10.0   # 需要 v11+ 才能识别 pnpm-workspace.yaml 的 overrides
           
       - name: Install dependencies
         run: pnpm install
@@ -403,7 +404,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 11.10.0   # 需要 v11+ 才能识别 pnpm-workspace.yaml 的 overrides
           
       - name: Install dependencies
         run: pnpm install

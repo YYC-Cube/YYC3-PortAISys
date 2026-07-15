@@ -46,6 +46,9 @@ pnpm-debug.log*
 # TypeScript
 *.tsbuildinfo
 
+# Historical diagnostic dumps (regenerate via `pnpm typecheck` if needed)
+ts-errors.txt
+
 # Next.js
 .next/
 out/

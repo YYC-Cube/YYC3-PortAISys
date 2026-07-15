@@ -6,7 +6,7 @@
   <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0;">
     <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version">
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
-    <img src="https://img.shields.io/badge/node-%3E18.0.0-brightgreen.svg" alt="Node">
+    <img src="https://img.shields.io/badge/node-%3E%3D20.19.0-brightgreen.svg" alt="Node">
     <img src="https://img.shields.io/badge/typescript-%3E5.0.0-blue.svg" alt="TypeScript">
     <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build">
   </div>
@@ -116,9 +116,9 @@ YYC³ Portable Intelligent AI System 采用清晰的微服务架构，明确定�
 
 ### 环境要求
 
-- Node.js >= 18.0.0
-- TypeScript >= 5.0.0
-- npm >= 9.0.0 或 pnpm >= 8.0.0
+- Node.js >= 20.19.0 （Prisma 7 要求；见 `.nvmrc` 与 `package.json` engines）
+- TypeScript >= 5.3.0
+- pnpm >= 8.0.0（CI 使用 pnpm，请勿使用 npm 以免 lockfile 冲突）
 - PostgreSQL >= 14.0
 - Redis >= 6.0.0 (可选，用于缓存)
 
@@ -129,10 +129,8 @@ YYC³ Portable Intelligent AI System 采用清晰的微服务架构，明确定�
 git clone https://github.com/YYC-Cube/YYC3-PortAISys.git
 cd YYC3-PortAISys
 
-# 安装依赖
+# 安装依赖（请使用 pnpm，CI 与 lockfile 均基于 pnpm）
 pnpm install
-# 或
-npm install
 ```
 
 ### 配置

@@ -13,5 +13,7 @@
     }
   ],
   "githubPullRequests.showPullRequestNumber": true,
-  "githubPullRequests.defaultMergeMethod": "merge"
+  "githubPullRequests.defaultMergeMethod": "merge",
+  "markdown.extension.completion.enabled": false,
+  "markdown.extension.tableFormatter.enabled": false
 }
