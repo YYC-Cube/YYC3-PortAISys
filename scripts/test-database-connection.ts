@@ -76,7 +76,7 @@ async function testConnection() {
     if (tablesResult.rows.length === 0) {
       console.log('  (无表)');
     } else {
-      tablesResult.rows.forEach((row, index) => {
+      tablesResult.rows.forEach((row: any, index: number) => {
         console.log(`  ${index + 1}. ${row.table_name}`);
       });
     }
@@ -127,7 +127,7 @@ async function testConnection() {
     if (schemaResult.rows.length === 0) {
       console.log('  (无自定义 Schema)');
     } else {
-      schemaResult.rows.forEach((row, index) => {
+      schemaResult.rows.forEach((row: any, index: number) => {
         console.log(`  ${index + 1}. ${row.schema_name}`);
       });
     }
@@ -143,7 +143,7 @@ async function testConnection() {
     if (extensionResult.rows.length === 0) {
       console.log('  (无扩展)');
     } else {
-      extensionResult.rows.forEach((row, index) => {
+      extensionResult.rows.forEach((row: any, index: number) => {
         console.log(`  ${index + 1}. ${row.extname} (v${row.extversion})`);
       });
     }

@@ -187,7 +187,7 @@ async function insertInitialData(client: Client): Promise<void> {
 
   await client.query(`
     INSERT INTO ${SCHEMA_NAME}.ai_models (name, provider, model_id, version, is_active, config)
-    VALUES 
+    VALUES
       ('GPT-4 Turbo', 'openai', 'gpt-4-turbo-preview', '2024-04-09', true, '{"max_tokens": 4096, "temperature": 0.7}'),
       ('Claude 3 Opus', 'anthropic', 'claude-3-opus-20240229', '2024-02-29', true, '{"max_tokens": 4096, "temperature": 0.7}'),
       ('Local LLaMA', 'local', 'llama-2-7b', '1.0.0', false, '{"max_tokens": 2048, "temperature": 0.8}')
@@ -196,7 +196,7 @@ async function insertInitialData(client: Client): Promise<void> {
 
   await client.query(`
     INSERT INTO ${SCHEMA_NAME}.plugins (name, version, description, author, is_enabled)
-    VALUES 
+    VALUES
       ('Core Widget', '1.0.0', '核心智能窗口插件', 'YYC³ Team', true),
       ('Knowledge Base', '1.0.0', '知识库集成插件', 'YYC³ Team', true),
       ('Multi-Model', '1.0.0', '多模型管理插件', 'YYC³ Team', true)
@@ -215,7 +215,7 @@ async function verifySchema(client: Client): Promise<void> {
   `, [SCHEMA_NAME]);
 
   console.log(`📋  Schema "${SCHEMA_NAME}" 中的表：`);
-  tablesResult.rows.forEach((row, index) => {
+  tablesResult.rows.forEach((row: any, index: number) => {
     console.log(`  ${index + 1}. ${row.table_name}`);
   });
 

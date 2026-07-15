@@ -62,7 +62,7 @@ async function verifyTables(client: Client): Promise<void> {
   ];
 
   console.log('📋 验证表结构：');
-  tablesResult.rows.forEach((row, index) => {
+  tablesResult.rows.forEach((row: any, index: number) => {
     const isExpected = expectedTables.includes(row.table_name);
     const icon = isExpected ? '✅' : '⚠️';
     console.log(`  ${icon} ${index + 1}. ${row.table_name}`);
@@ -70,7 +70,7 @@ async function verifyTables(client: Client): Promise<void> {
   console.log();
 
   const missingTables = expectedTables.filter(
-    table => !tablesResult.rows.some(row => row.table_name === table)
+    table => !tablesResult.rows.some((row: any) => row.table_name === table)
   );
 
   if (missingTables.length > 0) {
@@ -102,7 +102,7 @@ async function verifyInitialData(client: Client): Promise<void> {
     ORDER BY name
   `);
   console.log('  AI 模型：');
-  modelsResult.rows.forEach((row, index) => {
+  modelsResult.rows.forEach((row: any, index: number) => {
     const status = row.is_active ? '✅' : '⚪';
     console.log(`    ${status} ${index + 1}. ${row.name} (${row.provider})`);
   });
@@ -114,7 +114,7 @@ async function verifyInitialData(client: Client): Promise<void> {
     ORDER BY name
   `);
   console.log('  插件：');
-  pluginsResult.rows.forEach((row, index) => {
+  pluginsResult.rows.forEach((row: any, index: number) => {
     const status = row.is_enabled ? '✅' : '⚪';
     console.log(`    ${status} ${index + 1}. ${row.name} v${row.version}`);
   });

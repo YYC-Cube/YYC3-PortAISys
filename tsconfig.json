@@ -40,7 +40,8 @@
   "include": [
     "core/**/*",
     "src/**/*",
-    "tests/**/*"
+    "tests/**/*",
+    "scripts/**/*.ts"
   ],
   "exclude": [
     "node_modules",
