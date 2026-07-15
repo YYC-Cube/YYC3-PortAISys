@@ -129,9 +129,9 @@ export const InsightsQuerySchema = z.object({
 // ============================================================
 
 export const ReplyContextSchema = z.object({
-  message: z.string().max(8000).optional(),
-  sessionId: z.string().max(100).optional(),
-  userRole: z.string().max(50).optional(),
+  lastMessage: z.string().min(1).max(8000),
+  conversationSummary: z.string().max(4000).optional(),
+  userIntent: z.string().max(200).optional(),
 });
 
 export type SuggestionsRequest = z.infer<typeof ReplyContextSchema>;

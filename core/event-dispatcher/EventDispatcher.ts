@@ -152,6 +152,14 @@ export class EventDispatcher extends EventEmitter {
     return this.onEvent(eventType, handler, { once: true });
   }
 
+  /**
+   * 注销处理器（委托到 offEvent，兼容旧调用方使用 off(handlerId) 的场景）
+   */
+  off(handlerId: string | symbol): this {
+    this.offEvent(String(handlerId));
+    return this;
+  }
+
   offEvent(handlerId: string): void {
     for (const [eventType, handlers] of this.handlers.entries()) {
       const index = handlers.findIndex(h => h.id === handlerId);

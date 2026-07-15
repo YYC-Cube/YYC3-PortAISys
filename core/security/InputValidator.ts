@@ -84,8 +84,8 @@ export class InputValidator {
     switch (endpoint) {
       case '/api/users':
         schema = schema.extend({
-          email: z.string().email('Invalid email format'),
-          password: z.string().min(8, 'Password too short'),
+          email: z.string().email('Invalid email format').optional(),
+          password: z.string().min(8, 'Password too short').optional(),
         });
         break;
       case '/api/messages':
@@ -165,7 +165,7 @@ export class InputValidator {
     const result = this.validate(input, schema, 'fileUpload');
 
     if (result.success && this.config.enableSanitization) {
-      result.data = this.sanitizeFilename(input.filename);
+      result.data.filename = this.sanitizeFilename(input.filename);
     }
 
     return result;

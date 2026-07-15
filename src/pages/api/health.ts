@@ -53,20 +53,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         endpoint: 'https://api.openai.com/v1/chat/completions',
         timeout: 30000,
         maxTokens: 4096,
-        temperature: 0.7
+        temperature: 0.7,
+        enableLearning: false,
+        enableMemory: false,
+        enableToolUse: false,
+        enableContextAwareness: false,
+        position: 'bottom-right',
+        theme: 'auto',
+        language: 'zh-CN',
       };
 
       const modelAdapter = new OpenAIModelAdapter(modelConfig);
       const adapterStatus = modelAdapter.getStatus();
-      
+
       modelStatus = {
         status: adapterStatus === 'idle' ? 'ok' : 'warning',
         message: `Model adapter status: ${adapterStatus}`,
-        config: {
-          apiType: modelConfig.apiType,
-          modelName: modelConfig.modelName,
-          hasApiKey: !!modelConfig.apiKey
-        }
       };
     } catch (error) {
       modelStatus = {
@@ -96,11 +98,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
     });
-  } catch (error) {
-    console.error('Health check API error:', error);
+  } catch (err) {
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Internal server error'
+      error: err instanceof Error ? err.message : 'Internal server error'
     });
   }
 }

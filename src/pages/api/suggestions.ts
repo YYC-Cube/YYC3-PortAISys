@@ -1,10 +1,10 @@
 /**
  * @file pages/api/suggestions.ts
- * @description Suggestions 模块
+ * @description Suggestions 模块 — 建议回复（含认证 + Zod 输入校验）
  * @author YanYuCloudCube Team <admin@0379.email>
- * @version v1.0.0
+ * @version v1.1.0
  * @created 2026-03-07
- * @updated 2026-03-07
+ * @updated 2026-07-16
  * @status stable
  * @license MIT
  * @copyright Copyright (c) 2026 YanYuCloudCube Team
@@ -12,7 +12,9 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { SuggestedReply, ReplyContext } from '../../../core/ui/types';
+import { ReplyContext, SuggestedReply } from '../../../core/ui/types';
+import { withAuth } from '../../lib/auth';
+import { ReplyContextSchema, validate } from './schemas';
 
 /**
  * 基于上下文生成建议回复
@@ -23,7 +25,7 @@ function generateSuggestions(context: ReplyContext): SuggestedReply[] {
   const suggestions: SuggestedReply[] = [];
 
   // 基于消息内容的建议
-  if (context.message && context.message.toLowerCase().includes('什么')) {
+  if (context.lastMessage && context.lastMessage.toLowerCase().includes('什么')) {
     suggestions.push({
       text: '您想了解的具体是什么呢？',
       confidence: 0.9,
@@ -31,7 +33,7 @@ function generateSuggestions(context: ReplyContext): SuggestedReply[] {
     });
   }
 
-  if (context.message && context.message.toLowerCase().includes('如何')) {
+  if (context.lastMessage && context.lastMessage.toLowerCase().includes('如何')) {
     suggestions.push({
       text: '让我为您详细说明一下操作步骤',
       confidence: 0.85,
@@ -39,7 +41,7 @@ function generateSuggestions(context: ReplyContext): SuggestedReply[] {
     });
   }
 
-  if (context.message && context.message.toLowerCase().includes('谢谢')) {
+  if (context.lastMessage && context.lastMessage.toLowerCase().includes('谢谢')) {
     suggestions.push({
       text: '不客气，很高兴能帮到您',
       confidence: 0.95,
@@ -47,7 +49,7 @@ function generateSuggestions(context: ReplyContext): SuggestedReply[] {
     });
   }
 
-  if (context.message && context.message.toLowerCase().includes('问题')) {
+  if (context.lastMessage && context.lastMessage.toLowerCase().includes('问题')) {
     suggestions.push({
       text: '请详细描述一下您遇到的问题，我会尽力帮助您',
       confidence: 0.8,
@@ -103,18 +105,24 @@ function generateSuggestions(context: ReplyContext): SuggestedReply[] {
 /**
  * 建议回复API接口
  * @route POST /api/suggestions
- * @access 公开
+ * @access 需认证（Bearer Token）
  * @param req 请求对象
  * @param res 响应对象
  * @returns {Promise<void>}
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ success: false, error: 'Method not allowed' });
     }
 
-    const context: ReplyContext = req.body;
+    // Zod 输入校验
+    const validation = validate(ReplyContextSchema, req.body);
+    if (!validation.success) {
+      return res.status(validation.status).json(validation.body);
+    }
+
+    const context: ReplyContext = validation.data;
 
     // 生成建议回复
     const suggestions = generateSuggestions(context);
@@ -124,10 +132,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       data: suggestions,
     });
   } catch (error) {
-    console.error('Suggestions API error:', error);
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Internal server error',
     });
   }
 }
+
+export default withAuth(handler);

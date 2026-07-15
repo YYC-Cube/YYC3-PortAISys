@@ -231,7 +231,8 @@ describe('EnhancedMonitoringAlertSystem', () => {
     });
 
     it('应该正确判断告警严重程度', async () => {
-      monitoringSystem.startMonitoring();
+      // 不调用 startMonitoring()，避免随机模拟指标稀释测试数据
+      // 手动触发告警评估
 
       const rule: AlertRule = {
         id: 'cpu-severity-rule',
@@ -272,13 +273,14 @@ describe('EnhancedMonitoringAlertSystem', () => {
         monitoringSystem.recordMetric(metric);
       }
 
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // 手动触发告警评估（不依赖 startMonitoring 的定时器）
+      (monitoringSystem as any).evaluateAlerts();
 
       const activeAlerts = monitoringSystem.getActiveAlerts();
       expect(activeAlerts.length).toBeGreaterThan(0);
       expect(activeAlerts[0].severity).toBe(AlertSeverity.CRITICAL);
-
-      monitoringSystem.stopMonitoring();
     });
 
     it('应该避免重复告警', async () => {

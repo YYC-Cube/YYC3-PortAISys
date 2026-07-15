@@ -21,7 +21,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./core/*"
@@ -41,8 +40,7 @@
   "include": [
     "core/**/*",
     "src/**/*",
-    "tests/**/*",
-    "scripts/**/*.ts"
+    "tests/**/*"
   ],
   "exclude": [
     "node_modules",

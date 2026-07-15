@@ -307,7 +307,7 @@ describe('OpenAIModelAdapter - Stream功能', () => {
 
     it('应该忽略无效的JSON数据', async () => {
       const onChunk: StreamCallback = vi.fn();
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       const mockStream = createMockStream([
         'data: {"choices":[{"delta":{"content":"Valid"}}]}\n\n',
@@ -330,9 +330,9 @@ describe('OpenAIModelAdapter - Stream功能', () => {
       const response = await adapter.generateStream(request, onChunk);
 
       expect(response.content).toBe('ValidData');
-      expect(consoleWarnSpy).toHaveBeenCalled();
-      
-      consoleWarnSpy.mockRestore();
+      expect(consoleLogSpy).toHaveBeenCalled();
+
+      consoleLogSpy.mockRestore();
     });
   });
 });

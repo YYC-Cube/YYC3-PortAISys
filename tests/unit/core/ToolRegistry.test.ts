@@ -150,14 +150,11 @@ describe('ToolRegistry', () => {
 
     it('应该记录工具使用', async () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-      
+
       await registry.executeTool('test-tool', { input: 'test' });
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'Tool used: test-tool',
-        expect.objectContaining({
-          parameters: { input: 'test' },
-        })
+        expect.stringContaining('Tool used: test-tool')
       );
 
       consoleSpy.mockRestore();

@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { QueryRewriter } from '@/core/optimization/QueryRewriter';
+import { QueryRewriter } from '@/optimization/QueryRewriter';
 
 describe('QueryRewriter', () => {
   let queryRewriter: QueryRewriter;

@@ -104,7 +104,7 @@ export class CacheSharding {
       totalHits,
       totalMisses,
       totalOperations,
-      hitRate: totalHits / totalOperations,
+      hitRate: totalOperations > 0 ? totalHits / totalOperations : 0,
       shardCount: this.shardCount,
     };
   }

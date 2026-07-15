@@ -120,8 +120,8 @@ export class MultiEnvironmentConfigManager extends EventEmitter {
   }
 
   private detectEnvironment(): Environment {
-    const env = process.env.NODE_ENV || process.env.ENVIRONMENT || 'development';
-    
+    const env = (process.env.NODE_ENV || process.env.ENVIRONMENT || 'development') as string;
+
     if (env === 'production') return 'production';
     if (env === 'staging') return 'staging';
     if (env === 'test') return 'test';

@@ -92,14 +92,14 @@ describe('Chat API', () => {
     it('当缺少message参数时应该返回400错误', async () => {
       // 准备
       req.body = {};
-      
+
       // 执行
       await handler(req as NextApiRequest, res as NextApiResponse);
-      
+
       // 断言
       expect(status).toBe(400);
       expect(json.success).toBe(false);
-      expect(json.error).toBe('Message is required');
+      expect(json.error).toContain('Invalid');
     });
 
     it('当模型适配器出错时应该返回500错误', async () => {

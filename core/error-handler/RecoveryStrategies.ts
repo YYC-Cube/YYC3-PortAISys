@@ -262,8 +262,8 @@ export class FallbackStrategy implements ErrorRecoveryStrategy {
 export class TimeoutRecoveryStrategy implements ErrorRecoveryStrategy {
   private timeouts: Map<string, number> = new Map();
 
-  canRecover(_error: YYC3Error): boolean {
-    return true;
+  canRecover(error: YYC3Error): boolean {
+    return error.category === ErrorCategory.TIMEOUT;
   }
 
   async recover(error: YYC3Error): Promise<boolean> {

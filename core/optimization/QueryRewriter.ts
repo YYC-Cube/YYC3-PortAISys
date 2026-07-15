@@ -32,6 +32,8 @@ export class QueryRewriter {
   }
 
   rewrite(query: string, rules: string[] = []): string {
+    if (query == null) return null as any;
+
     let rewritten = query;
     const rulesToApply = rules.length > 0 ? rules : Array.from(this.rewriteRules.keys());
 

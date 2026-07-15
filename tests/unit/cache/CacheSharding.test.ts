@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { CacheSharding } from '@/core/cache/CacheSharding';
+import { CacheSharding } from '@/cache/CacheSharding';
 
 describe('CacheSharding', () => {
   let cacheSharding: CacheSharding;

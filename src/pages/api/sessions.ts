@@ -1,10 +1,10 @@
 /**
  * @file pages/api/sessions.ts
- * @description Sessions 模块
+ * @description Sessions 模块 — 会话管理（含认证 + Zod 输入校验）
  * @author YanYuCloudCube Team <admin@0379.email>
- * @version v1.0.0
+ * @version v1.1.0
  * @created 2026-03-07
- * @updated 2026-03-07
+ * @updated 2026-07-16
  * @status stable
  * @license MIT
  * @copyright Copyright (c) 2026 YanYuCloudCube Team
@@ -13,16 +13,19 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ChatSession } from '../../../core/ui/types';
+import { withAuth } from '../../lib/auth';
+import { SessionCreateSchema, SessionUpdateSchema, validate } from './schemas';
+import crypto from 'crypto';
 
 // 内存存储会话数据（实际应用中应该使用数据库）
 let sessions: Map<string, ChatSession> = new Map();
 
 /**
- * 生成唯一ID
+ * 生成唯一ID（使用 crypto 防止碰撞）
  * @returns {string} 唯一ID
  */
 function generateId(): string {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return crypto.randomUUID();
 }
 
 /**
@@ -32,12 +35,12 @@ function generateId(): string {
  * @route GET /api/sessions/:id
  * @route PUT /api/sessions/:id
  * @route DELETE /api/sessions/:id
- * @access 公开
+ * @access 需认证（Bearer Token）
  * @param req 请求对象
  * @param res 响应对象
  * @returns {Promise<void>}
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { id } = req.query;
 
@@ -57,9 +60,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         break;
 
-      case 'POST':
-        // 创建新会话
-        const { name, template, model } = req.body;
+      case 'POST': {
+        // Zod 校验创建请求
+        const validation = validate(SessionCreateSchema, req.body);
+        if (!validation.success) {
+          return res.status(validation.status).json(validation.body);
+        }
+
+        const { name, template, model } = validation.data;
         const sessionId = generateId();
         const newSession: ChatSession = {
           id: sessionId,
@@ -67,15 +75,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           messages: [],
           createdAt: Date.now(),
           updatedAt: Date.now(),
-          template,
+          template: template as any,
           model
         };
         sessions.set(sessionId, newSession);
         res.status(201).json({ success: true, data: newSession });
         break;
+      }
 
-      case 'PUT':
-        // 更新会话
+      case 'PUT': {
+        // Zod 校验更新请求
+        const validation = validate(SessionUpdateSchema, req.body);
+        if (!validation.success) {
+          return res.status(validation.status).json(validation.body);
+        }
+
         if (!id) {
           return res.status(400).json({ success: false, error: 'Session ID is required' });
         }
@@ -83,17 +97,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!session) {
           return res.status(404).json({ success: false, error: 'Session not found' });
         }
-        const { name: updatedName, messages: updatedMessages } = req.body;
+        const { name: updatedName, messages: updatedMessages } = validation.data;
         if (updatedName) {
           session.name = updatedName;
         }
         if (updatedMessages) {
-          session.messages = updatedMessages;
+          session.messages = updatedMessages as any[];
         }
         session.updatedAt = Date.now();
         sessions.set(id as string, session);
         res.status(200).json({ success: true, data: session });
         break;
+      }
 
       case 'DELETE':
         // 删除会话
@@ -111,10 +126,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(405).json({ success: false, error: 'Method not allowed' });
     }
   } catch (error) {
-    console.error('Sessions API error:', error);
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Internal server error'
     });
   }
 }
+
+export default withAuth(handler);

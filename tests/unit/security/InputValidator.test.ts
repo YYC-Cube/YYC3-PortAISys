@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { InputValidator } from '@/core/security/InputValidator';
+import { InputValidator } from '@/security/InputValidator';
 
 describe('InputValidator', () => {
   let inputValidator: InputValidator;

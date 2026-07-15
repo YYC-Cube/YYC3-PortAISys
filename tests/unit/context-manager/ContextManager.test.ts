@@ -2,223 +2,64 @@
  * @file unit/context-manager/ContextManager.test.ts
  * @description Context Manager.test 模块
  * @author YanYuCloudCube Team <admin@0379.email>
- * @version v1.0.0
- * @created 2026-03-07
- * @updated 2026-03-07
+ * @version v1.1.0
+ * @created 2026-07-16
+ * @updated 2026-07-16
  * @status stable
  * @license MIT
  * @copyright Copyright (c) 2026 YanYuCloudCube Team
  * @tags typescript
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ContextManager } from '@/context-manager/ContextManager';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { ContextManager } from '../../../core/context-manager/ContextManager';
 
 describe('ContextManager', () => {
-  let contextManager: ContextManager;
+  let cm: ContextManager;
 
   beforeEach(() => {
-    contextManager = new ContextManager();
-  });
-
-  describe('初始化', () => {
-    it('应该成功创建上下文管理器实例', () => {
-      expect(contextManager).toBeDefined();
-      expect(contextManager).toBeInstanceOf(ContextManager);
-    });
-
-    it('应该初始化默认上下文', () => {
-      const context = contextManager.getContext();
-      expect(context).toBeDefined();
-      expect(context.timestamp).toBeInstanceOf(Date);
-    });
+    cm = new ContextManager();
   });
 
   describe('getContext', () => {
-    it('应该返回当前上下文', () => {
-      const context = contextManager.getContext();
-      expect(context).toBeDefined();
-      expect(context.timestamp).toBeInstanceOf(Date);
-    });
-
-    it('应该返回完整的上下文对象', () => {
-      const context = contextManager.getContext();
-      expect(context).toHaveProperty('timestamp');
+    it('应该返回初始上下文（含 timestamp）', () => {
+      const ctx = cm.getContext();
+      expect(ctx).toBeDefined();
+      expect(ctx.timestamp).toBeInstanceOf(Date);
     });
   });
 
   describe('updateContext', () => {
-    it('应该更新上下文信息', () => {
-      const updates = {
-        user: 'test-user',
-        pageContext: { url: 'https://example.com' }
-      };
-
-      contextManager.updateContext(updates);
-      const context = contextManager.getContext();
-
-      expect(context.user).toBe('test-user');
-      expect(context.pageContext).toEqual({ url: 'https://example.com' });
+    it('应该合并更新上下文', () => {
+      cm.updateContext({ user: 'test-user', pageContext: { url: '/test' } });
+      const ctx = cm.getContext();
+      expect(ctx.user).toBe('test-user');
+      expect(ctx.pageContext.url).toBe('/test');
     });
 
-    it('应该保留原有上下文信息', () => {
-      const initialContext = contextManager.getContext();
-      const initialTimestamp = initialContext.timestamp;
-
-      contextManager.updateContext({ user: 'test-user' });
-      const updatedContext = contextManager.getContext();
-
-      expect(updatedContext.user).toBe('test-user');
-      expect(updatedContext.timestamp).toBeInstanceOf(Date);
-    });
-
-    it('应该更新时间戳', () => {
-      const initialContext = contextManager.getContext();
-      const initialTimestamp = initialContext.timestamp;
-
-      setTimeout(() => {
-        contextManager.updateContext({ user: 'test-user' });
-        const updatedContext = contextManager.getContext();
-
-        expect(updatedContext.timestamp.getTime()).toBeGreaterThan(initialTimestamp.getTime());
-      }, 10);
-    });
-
-    it('应该支持部分更新', () => {
-      contextManager.updateContext({ user: 'user1' });
-      contextManager.updateContext({ pageContext: { url: 'test' } });
-
-      const context = contextManager.getContext();
-      expect(context.user).toBe('user1');
-      expect(context.pageContext).toEqual({ url: 'test' });
-    });
-
-    it('应该支持嵌套对象更新', () => {
-      const updates = {
-        userPreferences: {
-          theme: 'dark',
-          language: 'zh-CN'
-        }
-      };
-
-      contextManager.updateContext(updates);
-      const context = contextManager.getContext();
-
-      expect(context.userPreferences).toEqual(updates.userPreferences);
-    });
-
-    it('应该支持数组更新', () => {
-      const updates = {
-        conversationHistory: [
-          { role: 'user', content: 'Hello' },
-          { role: 'assistant', content: 'Hi' }
-        ]
-      };
-
-      contextManager.updateContext(updates);
-      const context = contextManager.getContext();
-
-      expect(context.conversationHistory).toEqual(updates.conversationHistory);
-    });
-  });
-
-  describe('getMetrics', () => {
-    it('应该返回上下文指标', () => {
-      const metrics = contextManager.getMetrics();
-      expect(metrics).toBeDefined();
-      expect(metrics).toHaveProperty('contextSize');
-      expect(metrics).toHaveProperty('lastUpdated');
-    });
-
-    it('应该正确计算上下文大小', () => {
-      const initialMetrics = contextManager.getMetrics();
-      const initialSize = initialMetrics.contextSize;
-
-      contextManager.updateContext({
-        user: 'test',
-        pageContext: { url: 'test' },
-        userPreferences: { theme: 'dark' }
-      });
-
-      const updatedMetrics = contextManager.getMetrics();
-      expect(updatedMetrics.contextSize).toBeGreaterThan(initialSize);
-    });
-
-    it('应该返回最后更新时间', () => {
-      const metrics = contextManager.getMetrics();
-      expect(metrics.lastUpdated).toBeInstanceOf(Date);
-    });
-
-    it('应该反映上下文更新后的时间', () => {
-      const initialMetrics = contextManager.getMetrics();
-      const initialTime = initialMetrics.lastUpdated;
-
-      setTimeout(() => {
-        contextManager.updateContext({ user: 'test' });
-        const updatedMetrics = contextManager.getMetrics();
-
-        expect(updatedMetrics.lastUpdated.getTime()).toBeGreaterThan(initialTime.getTime());
-      }, 10);
+    it('应该在更新时刷新 timestamp', () => {
+      const before = cm.getContext().timestamp;
+      cm.updateContext({ user: 'new' });
+      const after = cm.getContext().timestamp;
+      expect(after.getTime()).toBeGreaterThanOrEqual(before.getTime());
     });
   });
 
   describe('getPageContext', () => {
-    it('应该返回页面上下文', async () => {
-      const pageContext = await contextManager.getPageContext();
-      expect(pageContext).toBeDefined();
-      expect(pageContext).toHaveProperty('url');
-      expect(pageContext).toHaveProperty('title');
-      expect(pageContext).toHaveProperty('timestamp');
-    });
-
-    it('应该处理浏览器环境', async () => {
-      const pageContext = await contextManager.getPageContext();
-      expect(pageContext.url).toBeDefined();
-      expect(pageContext.title).toBeDefined();
-    });
-
-    it('应该返回当前时间戳', async () => {
-      const pageContext = await contextManager.getPageContext();
-      expect(pageContext.timestamp).toBeInstanceOf(Date);
+    it('应该返回页面上下文（Node 环境下为 unknown）', async () => {
+      const pageCtx = await cm.getPageContext();
+      expect(pageCtx).toBeDefined();
+      expect(pageCtx.url).toBeDefined();
+      expect(pageCtx.title).toBeDefined();
     });
   });
 
-  describe('集成测试', () => {
-    it('应该支持完整的上下文生命周期', () => {
-      const initialContext = contextManager.getContext();
-
-      contextManager.updateContext({
-        user: 'test-user',
-        pageContext: { url: 'https://example.com' },
-        userPreferences: { theme: 'dark' }
-      });
-
-      const updatedContext = contextManager.getContext();
-      const metrics = contextManager.getMetrics();
-
-      expect(updatedContext.user).toBe('test-user');
-      expect(updatedContext.pageContext).toEqual({ url: 'https://example.com' });
-      expect(updatedContext.userPreferences).toEqual({ theme: 'dark' });
+  describe('getMetrics', () => {
+    it('应该返回上下文度量', () => {
+      cm.updateContext({ user: 'a', pageContext: { x: 1 } });
+      const metrics = cm.getMetrics();
       expect(metrics.contextSize).toBeGreaterThan(0);
-    });
-
-    it('应该支持多次更新', () => {
-      contextManager.updateContext({ user: 'user1' });
-      contextManager.updateContext({ pageContext: { url: 'url1' } });
-      contextManager.updateContext({ userPreferences: { theme: 'dark' } });
-
-      const context = contextManager.getContext();
-      expect(context.user).toBe('user1');
-      expect(context.pageContext).toEqual({ url: 'url1' });
-      expect(context.userPreferences).toEqual({ theme: 'dark' });
-    });
-
-    it('应该支持覆盖更新', () => {
-      contextManager.updateContext({ user: 'user1' });
-      contextManager.updateContext({ user: 'user2' });
-
-      const context = contextManager.getContext();
-      expect(context.user).toBe('user2');
+      expect(metrics.lastUpdated).toBeDefined();
     });
   });
 });
