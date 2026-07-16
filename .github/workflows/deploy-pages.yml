@@ -12,31 +12,22 @@ permissions:
 
 jobs:
   deploy:
-    name: 构建并部署
+    name: 构建与部署
     environment:
       name: github-pages
       url: https://portable.yyc3.top
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-
-      - name: Install & Build
-        run: |
-          npx --yes pnpm@11.10.0 install --ignore-scripts
-          npx pnpm@11.10.0 run build
+      - run: npm install -g pnpm@11.10.0
+      - run: pnpm install
         env:
           PNPM_MINIMUM_RELEASE_AGE: 0
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - run: pnpm run build
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
-
-      - name: Deploy to Pages
-        uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v4
