@@ -18,3 +18,8 @@ onlyBuiltDependencies:
 overrides:
   protobufjs: '>=8.0.1'
   js-yaml: '>=4.1.2'
+  '@isaacs/brace-expansion': '>=5.0.1'
+  minimatch: '>=10.2.3'
+  ws: '>=8.21.0'
+  '@hono/node-server': '>=1.19.13'
+  postcss: '>=8.5.10'
