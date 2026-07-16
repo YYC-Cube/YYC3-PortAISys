@@ -26,18 +26,12 @@ jobs:
         with:
           node-version: "22.13.0"
 
-      - name: Install pnpm
-        run: npm i -g pnpm@11.10.0
-
       - name: Install & Build
         run: |
-          pnpm install --frozen-lockfile 2>&1 || true
-          pnpm install --no-frozen-lockfile 2>&1
+          npx --yes pnpm@11.10.0 install --ignore-scripts
+          npx pnpm@11.10.0 run build
         env:
           PNPM_MINIMUM_RELEASE_AGE: 0
-
-      - name: Build
-        run: pnpm run build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
