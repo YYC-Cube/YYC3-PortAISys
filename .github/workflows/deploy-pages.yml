@@ -48,7 +48,7 @@ jobs:
           pnpm store path
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --ignore-scripts
 
       - name: Build for Pages
         run: pnpm run build
