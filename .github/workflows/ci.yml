@@ -50,8 +50,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
-        env:
-          PNPM_MINIMUM_RELEASE_AGE: 0
 
       - name: ESLint检查
         run: pnpm run lint
