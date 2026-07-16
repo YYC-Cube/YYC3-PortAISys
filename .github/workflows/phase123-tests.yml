@@ -196,8 +196,8 @@ jobs:
       - name: Run complete workflow tests
         run: pnpm test tests/e2e/complete-workflow.test.ts
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || '' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || '' }}
 
       - name: Upload E2E reports
         uses: actions/upload-artifact@v4

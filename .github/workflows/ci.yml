@@ -309,7 +309,7 @@ jobs:
           command: test
         continue-on-error: true # Snyk 仅作参考，不阻断（无 token 或配额限制时不影响 CI）
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN || '' }}
 
       - name: 上传安全测试报告
         uses: actions/upload-artifact@v4

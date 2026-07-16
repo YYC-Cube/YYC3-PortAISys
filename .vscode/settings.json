@@ -15,5 +15,8 @@
   "githubPullRequests.showPullRequestNumber": true,
   "githubPullRequests.defaultMergeMethod": "merge",
   "markdown.extension.completion.enabled": false,
-  "markdown.extension.tableFormatter.enabled": false
+  "markdown.extension.tableFormatter.enabled": false,
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*"
+  }
 }
