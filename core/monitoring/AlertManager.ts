@@ -226,6 +226,10 @@ export class AlertManager extends EventEmitter {
   checkRules(data: any): Alert[] {
     const triggeredAlerts: Alert[] = [];
 
+    if (!data || typeof data !== 'object') {
+      return triggeredAlerts;
+    }
+
     for (const rule of this.rules.values()) {
       if (!rule.enabled) {
         continue;

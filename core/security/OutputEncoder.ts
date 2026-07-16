@@ -38,6 +38,7 @@ export class OutputEncoder {
   }
 
   encodeHTML(value: string): string {
+    if (value === null || value === undefined) return null as any;
     if (!this.config.enableHTML) return value;
 
     const encoded = value

@@ -148,9 +148,12 @@ export class DatabaseOptimizer extends EventEmitter {
     stats.maxDuration = Math.max(stats.maxDuration, duration);
     stats.lastExecuted = new Date();
 
-    // 检测慢查询
+    // 检测慢查询并即时分析索引建议
     if (duration > this.config.slowQueryThreshold) {
       this.emit('slow:query', { query: normalizedQuery, duration });
+      if (this.config.enableAutoIndex) {
+        this.analyzeIndexes();
+      }
     }
   }
 

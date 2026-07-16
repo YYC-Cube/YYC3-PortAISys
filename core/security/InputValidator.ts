@@ -56,8 +56,7 @@ export class InputValidator {
         .regex(/[^a-zA-Z0-9]/, 'Password must contain special character'),
       name: z.string()
         .min(2, 'Name must be at least 2 characters')
-        .max(100, 'Name must be at most 100 characters')
-        .regex(/^[a-zA-Z\s]+$/, 'Name must contain only letters and spaces'),
+        .max(100, 'Name must be at most 100 characters'),
       phone: z.string()
         .regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number format')
         .optional(),

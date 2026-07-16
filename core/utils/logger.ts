@@ -142,8 +142,15 @@ export class Logger {
         [LogLevel.FATAL]: '\x1b[35m'   // Magenta
       };
       const reset = '\x1b[0m';
+      const coloredMsg = `${colors[entry.level]}${formatted}${reset}`;
 
-      console.log(`${colors[entry.level]}${formatted}${reset}`);
+      // 根据日志级别使用对应的 console 方法
+      const consoleMethod = entry.level === LogLevel.ERROR || entry.level === LogLevel.FATAL
+        ? console.error
+        : entry.level === LogLevel.WARN
+          ? console.warn
+          : console.log;
+      consoleMethod(coloredMsg);
     }
 
     // 文件输出

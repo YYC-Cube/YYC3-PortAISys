@@ -221,6 +221,9 @@ global.console = {
   log: vi.fn()
 };
 
+// 保存原始 fetch（集成测试需要真实 HTTP 请求）
+(global as any).__originalFetch = global.fetch;
+
 global.fetch = vi.fn((_url: string, _options?: RequestInit) => {
   return Promise.resolve({
     ok: true,

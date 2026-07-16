@@ -455,7 +455,7 @@ export class MultiModelManager extends EventEmitter {
     let modelToUse = request.modelId || selected.modelId;
 
     if (request.preferredModel && request.allowDowngrade) {
-      modelToUse = this.handleModelDowngrade(selected, modelToUse, request.preferredModel);
+      modelToUse = await this.handleModelDowngrade(selected, modelToUse, request.preferredModel);
     }
 
     if (request.images) {
@@ -473,9 +473,9 @@ export class MultiModelManager extends EventEmitter {
     return { selected, modelToUse };
   }
 
-  private handleModelDowngrade(selected: any, modelToUse: string, preferredModel: string): string {
-    const isAvailable = this.checkModelAvailabilitySync(selected.provider, modelToUse);
-    if (!isAvailable && !modelToUse.includes(preferredModel)) {
+  private async handleModelDowngrade(selected: any, modelToUse: string, preferredModel: string): Promise<string> {
+    const isAvailable = await this.checkModelAvailability(selected.provider, modelToUse);
+    if (!isAvailable) {
       const alternativeModels = Array.from(this.models.values())
         .filter(m => !m.id.includes(preferredModel) && m.id !== preferredModel);
       if (alternativeModels.length > 0) {

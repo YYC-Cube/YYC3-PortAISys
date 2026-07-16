@@ -16,19 +16,43 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Type stubs for Expo modules (not available in this environment)
 interface LocationModule {
-  requestForegroundPermissionsAsync: () => Promise<{ status: string }>;
+  requestForegroundPermissionsAsync: () => Promise<{ status: string; granted?: boolean }>;
   getCurrentPositionAsync: (options?: any) => Promise<{ coords: any; timestamp: number }>;
   watchPositionAsync: (options: any, callback: (position: any) => void) => Promise<{ remove: () => void }>;
+  hasServicesEnabledAsync?: () => Promise<boolean>;
 }
 
 interface LocalAuthenticationModule {
   hasHardwareAsync: () => Promise<boolean>;
   isEnrolledAsync: () => Promise<boolean>;
-  authenticateAsync: (options: any) => Promise<{ success: boolean }>;
+  authenticateAsync: (options: any) => Promise<{ success: boolean; error?: string }>;
 }
 
-const LocationAPI: LocationModule = {} as LocationModule;
-const LocalAuthAPI: LocalAuthenticationModule = {} as LocalAuthenticationModule;
+// 动态加载 Expo 模块，失败时回退到空实现
+let _locationAPI: LocationModule | null = null;
+let _localAuthAPI: LocalAuthenticationModule | null = null;
+
+async function getLocationAPI(): Promise<LocationModule> {
+  if (_locationAPI) return _locationAPI;
+  try {
+    const mod = await import('expo-location');
+    _locationAPI = mod as unknown as LocationModule;
+  } catch {
+    _locationAPI = {} as LocationModule;
+  }
+  return _locationAPI!;
+}
+
+async function getLocalAuthAPI(): Promise<LocalAuthenticationModule> {
+  if (_localAuthAPI) return _localAuthAPI;
+  try {
+    const mod = await import('expo-local-authentication');
+    _localAuthAPI = mod as unknown as LocalAuthenticationModule;
+  } catch {
+    _localAuthAPI = {} as LocalAuthenticationModule;
+  }
+  return _localAuthAPI!;
+}
 
 /**
  * 设备信息
@@ -359,6 +383,7 @@ export class MobileAppCore extends EventEmitter {
    * 获取位置
    */
   async getCurrentLocation(_options?: any): Promise<LocationData> {
+    const LocationAPI = await getLocationAPI();
     const permission = await LocationAPI.requestForegroundPermissionsAsync();
     if (permission.status !== 'granted') {
       throw new Error('Location permission denied');
@@ -685,10 +710,12 @@ export class MobileAppCore extends EventEmitter {
   }
 
   async hasBiometricHardware(): Promise<boolean> {
+    const LocalAuthAPI = await getLocalAuthAPI();
     return LocalAuthAPI.hasHardwareAsync();
   }
 
   async isBiometricEnrolled(): Promise<boolean> {
+    const LocalAuthAPI = await getLocalAuthAPI();
     return LocalAuthAPI.isEnrolledAsync();
   }
 
@@ -705,7 +732,7 @@ export class MobileAppCore extends EventEmitter {
       throw new Error('Biometrics are not enabled');
     }
 
-    const result = await LocalAuthAPI.authenticateAsync(_options);
+    const result = await (await getLocalAuthAPI()).authenticateAsync(_options);
     const payload = {
       success: !!result.success,
       authenticated: !!result.success,

@@ -87,6 +87,9 @@ importers:
         specifier: ^4.3.6
         version: 4.4.3
     devDependencies:
+      '@hono/node-server':
+        specifier: ^2.0.10
+        version: 2.0.10(hono@4.12.30)
       '@playwright/test':
         specifier: ^1.40.0
         version: 1.58.0
@@ -141,6 +144,9 @@ importers:
       glob:
         specifier: ^13.0.0
         version: 13.0.0
+      hono:
+        specifier: ^4.12.30
+        version: 4.12.30
       jsdom:
         specifier: ^27.4.0
         version: 27.4.0

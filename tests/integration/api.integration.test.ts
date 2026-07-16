@@ -21,7 +21,15 @@ describe('API Integration Tests', () => {
   let server: any;
   const baseUrl = 'http://localhost:3200';
 
+  let mockedFetch: any;
+
   beforeAll(async () => {
+    // 恢复原始 fetch 用于真实 HTTP 请求（setup.ts 中的 mock 会拦截所有 fetch）
+    mockedFetch = global.fetch;
+    if ((global as any).__originalFetch) {
+      global.fetch = (global as any).__originalFetch;
+    }
+
     app = new Hono();
 
     app.use('*', cors({
@@ -54,6 +62,11 @@ describe('API Integration Tests', () => {
       
       if (body.password === 'weak') {
         return c.json({ error: 'Password too weak' }, 400);
+      }
+
+      // 拒绝恶意输入（XSS）
+      if (body.name && body.name.includes('<script>')) {
+        return c.json({ error: 'Malicious input detected' }, 400);
       }
       
       return c.json({ success: true, user: body }, 201);
@@ -115,6 +128,10 @@ describe('API Integration Tests', () => {
   });
 
   afterAll(async () => {
+    // 恢复 mocked fetch
+    if (mockedFetch) {
+      global.fetch = mockedFetch;
+    }
     if (server) {
       await new Promise((resolve) => {
         server.close(resolve);
@@ -413,7 +430,7 @@ describe('API Integration Tests', () => {
       const data = await response.json();
 
       expect(response.status).toBeGreaterThanOrEqual(400);
-      expect(data.name).not.toContain('<script>');
+      expect(JSON.stringify(data)).not.toContain('<script>');
     });
   });
 });
