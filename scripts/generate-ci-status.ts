@@ -88,8 +88,8 @@ function generateCIStatus() {
       : 'failure';
   }
 
-  // 确保输出目录存在
-  const outputDir = path.join(__dirname, '..', 'ci-status-report.json');
+  // 确保输出目录存在（ESM 下无 __dirname，使用 process.cwd()）
+  const outputDir = path.join(process.cwd(), 'ci-status-report.json');
   
   // 写入状态报告
   fs.writeFileSync(outputDir, JSON.stringify(status, null, 2));

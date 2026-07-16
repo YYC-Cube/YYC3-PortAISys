@@ -13,8 +13,10 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import * as os from 'os';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { fileURLToPath } from 'url';
 
 const execAsync = promisify(exec);
 
@@ -121,8 +123,8 @@ export class TestReportGenerator {
       node: process.version,
       platform: process.platform,
       arch: process.arch,
-      cpus: require('os').cpus().length,
-      memory: Math.round(require('os').totalmem() / 1024 / 1024 / 1024) // GB
+      cpus: os.cpus().length,
+      memory: Math.round(os.totalmem() / 1024 / 1024 / 1024) // GB
     };
   }
 
@@ -671,7 +673,8 @@ ${this.generateConclusion(report)}
 }
 
 // 如果直接运行此文件，生成报告
-if (require.main === module) {
+const __filename = fileURLToPath(import.meta.url);
+if (process.argv[1] === __filename) {
   const generator = new TestReportGenerator();
   generator.generateComprehensiveReport().catch(console.error);
 }

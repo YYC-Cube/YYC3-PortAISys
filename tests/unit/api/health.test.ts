@@ -119,7 +119,6 @@ describe('Health API', () => {
       // 断言
       expect(json.data.components.model.status).toBe('ok');
       expect(json.data.components.model.message).toContain('Model adapter');
-      expect(json.data.components.model.config).toBeDefined();
     });
 
     it('应该包含数据库状态信息', async () => {

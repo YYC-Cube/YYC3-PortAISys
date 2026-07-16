@@ -74,11 +74,14 @@ jobs:
         continue-on-error: true
       - uses: actions/upload-artifact@v4
         if: always()
+        continue-on-error: true
         with:
           name: zap-report
           path: report_html.html
+          if-no-files-found: ignore
       - uses: github/codeql-action/upload-sarif@v4
         if: always()
+        continue-on-error: true
         with:
           sarif_file: zap_report.sarif
 
