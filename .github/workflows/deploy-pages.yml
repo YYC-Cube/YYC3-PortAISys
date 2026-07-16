@@ -6,11 +6,17 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  deploy:
-    name: 构建与部署
+  build:
+    name: 构建站点
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,9 +24,23 @@ jobs:
         with:
           node-version: "22.13.0"
       - run: npm install --ignore-scripts --no-package-lock
-      - run: npx vite build
-      - uses: peaceiris/actions-gh-pages@v4
+      - run: npx vite build --base=/
+      - name: 添加 CNAME
+        run: echo "portable.yyc3.top" > ./dist/CNAME
+      - uses: actions/configure-pages@v5
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          cname: portable.yyc3.top
+          enablement: false
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    name: 部署到 GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
