@@ -1,10 +1,5 @@
 {
-  "cSpell.words": [
-    "YYC3",
-    "Retryable",
-    "retryable",
-    "yyc3"
-  ],
+  "cSpell.words": ["YYC3", "Retryable", "retryable", "yyc3"],
   "editor.codeActions.triggerOnFocusChange": true,
   "githubPullRequests.queries": [
     {

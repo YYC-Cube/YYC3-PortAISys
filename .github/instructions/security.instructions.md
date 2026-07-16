@@ -3,6 +3,7 @@
 ## Security Context
 
 YYC³ PortAISys is a mission-critical AI system for port and logistics operations. Security vulnerabilities can lead to:
+
 - Unauthorized access to sensitive port operational data
 - Data breaches affecting shipping and customer information
 - Service disruption impacting port operations
@@ -46,39 +47,43 @@ core/security/
 #### Must Check
 
 **Authentication**:
+
 ```typescript
 // ✅ Preferred: Use NextAuth session validation
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/config/auth';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/config/auth";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) {
-    return new Response('Unauthorized', { status: 401 });
+    return new Response("Unauthorized", { status: 401 });
   }
   // Proceed with authenticated logic
 }
 
 // ❌ Discouraged: Custom auth without proper validation
-if (request.headers.get('Authorization')) {
+if (request.headers.get("Authorization")) {
   // Unsafe - no token verification
 }
 ```
 
 **Authorization (RBAC)**:
+
 ```typescript
 // ✅ Preferred: Check user role/permissions
-import { hasPermission } from '@/core/security/permissions';
+import { hasPermission } from "@/core/security/permissions";
 
-if (!hasPermission(session.user, 'port:write')) {
-  return new Response('Forbidden', { status: 403 });
+if (!hasPermission(session.user, "port:write")) {
+  return new Response("Forbidden", { status: 403 });
 }
 
 // ❌ Discouraged: Hard-coded role checks
-if (user.role !== 'admin') { } // Inflexible, error-prone
+if (user.role !== "admin") {
+} // Inflexible, error-prone
 ```
 
 **Action Items**:
+
 - [ ] Verify all API routes validate authentication
 - [ ] Check authorization before data access/modification
 - [ ] Ensure session tokens are properly validated
@@ -88,12 +93,14 @@ if (user.role !== 'admin') { } // Inflexible, error-prone
 #### Common Vulnerabilities
 
 🚨 **Broken Authentication**:
+
 - Missing authentication checks on API endpoints
 - Session tokens without expiration
 - Weak password requirements (<8 chars, no complexity)
 - Insecure session storage (localStorage for sensitive tokens)
 
 🚨 **Broken Access Control**:
+
 - Missing authorization checks (authenticated but not authorized)
 - Direct object references without ownership validation
 - Privilege escalation paths
@@ -104,13 +111,14 @@ if (user.role !== 'admin') { } // Inflexible, error-prone
 #### Must Check
 
 **Input Validation**:
+
 ```typescript
 // ✅ Preferred: Zod schema validation
-import { z } from 'zod';
+import { z } from "zod";
 
 const PortDataSchema = z.object({
   portId: z.string().uuid(),
-  operation: z.enum(['load', 'unload', 'inspect']),
+  operation: z.enum(["load", "unload", "inspect"]),
   containerId: z.string().regex(/^[A-Z]{4}\d{7}$/),
   timestamp: z.string().datetime(),
 });
@@ -118,11 +126,11 @@ const PortDataSchema = z.object({
 export async function POST(request: Request) {
   const body = await request.json();
   const validation = PortDataSchema.safeParse(body);
-  
+
   if (!validation.success) {
     return Response.json({ error: validation.error }, { status: 400 });
   }
-  
+
   const data = validation.data; // Type-safe, validated data
   // Proceed with processing
 }
@@ -135,6 +143,7 @@ export async function POST(request: Request) {
 ```
 
 **SQL Injection Prevention**:
+
 ```typescript
 // ✅ Preferred: Prisma parameterized queries
 const users = await prisma.user.findMany({
@@ -147,6 +156,7 @@ await prisma.$executeRawUnsafe(query); // NEVER DO THIS
 ```
 
 **XSS Prevention**:
+
 ```typescript
 // ✅ Preferred: React auto-escaping + explicit sanitization
 import DOMPurify from 'isomorphic-dompurify';
@@ -154,7 +164,7 @@ import DOMPurify from 'isomorphic-dompurify';
 function UserComment({ comment }: { comment: string }) {
   // React automatically escapes
   return <p>{comment}</p>;
-  
+
   // For HTML content, sanitize first
   const cleanHTML = DOMPurify.sanitize(comment);
   return <div dangerouslySetInnerHTML={{ __html: cleanHTML }} />;
@@ -165,6 +175,7 @@ function UserComment({ comment }: { comment: string }) {
 ```
 
 **Action Items**:
+
 - [ ] All user inputs validated with Zod schemas
 - [ ] Database queries use Prisma ORM (no raw SQL)
 - [ ] File uploads validated (type, size, content)
@@ -175,6 +186,7 @@ function UserComment({ comment }: { comment: string }) {
 #### Common Vulnerabilities
 
 🚨 **Injection Attacks**:
+
 - SQL injection (raw queries with string interpolation)
 - NoSQL injection (unvalidated MongoDB queries)
 - Command injection (executing shell commands with user input)
@@ -182,6 +194,7 @@ function UserComment({ comment }: { comment: string }) {
 - XPath injection
 
 🚨 **Cross-Site Scripting (XSS)**:
+
 - Reflected XSS (unescaped URL parameters in output)
 - Stored XSS (unescaped user content in database)
 - DOM-based XSS (client-side script injection)
@@ -191,9 +204,10 @@ function UserComment({ comment }: { comment: string }) {
 #### Must Check
 
 **Encryption**:
+
 ```typescript
 // ✅ Preferred: Encrypt sensitive data
-import { EncryptionService } from '@/core/security/EncryptionService';
+import { EncryptionService } from "@/core/security/EncryptionService";
 
 const encrypted = await EncryptionService.encrypt(sensitiveData);
 await db.save({ data: encrypted });
@@ -206,9 +220,10 @@ await db.save({ creditCard: userInput }); // VULNERABLE!
 ```
 
 **Password Security**:
+
 ```typescript
 // ✅ Preferred: bcryptjs hashing
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
 
 const hashedPassword = await bcrypt.hash(password, 12); // 12+ rounds
 await db.user.create({ passwordHash: hashedPassword });
@@ -218,23 +233,25 @@ const isValid = await bcrypt.compare(inputPassword, storedHash);
 
 // ❌ NEVER: Plain text or weak hashing
 await db.user.create({ password: plainPassword }); // NEVER!
-const hash = crypto.createHash('md5').update(password).digest('hex'); // WEAK!
+const hash = crypto.createHash("md5").update(password).digest("hex"); // WEAK!
 ```
 
 **Secrets Management**:
+
 ```typescript
 // ✅ Preferred: Environment variables (never commit)
 const apiKey = process.env.OPENAI_API_KEY;
-if (!apiKey) throw new Error('API key not configured');
+if (!apiKey) throw new Error("API key not configured");
 
 // ❌ NEVER: Hard-coded secrets
-const apiKey = 'sk-abc123xyz'; // NEVER COMMIT SECRETS!
+const apiKey = "sk-abc123xyz"; // NEVER COMMIT SECRETS!
 
 // ❌ NEVER: Log secrets
-logger.info('API Key:', apiKey); // Exposes secret in logs
+logger.info("API Key:", apiKey); // Exposes secret in logs
 ```
 
 **Action Items**:
+
 - [ ] Sensitive data encrypted at rest
 - [ ] TLS/HTTPS enforced for data in transit
 - [ ] Passwords hashed with bcrypt (12+ rounds)
@@ -247,6 +264,7 @@ logger.info('API Key:', apiKey); // Exposes secret in logs
 #### Common Vulnerabilities
 
 🚨 **Sensitive Data Exposure**:
+
 - Credentials in source code or config files
 - API keys committed to git
 - Passwords in plain text
@@ -256,6 +274,7 @@ logger.info('API Key:', apiKey); // Exposes secret in logs
 - Insecure data transmission (HTTP instead of HTTPS)
 
 🚨 **Cryptographic Failures**:
+
 - Weak hashing algorithms (MD5, SHA1)
 - Insufficient salt rounds for bcrypt (<10)
 - Hard-coded encryption keys
@@ -267,17 +286,18 @@ logger.info('API Key:', apiKey); // Exposes secret in logs
 #### Must Check
 
 **Rate Limiting**:
+
 ```typescript
 // ✅ Preferred: Implement rate limiting
-import { rateLimit } from '@/core/security/rateLimit';
+import { rateLimit } from "@/core/security/rateLimit";
 
 export async function POST(request: Request) {
-  const clientId = request.headers.get('X-Client-ID');
-  
-  if (!await rateLimit.check(clientId, { max: 100, window: 60000 })) {
-    return new Response('Too many requests', { status: 429 });
+  const clientId = request.headers.get("X-Client-ID");
+
+  if (!(await rateLimit.check(clientId, { max: 100, window: 60000 }))) {
+    return new Response("Too many requests", { status: 429 });
   }
-  
+
   // Process request
 }
 
@@ -286,6 +306,7 @@ export async function POST(request: Request) {
 ```
 
 **CORS Configuration**:
+
 ```typescript
 // ✅ Preferred: Restrictive CORS
 const allowedOrigins = [
@@ -304,11 +325,12 @@ headers: {
 ```
 
 **API Key Validation**:
+
 ```typescript
 // ✅ Preferred: Validate API keys
-const apiKey = request.headers.get('X-API-Key');
-if (!await validateApiKey(apiKey)) {
-  return new Response('Invalid API key', { status: 401 });
+const apiKey = request.headers.get("X-API-Key");
+if (!(await validateApiKey(apiKey))) {
+  return new Response("Invalid API key", { status: 401 });
 }
 
 // ❌ Discouraged: No API key validation
@@ -316,6 +338,7 @@ if (!await validateApiKey(apiKey)) {
 ```
 
 **Action Items**:
+
 - [ ] Rate limiting on all public endpoints
 - [ ] CORS configured with specific origins
 - [ ] API keys validated for external integrations
@@ -326,6 +349,7 @@ if (!await validateApiKey(apiKey)) {
 #### Common Vulnerabilities
 
 🚨 **API Abuse**:
+
 - Missing rate limiting (DoS vulnerability)
 - Overly permissive CORS
 - No request size limits
@@ -333,6 +357,7 @@ if (!await validateApiKey(apiKey)) {
 - Missing authentication on public APIs
 
 🚨 **Mass Assignment**:
+
 - Accepting all fields from user input
 - No explicit field whitelisting
 - Allowing role/permission modification via API
@@ -342,11 +367,12 @@ if (!await validateApiKey(apiKey)) {
 #### Must Check (Port AI Systems)
 
 **Model Input Validation**:
+
 ```typescript
 // ✅ Preferred: Validate AI inputs
 const AIInputSchema = z.object({
   prompt: z.string().max(4000), // Limit length
-  model: z.enum(['gpt-4', 'claude-3', 'gemini']), // Whitelist models
+  model: z.enum(["gpt-4", "claude-3", "gemini"]), // Whitelist models
   temperature: z.number().min(0).max(2),
   maxTokens: z.number().max(2000),
 });
@@ -357,11 +383,12 @@ const response = await aiService.generate(input);
 // ❌ Discouraged: Unvalidated AI inputs
 const response = await aiService.generate({
   prompt: userInput, // No length/content validation
-  model: userModel,  // User-controlled model selection
+  model: userModel, // User-controlled model selection
 });
 ```
 
 **Prompt Injection Prevention**:
+
 ```typescript
 // ✅ Preferred: Sanitize and separate system/user content
 const systemPrompt = "You are a port logistics assistant.";
@@ -369,9 +396,9 @@ const userContent = sanitizePrompt(userInput); // Remove injection attempts
 
 const response = await openai.chat.completions.create({
   messages: [
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: userContent }
-  ]
+    { role: "system", content: systemPrompt },
+    { role: "user", content: userContent },
+  ],
 });
 
 // ❌ Discouraged: Concatenating prompts
@@ -379,6 +406,7 @@ const prompt = `${systemInstructions}\nUser: ${userInput}`; // VULNERABLE to inj
 ```
 
 **Model Output Validation**:
+
 ```typescript
 // ✅ Preferred: Validate AI outputs before use
 const OutputSchema = z.object({
@@ -396,6 +424,7 @@ executeCommand(result.action); // DANGEROUS!
 ```
 
 **Data Privacy in AI Training**:
+
 ```typescript
 // ✅ Preferred: Anonymize data before AI processing
 const anonymized = anonymizePortData(sensitiveData);
@@ -406,6 +435,7 @@ await openai.analyze(customerData); // May violate privacy policies
 ```
 
 **Action Items**:
+
 - [ ] AI inputs validated (length, content, model selection)
 - [ ] Prompt injection defenses in place
 - [ ] AI outputs validated before execution
@@ -417,21 +447,25 @@ await openai.analyze(customerData); // May violate privacy policies
 #### Common AI Vulnerabilities
 
 🚨 **Prompt Injection**:
+
 - User input directly concatenated to system prompts
 - No separation between instructions and user content
 - Allowing users to override system behavior
 
 🚨 **Model Poisoning**:
+
 - Training data not validated
 - Accepting user-contributed training data
 - No data provenance tracking
 
 🚨 **Data Leakage**:
+
 - Sending PII to third-party AI services
 - Training data exposed through model queries
 - Context window leaking previous user data
 
 🚨 **Model Abuse**:
+
 - No rate limiting on AI endpoints
 - Expensive model calls without cost controls
 - Resource exhaustion through AI requests
@@ -441,6 +475,7 @@ await openai.analyze(customerData); // May violate privacy policies
 #### Must Check
 
 **Dependency Security**:
+
 ```typescript
 // ✅ Preferred: Regular dependency audits
 // Run: pnpm audit
@@ -456,15 +491,16 @@ await openai.analyze(customerData); // May violate privacy policies
 ```
 
 **Plugin Security** (Port AI Plugin System):
+
 ```typescript
 // ✅ Preferred: Validate plugins before loading
-import { PluginValidator } from '@/core/plugin-system/validator';
+import { PluginValidator } from "@/core/plugin-system/validator";
 
 const plugin = await loadPlugin(pluginPath);
 const validation = await PluginValidator.verify(plugin);
 
 if (!validation.isSafe) {
-  throw new Error(`Unsafe plugin: ${validation.threats.join(', ')}`);
+  throw new Error(`Unsafe plugin: ${validation.threats.join(", ")}`);
 }
 
 // ❌ Discouraged: Loading untrusted plugins
@@ -472,6 +508,7 @@ const plugin = require(userProvidedPath); // DANGEROUS!
 ```
 
 **Action Items**:
+
 - [ ] Dependencies regularly updated (monthly)
 - [ ] Security advisories monitored
 - [ ] Unused dependencies removed
@@ -482,6 +519,7 @@ const plugin = require(userProvidedPath); // DANGEROUS!
 #### Common Vulnerabilities
 
 🚨 **Supply Chain Attacks**:
+
 - Compromised dependencies (typosquatting)
 - Malicious packages in npm
 - Outdated packages with known CVEs
@@ -492,33 +530,35 @@ const plugin = require(userProvidedPath); // DANGEROUS!
 #### Must Check
 
 **Audit Logging**:
+
 ```typescript
 // ✅ Preferred: Comprehensive audit logs
-import { AuditLogger } from '@/core/security/AuditLogger';
+import { AuditLogger } from "@/core/security/AuditLogger";
 
 await AuditLogger.log({
-  action: 'PORT_DATA_ACCESS',
+  action: "PORT_DATA_ACCESS",
   userId: session.user.id,
   resource: portId,
   ip: request.ip,
   timestamp: new Date(),
-  result: 'SUCCESS'
+  result: "SUCCESS",
 });
 
 // ❌ Discouraged: No audit trail for sensitive operations
 ```
 
 **Security Event Monitoring**:
+
 ```typescript
 // ✅ Preferred: Alert on security events
-import { SecurityMonitor } from '@/core/security/monitoring';
+import { SecurityMonitor } from "@/core/security/monitoring";
 
 if (failedLoginAttempts > 5) {
   await SecurityMonitor.alert({
-    level: 'HIGH',
-    type: 'BRUTE_FORCE_ATTEMPT',
+    level: "HIGH",
+    type: "BRUTE_FORCE_ATTEMPT",
     userId: attemptedUserId,
-    ip: request.ip
+    ip: request.ip,
   });
 }
 
@@ -526,6 +566,7 @@ if (failedLoginAttempts > 5) {
 ```
 
 **Action Items**:
+
 - [ ] Security events logged (auth failures, permission denials)
 - [ ] Audit logs immutable (append-only)
 - [ ] Logs retained per compliance requirements (7 years)
@@ -536,12 +577,14 @@ if (failedLoginAttempts > 5) {
 #### Common Vulnerabilities
 
 🚨 **Insufficient Logging**:
+
 - No audit trail for sensitive operations
 - Security events not logged
 - Logs can be modified/deleted
 - No alerting on anomalies
 
 🚨 **Information Leakage**:
+
 - Sensitive data in logs (passwords, tokens)
 - Verbose error messages exposing system details
 - Stack traces shown to users
@@ -551,6 +594,7 @@ if (failedLoginAttempts > 5) {
 #### Must Check
 
 **Environment Configuration**:
+
 ```typescript
 // ✅ Preferred: Secure defaults
 const config = {
@@ -570,6 +614,7 @@ const config = {
 ```
 
 **Security Headers**:
+
 ```typescript
 // ✅ Preferred: Security headers configured
 headers: {
@@ -583,6 +628,7 @@ headers: {
 ```
 
 **Action Items**:
+
 - [ ] TLS 1.2+ enforced (no SSL, no TLS 1.0/1.1)
 - [ ] Security headers configured
 - [ ] Cookie flags set (Secure, HttpOnly, SameSite)
@@ -596,40 +642,41 @@ headers: {
 
 ```typescript
 // tests/security/auth.security.test.ts
-describe('Authentication Security', () => {
-  it('should reject requests without valid tokens', async () => {
-    const response = await fetch('/api/sensitive', { 
-      headers: { Authorization: 'Bearer invalid' } 
+describe("Authentication Security", () => {
+  it("should reject requests without valid tokens", async () => {
+    const response = await fetch("/api/sensitive", {
+      headers: { Authorization: "Bearer invalid" },
     });
     expect(response.status).toBe(401);
   });
-  
-  it('should prevent session fixation', async () => {
+
+  it("should prevent session fixation", async () => {
     // Test implementation
   });
-  
-  it('should enforce MFA for admin operations', async () => {
+
+  it("should enforce MFA for admin operations", async () => {
     // Test implementation
   });
 });
 
 // tests/security/injection.security.test.ts
-describe('Injection Protection', () => {
-  it('should prevent SQL injection via user input', async () => {
+describe("Injection Protection", () => {
+  it("should prevent SQL injection via user input", async () => {
     const malicious = "1' OR '1'='1";
     const result = await getUserById(malicious);
     expect(result).toBeNull();
   });
-  
-  it('should sanitize XSS attempts', async () => {
+
+  it("should sanitize XSS attempts", async () => {
     const xss = '<script>alert("XSS")</script>';
     const sanitized = sanitizeInput(xss);
-    expect(sanitized).not.toContain('<script>');
+    expect(sanitized).not.toContain("<script>");
   });
 });
 ```
 
 **Action Items**:
+
 - [ ] Security tests exist for authentication/authorization
 - [ ] Input validation tested with malicious payloads
 - [ ] XSS prevention tested
@@ -642,6 +689,7 @@ describe('Injection Protection', () => {
 ### Regulatory Requirements
 
 **GDPR Compliance**:
+
 - [ ] User consent tracked and stored
 - [ ] Data retention policies enforced
 - [ ] Right to deletion implemented
@@ -649,12 +697,14 @@ describe('Injection Protection', () => {
 - [ ] Privacy policy up to date
 
 **SOC 2 Type II**:
+
 - [ ] Access controls documented
 - [ ] Change management process followed
 - [ ] Incident response procedures tested
 - [ ] Audit logs complete and immutable
 
 **ISO 27001**:
+
 - [ ] Risk assessments conducted
 - [ ] Security policies documented
 - [ ] Employee training tracked
@@ -707,32 +757,32 @@ Use this checklist for all code reviews involving security-sensitive code:
 export async function GET(request: Request) {
   // 1. Authenticate
   const session = await getServerSession(authOptions);
-  if (!session) return new Response('Unauthorized', { status: 401 });
-  
+  if (!session) return new Response("Unauthorized", { status: 401 });
+
   // 2. Authorize
-  if (!hasPermission(session.user, 'port:read')) {
-    return new Response('Forbidden', { status: 403 });
+  if (!hasPermission(session.user, "port:read")) {
+    return new Response("Forbidden", { status: 403 });
   }
-  
+
   // 3. Validate input
   const url = new URL(request.url);
-  const portId = PortIdSchema.parse(url.searchParams.get('portId'));
-  
+  const portId = PortIdSchema.parse(url.searchParams.get("portId"));
+
   // 4. Check ownership/access
   const hasAccess = await checkPortAccess(session.user.id, portId);
-  if (!hasAccess) return new Response('Forbidden', { status: 403 });
-  
+  if (!hasAccess) return new Response("Forbidden", { status: 403 });
+
   // 5. Fetch and sanitize data
   const portData = await getPortData(portId);
   const sanitized = sanitizeOutput(portData);
-  
+
   // 6. Log access
   await AuditLogger.log({
-    action: 'PORT_DATA_ACCESS',
+    action: "PORT_DATA_ACCESS",
     userId: session.user.id,
     resource: portId,
   });
-  
+
   return Response.json(sanitized);
 }
 ```
@@ -744,36 +794,36 @@ export async function GET(request: Request) {
 async function analyzeShipmentRisk(shipmentData: ShipmentData) {
   // 1. Anonymize sensitive data
   const anonymized = anonymizeShipmentData(shipmentData);
-  
+
   // 2. Validate AI input
   const aiInput = AIInputSchema.parse({
     prompt: buildRiskAnalysisPrompt(anonymized),
-    model: 'gpt-4',
+    model: "gpt-4",
     maxTokens: 1000,
   });
-  
+
   // 3. Rate limit AI calls
-  if (!await rateLimiter.check('ai-risk-analysis', { max: 100 })) {
-    throw new Error('AI rate limit exceeded');
+  if (!(await rateLimiter.check("ai-risk-analysis", { max: 100 }))) {
+    throw new Error("AI rate limit exceeded");
   }
-  
+
   // 4. Call AI with timeout
   const response = await withTimeout(
     aiService.analyze(aiInput),
-    30000 // 30s timeout
+    30000, // 30s timeout
   );
-  
+
   // 5. Validate AI output
   const result = RiskAnalysisSchema.parse(response);
-  
+
   // 6. Log AI decision
   await AuditLogger.log({
-    action: 'AI_RISK_ANALYSIS',
+    action: "AI_RISK_ANALYSIS",
     shipmentId: shipmentData.id,
     result: result.riskLevel,
     modelVersion: aiInput.model,
   });
-  
+
   return result;
 }
 ```
@@ -785,35 +835,35 @@ async function analyzeShipmentRisk(shipmentData: ShipmentData) {
 async function installPlugin(pluginPackage: string) {
   // 1. Authenticate admin
   if (!isAdmin(session.user)) {
-    throw new Error('Only admins can install plugins');
+    throw new Error("Only admins can install plugins");
   }
-  
+
   // 2. Validate plugin source
   if (!isFromTrustedRegistry(pluginPackage)) {
-    throw new Error('Plugin must be from approved registry');
+    throw new Error("Plugin must be from approved registry");
   }
-  
+
   // 3. Scan for vulnerabilities
   const scanResult = await scanPlugin(pluginPackage);
   if (scanResult.hasVulnerabilities) {
     throw new Error(`Plugin has vulnerabilities: ${scanResult.cves}`);
   }
-  
+
   // 4. Verify signature
-  if (!await verifyPluginSignature(pluginPackage)) {
-    throw new Error('Plugin signature verification failed');
+  if (!(await verifyPluginSignature(pluginPackage))) {
+    throw new Error("Plugin signature verification failed");
   }
-  
+
   // 5. Sandbox plugin
   const plugin = await loadPluginInSandbox(pluginPackage);
-  
+
   // 6. Log installation
   await AuditLogger.log({
-    action: 'PLUGIN_INSTALLED',
+    action: "PLUGIN_INSTALLED",
     plugin: pluginPackage,
     userId: session.user.id,
   });
-  
+
   return plugin;
 }
 ```

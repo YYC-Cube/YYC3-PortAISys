@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main, develop]
   schedule:
-    - cron: '0 2 * * *'
+    - cron: "0 2 * * *"
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0'
+          node-version: "22.13.0"
       - run: npm install --ignore-scripts --no-package-lock
       - run: npx tsx scripts/verify-implementation.ts
       - uses: actions/upload-artifact@v4
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0'
+          node-version: "22.13.0"
       - run: npm install --ignore-scripts --no-package-lock
       - run: npx vitest run tests/unit --coverage
       - run: npx vitest run tests/integration --coverage
@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0'
+          node-version: "22.13.0"
       - run: npm install --ignore-scripts --no-package-lock
       - run: npx vitest run tests/performance --reporter=json
       - run: npx vitest run tests/security --reporter=json
@@ -79,7 +79,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0'
+          node-version: "22.13.0"
       - run: npm install --ignore-scripts --no-package-lock
       - name: Run ${{ matrix.test-suite }}
         run: |
@@ -111,7 +111,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0'
+          node-version: "22.13.0"
       - run: npm install --ignore-scripts --no-package-lock
       - run: npx vitest run tests/e2e/complete-workflow.test.ts
         env:
@@ -134,7 +134,7 @@ jobs:
           path: all-reports
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0'
+          node-version: "22.13.0"
       - run: npm install --ignore-scripts --no-package-lock
       - run: npx tsx scripts/generate-test-report.ts --input=all-reports
       - uses: actions/upload-artifact@v4

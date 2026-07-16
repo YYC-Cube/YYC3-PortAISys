@@ -6,6 +6,7 @@ allowBuilds:
   esbuild: true
   prisma: true
   sharp: true
+minimumReleaseAge: 0
 onlyBuiltDependencies:
   - '@prisma/client'
   - '@prisma/engines'

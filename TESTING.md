@@ -37,7 +37,7 @@ pnpm install
 
 pnpm exec playwright install
 
-```
+````
 
 ### 2. 运行所有测试
 
@@ -47,7 +47,7 @@ pnpm test:all
 
 # 方法2: 使用shell脚本
 ./scripts/run-all-tests.sh
-```
+````
 
 ### 3. 运行特定测试
 
@@ -78,7 +78,7 @@ pnpm test:e2e:debug
 
 测试完成后，报告会自动生成在 `test-reports/` 目录：
 
-```bash
+````bash
 # 查看综合HTML报告（推荐）
 open test-reports/test-report.html
 
@@ -167,9 +167,9 @@ pnpm test:e2e:report
 1. **查看测试报告**
    ```bash
    open test-reports/test-report.html
-   ```
+````
 
-   报告中会列出所有失败的测试和问题建议
+报告中会列出所有失败的测试和问题建议
 
 1. **运行单个测试文件**
 

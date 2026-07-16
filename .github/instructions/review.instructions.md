@@ -53,6 +53,7 @@ Every file must include a comprehensive header:
 - **Enums**: Use const enums for performance when appropriate
 
 **Action**: Check for:
+
 - Proper type annotations on function parameters and returns
 - No implicit `any` types
 - Correct use of path aliases instead of relative imports
@@ -61,6 +62,7 @@ Every file must include a comprehensive header:
 ### ESLint Rules
 
 **Critical Limits**:
+
 - Max 300 lines per file (warn)
 - Max 50 lines per function (warn)
 - Cyclomatic complexity max 10 (warn)
@@ -127,9 +129,10 @@ orchestrator.addAgent(customAgent);
 
 ```typescript
 // Preferred: Use dual-layer caching
-const data = await cache.get(key) || 
-             await redisCache.get(key) ||
-             await fetchFromDatabase();
+const data =
+  (await cache.get(key)) ||
+  (await redisCache.get(key)) ||
+  (await fetchFromDatabase());
 ```
 
 **Action**: Check if caching is implemented for expensive operations.
@@ -142,8 +145,8 @@ try {
   const result = await riskyOperation();
   return result;
 } catch (error) {
-  logger.error('Operation failed', { error, context });
-  throw new CustomError('User-friendly message', error);
+  logger.error("Operation failed", { error, context });
+  throw new CustomError("User-friendly message", error);
 }
 ```
 
@@ -213,6 +216,7 @@ tests/
 ```
 
 **Action**: Verify tests are in the correct directory and follow naming conventions:
+
 - Unit tests: `*.test.ts`
 - Integration tests: `*.integration.test.ts`
 - E2E tests: `*.spec.ts`
@@ -230,18 +234,19 @@ tests/
 
 ```typescript
 // Preferred: Descriptive test names
-describe('UserAuthenticationService', () => {
-  it('should hash password with bcrypt before storing', async () => {
+describe("UserAuthenticationService", () => {
+  it("should hash password with bcrypt before storing", async () => {
     // Test implementation
   });
-  
-  it('should reject passwords shorter than 8 characters', async () => {
+
+  it("should reject passwords shorter than 8 characters", async () => {
     // Test implementation
   });
 });
 ```
 
 **Action**: Ensure tests are:
+
 - Self-documenting with clear names
 - Independent and can run in any order
 - Fast (unit tests <100ms, integration <5s)
@@ -280,19 +285,19 @@ describe('UserAuthenticationService', () => {
 ```typescript
 /**
  * Processes port logistics data using AI analysis
- * 
+ *
  * @param portData - Raw port operational data
  * @param options - Processing configuration
  * @returns Analyzed insights with recommendations
  * @throws {ValidationError} If port data is invalid
  * @throws {AIServiceError} If AI model fails
- * 
+ *
  * @example
  * const insights = await processPortData(data, { model: 'gpt-4' });
  */
 async function processPortData(
   portData: PortData,
-  options: ProcessingOptions
+  options: ProcessingOptions,
 ): Promise<PortInsights> {
   // Implementation
 }
@@ -303,6 +308,7 @@ async function processPortData(
 ### README Updates
 
 When adding new features:
+
 - Update main README.md with feature description
 - Add usage examples
 - Document configuration options
@@ -323,6 +329,7 @@ When adding new features:
 **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
 
 **Examples**:
+
 - `feat(auth): implement RBAC permission system`
 - `fix(cache): resolve Redis connection timeout issue`
 - `docs(api): update endpoint documentation`
@@ -334,6 +341,7 @@ When adding new features:
 When reviewing code, prioritize checking in this order:
 
 ### P0 (Critical - Must Fix)
+
 - [ ] Security vulnerabilities
 - [ ] Data loss potential
 - [ ] Breaking API changes without migration path
@@ -341,6 +349,7 @@ When reviewing code, prioritize checking in this order:
 - [ ] Missing error handling in production code
 
 ### P1 (High - Should Fix)
+
 - [ ] Missing or inadequate tests
 - [ ] Type safety violations
 - [ ] Architectural pattern violations
@@ -348,12 +357,14 @@ When reviewing code, prioritize checking in this order:
 - [ ] Missing documentation for public APIs
 
 ### P2 (Medium - Nice to Have)
+
 - [ ] Minor style inconsistencies
 - [ ] Suboptimal variable names
 - [ ] Missing JSDoc for internal functions
 - [ ] Non-critical performance improvements
 
 ### P3 (Low - Optional)
+
 - [ ] Formatting preferences
 - [ ] Alternative implementation suggestions
 - [ ] Future enhancement ideas
@@ -364,23 +375,23 @@ When reviewing code, prioritize checking in this order:
 
 ```typescript
 // Explicit types
-async function getUser(id: string): Promise<User> { }
+async function getUser(id: string): Promise<User> {}
 
 // Proper error handling
 try {
   await operation();
 } catch (error) {
-  logger.error('Failed', { error });
-  throw new AppError('Operation failed', error);
+  logger.error("Failed", { error });
+  throw new AppError("Operation failed", error);
 }
 
 // Path aliases
-import { UserService } from '@/core/services/userService';
+import { UserService } from "@/core/services/userService";
 
 // Const enums
 const enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user'
+  ADMIN = "admin",
+  USER = "user",
 }
 ```
 
@@ -388,16 +399,17 @@ const enum UserRole {
 
 ```typescript
 // Any types without justification
-async function getUser(id: any): Promise<any> { }
+async function getUser(id: any): Promise<any> {}
 
 // Unhandled promises
 await riskyOperation(); // No error handling
 
 // Relative imports for core modules
-import { UserService } from '../../../core/services/userService';
+import { UserService } from "../../../core/services/userService";
 
 // Magic strings
-if (role === 'admin') { } // Should use enum
+if (role === "admin") {
+} // Should use enum
 ```
 
 ## Related Documentation
@@ -410,6 +422,7 @@ if (role === 'admin') { } // Should use enum
 ## Summary
 
 Focus on:
+
 1. **Security first** - Port AI systems handle sensitive logistics data
 2. **Type safety** - Leverage TypeScript's full power
 3. **Performance** - Cache, paginate, optimize

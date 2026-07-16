@@ -137,23 +137,24 @@ tests/                          # Test suites
 **Purpose**: Standardize AI agent behavior and enable orchestration.
 
 **Base Agent Pattern**:
+
 ```typescript
 // core/ai/agents/BaseAgent.ts
 abstract class BaseAgent {
   protected name: string;
   protected capabilities: string[];
   protected model: AIModel;
-  
+
   abstract async execute(params: AgentParams): Promise<AgentResult>;
-  
+
   async validate(params: AgentParams): Promise<boolean> {
     // Input validation
   }
-  
+
   async preExecute(params: AgentParams): Promise<void> {
     // Pre-processing hook
   }
-  
+
   async postExecute(result: AgentResult): Promise<AgentResult> {
     // Post-processing hook
   }
@@ -162,19 +163,19 @@ abstract class BaseAgent {
 // ✅ Preferred: Extend BaseAgent
 class PortAnalyticsAgent extends BaseAgent {
   constructor() {
-    super('PortAnalytics', ['analysis', 'forecasting']);
+    super("PortAnalytics", ["analysis", "forecasting"]);
   }
-  
+
   async execute(params: AgentParams): Promise<AgentResult> {
     await this.validate(params);
     await this.preExecute(params);
-    
+
     const analysis = await this.analyzePortData(params.data);
     const result = { analysis, confidence: 0.95 };
-    
+
     return await this.postExecute(result);
   }
-  
+
   private async analyzePortData(data: PortData): Promise<Analysis> {
     // Implementation
   }
@@ -182,14 +183,15 @@ class PortAnalyticsAgent extends BaseAgent {
 
 // ❌ Discouraged: Custom agent without BaseAgent
 class CustomAgent {
-  async doSomething() { } // No standardization
+  async doSomething() {} // No standardization
 }
 ```
 
 **Agent Orchestration**:
+
 ```typescript
 // ✅ Preferred: Use AgentOrchestrator for multi-agent tasks
-import { AgentOrchestrator } from '@/core/ai/orchestration/AgentOrchestrator';
+import { AgentOrchestrator } from "@/core/ai/orchestration/AgentOrchestrator";
 
 const orchestrator = new AgentOrchestrator();
 
@@ -198,9 +200,9 @@ orchestrator.addAgent(new RiskAssessmentAgent());
 orchestrator.addAgent(new OptimizationAgent());
 
 const result = await orchestrator.execute({
-  task: 'ANALYZE_PORT_EFFICIENCY',
+  task: "ANALYZE_PORT_EFFICIENCY",
   data: portOperationalData,
-  coordination: 'parallel', // or 'sequential'
+  coordination: "parallel", // or 'sequential'
 });
 
 // ❌ Discouraged: Manual agent coordination
@@ -211,12 +213,14 @@ const result2 = await agent2.execute(); // Duplicated pattern
 ```
 
 **When to Use**:
+
 - Creating any AI-powered functionality
 - Implementing intelligent automation
 - Building multi-step reasoning systems
 - Coordinating multiple AI models
 
 **Action Items**:
+
 - [ ] All AI agents extend `BaseAgent`
 - [ ] Agent capabilities clearly defined
 - [ ] Orchestration used for multi-agent tasks
@@ -229,17 +233,17 @@ const result2 = await agent2.execute(); // Duplicated pattern
 
 ```typescript
 // ✅ Preferred: Use ModelRouter for AI calls
-import { ModelRouter } from '@/core/ai/models/ModelRouter';
+import { ModelRouter } from "@/core/ai/models/ModelRouter";
 
 const router = new ModelRouter();
 
 const response = await router.complete({
-  prompt: 'Analyze port congestion',
-  capabilities: ['analysis', 'reasoning'],
+  prompt: "Analyze port congestion",
+  capabilities: ["analysis", "reasoning"],
   constraints: {
     maxLatency: 3000, // 3s
-    maxCost: 0.05,    // $0.05
-  }
+    maxCost: 0.05, // $0.05
+  },
 });
 
 // Router automatically selects:
@@ -249,21 +253,23 @@ const response = await router.complete({
 // - Internal models for cost-sensitive queries
 
 // ❌ Discouraged: Direct model calls
-import OpenAI from 'openai';
+import OpenAI from "openai";
 const openai = new OpenAI();
 const response = await openai.chat.completions.create({
-  model: 'gpt-4', // Hard-coded model
-  messages: [{ role: 'user', content: prompt }]
+  model: "gpt-4", // Hard-coded model
+  messages: [{ role: "user", content: prompt }],
 });
 ```
 
 **When to Use**:
+
 - Any AI/LLM integration
 - Multi-model deployments
 - Cost optimization scenarios
 - Fallback/redundancy requirements
 
 **Action Items**:
+
 - [ ] Use `ModelRouter` instead of direct API calls
 - [ ] Define capability requirements
 - [ ] Set appropriate constraints (latency/cost)
@@ -275,30 +281,30 @@ const response = await openai.chat.completions.create({
 
 ```typescript
 // ✅ Preferred: Dual-layer caching
-import { RedisCache } from '@/core/cache/RedisCache';
-import { LRUCache } from '@/core/cache/LRUCache';
+import { RedisCache } from "@/core/cache/RedisCache";
+import { LRUCache } from "@/core/cache/LRUCache";
 
 async function getPortData(portId: string): Promise<PortData> {
   const cacheKey = `port:${portId}`;
-  
+
   // L1: In-memory LRU cache (fastest)
   let data = LRUCache.get(cacheKey);
   if (data) return data;
-  
+
   // L2: Redis cache (fast)
   data = await RedisCache.get(cacheKey);
   if (data) {
     LRUCache.set(cacheKey, data);
     return data;
   }
-  
+
   // L3: Database (slow)
   data = await db.port.findUnique({ where: { id: portId } });
-  
+
   // Cache results
   await RedisCache.set(cacheKey, data, { ttl: 3600 });
   LRUCache.set(cacheKey, data);
-  
+
   return data;
 }
 
@@ -309,11 +315,12 @@ async function getPortData(portId: string): Promise<PortData> {
 ```
 
 **Cache Invalidation**:
+
 ```typescript
 // ✅ Preferred: Invalidate all layers
 async function updatePortData(portId: string, data: PortData) {
   await db.port.update({ where: { id: portId }, data });
-  
+
   const cacheKey = `port:${portId}`;
   LRUCache.delete(cacheKey);
   await RedisCache.delete(cacheKey);
@@ -321,12 +328,14 @@ async function updatePortData(portId: string, data: PortData) {
 ```
 
 **When to Use**:
+
 - Frequently accessed data (port info, user profiles)
 - Expensive computations (analytics, AI results)
 - External API responses
 - Static or semi-static data
 
 **Action Items**:
+
 - [ ] Implement caching for expensive operations
 - [ ] Use dual-layer (LRU + Redis) for critical paths
 - [ ] Invalidate cache on data mutations
@@ -342,29 +351,29 @@ async function updatePortData(portId: string, data: PortData) {
 // core/data/repositories/PortRepository.ts
 export class PortRepository {
   constructor(private prisma: PrismaClient) {}
-  
+
   async findById(id: string): Promise<Port | null> {
     return this.prisma.port.findUnique({
       where: { id },
-      include: { location: true, operations: true }
+      include: { location: true, operations: true },
     });
   }
-  
+
   async findByRegion(region: string): Promise<Port[]> {
     return this.prisma.port.findMany({
       where: { location: { region } },
-      orderBy: { capacity: 'desc' }
+      orderBy: { capacity: "desc" },
     });
   }
-  
+
   async create(data: CreatePortData): Promise<Port> {
     return this.prisma.port.create({ data });
   }
-  
+
   async update(id: string, data: UpdatePortData): Promise<Port> {
     return this.prisma.port.update({
       where: { id },
-      data
+      data,
     });
   }
 }
@@ -372,7 +381,7 @@ export class PortRepository {
 // Usage in services
 class PortService {
   constructor(private portRepo: PortRepository) {}
-  
+
   async getPortDetails(portId: string) {
     const port = await this.portRepo.findById(portId);
     // Business logic
@@ -389,12 +398,14 @@ class PortService {
 ```
 
 **When to Use**:
+
 - All database access
 - Complex queries
 - Data aggregations
 - Testable code
 
 **Action Items**:
+
 - [ ] Use repository pattern for data access
 - [ ] Inject repositories (dependency injection)
 - [ ] Keep repositories focused (single entity)
@@ -412,47 +423,47 @@ export class PortOperationsService {
     private portRepo: PortRepository,
     private analyticsEngine: AIAnalyticsEngine,
     private notificationService: NotificationService,
-    private auditLogger: AuditLogger
+    private auditLogger: AuditLogger,
   ) {}
-  
+
   async scheduleShipmentUnload(
     portId: string,
     shipmentId: string,
-    userId: string
+    userId: string,
   ): Promise<UnloadSchedule> {
     // Validate
     const port = await this.portRepo.findById(portId);
-    if (!port) throw new NotFoundError('Port not found');
-    
+    if (!port) throw new NotFoundError("Port not found");
+
     if (port.capacityUsed >= port.capacityMax) {
-      throw new BusinessError('Port at capacity');
+      throw new BusinessError("Port at capacity");
     }
-    
+
     // Analyze optimal timing
     const analysis = await this.analyticsEngine.analyzeBestTime({
       portId,
       shipmentSize: shipment.size,
-      currentLoad: port.capacityUsed
+      currentLoad: port.capacityUsed,
     });
-    
+
     // Create schedule
     const schedule = await this.portRepo.createUnloadSchedule({
       portId,
       shipmentId,
       scheduledTime: analysis.optimalTime,
-      estimatedDuration: analysis.estimatedDuration
+      estimatedDuration: analysis.estimatedDuration,
     });
-    
+
     // Notify stakeholders
     await this.notificationService.notifyScheduleCreated(schedule);
-    
+
     // Audit log
     await this.auditLogger.log({
-      action: 'UNLOAD_SCHEDULED',
+      action: "UNLOAD_SCHEDULED",
       userId,
-      resource: schedule.id
+      resource: schedule.id,
     });
-    
+
     return schedule;
   }
 }
@@ -462,19 +473,21 @@ export async function POST(request: Request) {
   const body = await request.json();
   const port = await prisma.port.findUnique({ where: { id: body.portId } });
   if (port.capacityUsed >= port.capacityMax) {
-    return Response.json({ error: 'At capacity' }, { status: 400 });
+    return Response.json({ error: "At capacity" }, { status: 400 });
   }
   // Business logic mixed with API handling
 }
 ```
 
 **When to Use**:
+
 - Complex business logic
 - Multi-step operations
 - Cross-cutting concerns (logging, caching, notifications)
 - Reusable functionality across multiple endpoints
 
 **Action Items**:
+
 - [ ] Extract business logic to service layer
 - [ ] Keep API routes thin (validation + service call)
 - [ ] Use dependency injection for services
@@ -492,7 +505,7 @@ interface Plugin {
   name: string;
   version: string;
   capabilities: string[];
-  
+
   initialize(context: PluginContext): Promise<void>;
   execute(action: string, params: any): Promise<any>;
   cleanup(): Promise<void>;
@@ -500,24 +513,24 @@ interface Plugin {
 
 // Example plugin
 class CustomAnalyticsPlugin implements Plugin {
-  id = 'custom-analytics';
-  name = 'Custom Analytics Plugin';
-  version = '1.0.0';
-  capabilities = ['analytics', 'reporting'];
-  
+  id = "custom-analytics";
+  name = "Custom Analytics Plugin";
+  version = "1.0.0";
+  capabilities = ["analytics", "reporting"];
+
   async initialize(context: PluginContext) {
     // Setup
   }
-  
+
   async execute(action: string, params: any) {
     switch (action) {
-      case 'analyze':
+      case "analyze":
         return this.performAnalysis(params);
       default:
         throw new Error(`Unknown action: ${action}`);
     }
   }
-  
+
   async cleanup() {
     // Cleanup resources
   }
@@ -527,18 +540,20 @@ class CustomAnalyticsPlugin implements Plugin {
 const pluginManager = new PluginManager();
 await pluginManager.register(new CustomAnalyticsPlugin());
 
-const result = await pluginManager.execute('custom-analytics', 'analyze', {
-  data: analyticsData
+const result = await pluginManager.execute("custom-analytics", "analyze", {
+  data: analyticsData,
 });
 ```
 
 **When to Use**:
+
 - Third-party integrations
 - Optional features
 - Customer-specific customizations
 - Marketplace extensions
 
 **Action Items**:
+
 - [ ] Plugins implement the Plugin interface
 - [ ] Plugin lifecycle properly managed (init/cleanup)
 - [ ] Security validation before loading plugins
@@ -550,14 +565,14 @@ const result = await pluginManager.execute('custom-analytics', 'analyze', {
 
 ```typescript
 // ✅ Preferred: Event-driven architecture
-import { EventEmitter } from 'events';
+import { EventEmitter } from "events";
 
 // Define events
 enum PortEvents {
-  SHIPMENT_ARRIVED = 'shipment:arrived',
-  UNLOAD_STARTED = 'unload:started',
-  UNLOAD_COMPLETED = 'unload:completed',
-  CAPACITY_ALERT = 'capacity:alert'
+  SHIPMENT_ARRIVED = "shipment:arrived",
+  UNLOAD_STARTED = "unload:started",
+  UNLOAD_COMPLETED = "unload:completed",
+  CAPACITY_ALERT = "capacity:alert",
 }
 
 // Event emitter
@@ -573,12 +588,12 @@ const eventBus = new PortEventBus();
 // Publishers
 class PortOperationsService {
   async completeUnload(unloadId: string) {
-    const unload = await this.updateUnloadStatus(unloadId, 'COMPLETED');
-    
+    const unload = await this.updateUnloadStatus(unloadId, "COMPLETED");
+
     eventBus.emit(PortEvents.UNLOAD_COMPLETED, {
       unloadId,
       portId: unload.portId,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 }
@@ -587,10 +602,10 @@ class PortOperationsService {
 eventBus.on(PortEvents.UNLOAD_COMPLETED, async (data) => {
   // Update analytics
   await analyticsEngine.recordCompletion(data);
-  
+
   // Trigger next scheduled unload
   await workflowEngine.triggerNext(data.portId);
-  
+
   // Notify stakeholders
   await notificationService.notifyCompletion(data.unloadId);
 });
@@ -598,8 +613,8 @@ eventBus.on(PortEvents.UNLOAD_COMPLETED, async (data) => {
 // ❌ Discouraged: Tight coupling
 class PortOperationsService {
   async completeUnload(unloadId: string) {
-    const unload = await this.updateUnloadStatus(unloadId, 'COMPLETED');
-    
+    const unload = await this.updateUnloadStatus(unloadId, "COMPLETED");
+
     // Directly calling dependent services
     await analyticsEngine.recordCompletion({ unloadId });
     await workflowEngine.triggerNext(unload.portId);
@@ -610,6 +625,7 @@ class PortOperationsService {
 ```
 
 **When to Use**:
+
 - Asynchronous workflows
 - Multi-step processes
 - Notification systems
@@ -617,6 +633,7 @@ class PortOperationsService {
 - Decoupled microservices
 
 **Action Items**:
+
 - [ ] Use events for cross-module communication
 - [ ] Event names are descriptive constants
 - [ ] Event data includes necessary context
@@ -629,23 +646,23 @@ class PortOperationsService {
 
 ```typescript
 // ✅ Preferred: Worker threads for CPU-intensive work
-import { Worker } from 'worker_threads';
+import { Worker } from "worker_threads";
 
 async function processLargeDataset(data: LargeDataset): Promise<Result> {
   return new Promise((resolve, reject) => {
-    const worker = new Worker('./workers/dataProcessor.js', {
-      workerData: data
+    const worker = new Worker("./workers/dataProcessor.js", {
+      workerData: data,
     });
-    
-    worker.on('message', (result) => {
+
+    worker.on("message", (result) => {
       resolve(result);
     });
-    
-    worker.on('error', (error) => {
+
+    worker.on("error", (error) => {
       reject(error);
     });
-    
-    worker.on('exit', (code) => {
+
+    worker.on("exit", (code) => {
       if (code !== 0) {
         reject(new Error(`Worker stopped with exit code ${code}`));
       }
@@ -654,7 +671,7 @@ async function processLargeDataset(data: LargeDataset): Promise<Result> {
 }
 
 // workers/dataProcessor.js
-const { parentPort, workerData } = require('worker_threads');
+const { parentPort, workerData } = require("worker_threads");
 
 const result = performExpensiveComputation(workerData);
 parentPort.postMessage(result);
@@ -667,6 +684,7 @@ function processLargeDataset(data: LargeDataset): Result {
 ```
 
 **When to Use**:
+
 - Heavy data processing
 - Complex algorithms
 - Image/video processing
@@ -674,6 +692,7 @@ function processLargeDataset(data: LargeDataset): Result {
 - ML inference (if not delegated to external service)
 
 **Action Items**:
+
 - [ ] CPU-intensive tasks use worker threads
 - [ ] Worker communication is type-safe
 - [ ] Worker error handling implemented
@@ -684,6 +703,7 @@ function processLargeDataset(data: LargeDataset): Result {
 ### 1. Separation of Concerns
 
 **Layers**:
+
 - **Presentation**: Web dashboard (Next.js/React)
 - **API**: API routes (Next.js API)
 - **Service**: Business logic (core/services)
@@ -691,6 +711,7 @@ function processLargeDataset(data: LargeDataset): Result {
 - **Infrastructure**: External services (cache, DB, AI)
 
 **Rules**:
+
 - Each layer only depends on the layer below
 - No presentation logic in services
 - No business logic in API routes
@@ -699,21 +720,18 @@ function processLargeDataset(data: LargeDataset): Result {
 ### 2. Dependency Injection
 
 **Preferred**:
+
 ```typescript
 class PortService {
   constructor(
     private portRepo: PortRepository,
     private cache: CacheService,
-    private logger: Logger
+    private logger: Logger,
   ) {}
 }
 
 // In factory/container
-const portService = new PortService(
-  portRepository,
-  cacheService,
-  logger
-);
+const portService = new PortService(portRepository, cacheService, logger);
 ```
 
 **Benefit**: Testable, flexible, loosely coupled
@@ -721,6 +739,7 @@ const portService = new PortService(
 ### 3. Interface-Based Design
 
 **Preferred**:
+
 ```typescript
 interface CacheService {
   get(key: string): Promise<any>;
@@ -745,17 +764,18 @@ class PortService {
 ### 4. Fail Fast
 
 **Preferred**:
+
 ```typescript
 async function processPort(portId: string) {
-  if (!portId) throw new ValidationError('Port ID required');
-  
+  if (!portId) throw new ValidationError("Port ID required");
+
   const port = await getPort(portId);
-  if (!port) throw new NotFoundError('Port not found');
-  
-  if (port.status === 'INACTIVE') {
-    throw new BusinessError('Cannot process inactive port');
+  if (!port) throw new NotFoundError("Port not found");
+
+  if (port.status === "INACTIVE") {
+    throw new BusinessError("Cannot process inactive port");
   }
-  
+
   // Proceed with processing
 }
 ```
@@ -765,11 +785,12 @@ async function processPort(portId: string) {
 ### 5. Immutability
 
 **Preferred**:
+
 ```typescript
 // Immutable data structures
 const newState = {
   ...oldState,
-  portCapacity: updatedCapacity
+  portCapacity: updatedCapacity,
 };
 
 // Pure functions
@@ -782,20 +803,20 @@ function calculateEfficiency(data: PortData): number {
 ### 6. Observability
 
 **Required**:
+
 - **Logging**: Structured logging with context
 - **Tracing**: OpenTelemetry distributed tracing
 - **Metrics**: Prometheus metrics collection
 - **Monitoring**: Real-time alerting
 
 ```typescript
-import { trace } from '@opentelemetry/api';
+import { trace } from "@opentelemetry/api";
 
 async function processShipment(shipmentId: string) {
-  const span = trace.getTracer('port-operations')
-    .startSpan('process-shipment');
-  
-  span.setAttribute('shipment.id', shipmentId);
-  
+  const span = trace.getTracer("port-operations").startSpan("process-shipment");
+
+  span.setAttribute("shipment.id", shipmentId);
+
   try {
     const result = await performProcessing(shipmentId);
     span.setStatus({ code: 0 }); // Success
@@ -813,36 +834,42 @@ async function processShipment(shipmentId: string) {
 ## Architecture Review Checklist
 
 ### Module Design
+
 - [ ] Module follows single responsibility principle
 - [ ] Module has clear, well-defined interface
 - [ ] Module dependencies are explicit
 - [ ] Module can be tested in isolation
 
 ### Data Flow
+
 - [ ] Data flows through proper layers (Presentation → API → Service → Data)
 - [ ] No layer skipping
 - [ ] Cross-cutting concerns properly handled (logging, caching)
 - [ ] Async operations properly managed
 
 ### Error Handling
+
 - [ ] Errors propagate correctly through layers
 - [ ] User-facing errors are informative
 - [ ] System errors are logged with context
 - [ ] Critical errors trigger alerts
 
 ### Performance
+
 - [ ] Expensive operations cached
 - [ ] Database queries optimized (no N+1)
 - [ ] CPU-intensive work offloaded to workers
 - [ ] Proper pagination for large datasets
 
 ### Scalability
+
 - [ ] Stateless design (horizontal scaling)
 - [ ] Resource pooling (DB connections, etc.)
 - [ ] Rate limiting on expensive operations
 - [ ] Load balancing considerations
 
 ### Testability
+
 - [ ] Dependencies injected (not hard-coded)
 - [ ] Pure functions where possible
 - [ ] Mocks/stubs available for external dependencies
@@ -855,11 +882,11 @@ async function processShipment(shipmentId: string) {
 ```typescript
 // ❌ Bad: One class does everything
 class PortManager {
-  async createPort() { }
-  async scheduleUnload() { }
-  async processPayment() { }
-  async sendNotifications() { }
-  async generateReports() { }
+  async createPort() {}
+  async scheduleUnload() {}
+  async processPayment() {}
+  async sendNotifications() {}
+  async generateReports() {}
   // 1000+ lines of unrelated functionality
 }
 ```
@@ -872,7 +899,7 @@ class PortManager {
 // ❌ Bad: Direct dependency on implementation
 class PortService {
   private redis = new RedisClient(); // Hard-coded
-  
+
   async getPort(id: string) {
     return this.redis.get(`port:${id}`);
   }
@@ -901,10 +928,10 @@ const users: PrismaUser[] = await getUsers();
 ```typescript
 // ❌ Bad: A imports B, B imports A
 // moduleA.ts
-import { funcB } from './moduleB';
+import { funcB } from "./moduleB";
 
 // moduleB.ts
-import { funcA } from './moduleA';
+import { funcA } from "./moduleA";
 ```
 
 **Solution**: Extract shared code to third module.
@@ -918,6 +945,7 @@ import { funcA } from './moduleA';
 ## Summary
 
 **Key Architectural Principles**:
+
 1. **Five-Dimensional Closed-Loop** - All components fit into the analysis-execution-optimization-learning-management cycle
 2. **Agent-Based Architecture** - AI agents as first-class citizens
 3. **Layered Design** - Clear separation between presentation, API, service, and data layers
@@ -928,6 +956,7 @@ import { funcA } from './moduleA';
 8. **Extensibility** - Plugin architecture for third-party integrations
 
 **When Reviewing Architecture**:
+
 - Does it fit the five-dimensional model?
 - Are layers properly separated?
 - Is it testable and maintainable?

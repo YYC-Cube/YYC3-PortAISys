@@ -25,14 +25,7 @@
     "org": "yyc3-team",
     "severity-threshold": "medium",
     "language": "typescript",
-    "exclude": [
-      "node_modules",
-      "dist",
-      "build",
-      ".git",
-      "coverage",
-      "test"
-    ],
+    "exclude": ["node_modules", "dist", "build", ".git", "coverage", "test"],
     "test": {
       "auto-deploy": true,
       "auto-deploy-branch": "main",

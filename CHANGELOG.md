@@ -8,21 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - File header documentation to key test files
 - Port configuration standardization (API_PORT: 3201, WS_PORT: 3202)
 
 ### Changed
+
 - Port configuration from 3000 to 3201 (YYC³ port standard compliance)
 - Console statements in ErrorHandlingSystem.ts to use logger instead
 - CORS_ORIGINS in .env.example from localhost:3000 to localhost:3201
 
 ### Fixed
+
 - Port configuration violation (3000-3199 range restriction)
 - Production code console.log usage in ErrorHandlingSystem
 
 ## [1.0.0] - 2026-01-01
 
 ### Added
+
 - Five-dimensional closed-loop architecture (Analysis, Execution, Optimization, Learning, Management)
 - 6 AI Agents (LayoutAgent, BehaviorAgent, ContentAgent, AssistantAgent, MonitoringAgent, LearningAgent)
 - 100+ core modules
@@ -38,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD pipeline with GitHub Actions
 
 ### Security
+
 - NextAuth.js v5 integration
 - RBAC (Role-Based Access Control)
 - JWT token authentication
@@ -47,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Data encryption at rest and in transit
 
 ### DevOps
+
 - Multi-environment support (development, staging, production, test)
 - Automated testing (unit, integration, E2E, performance, security)
 - Docker containerization support
@@ -54,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated deployment pipeline
 
 ### Documentation
+
 - Complete API documentation
 - Architecture design documents
 - Test framework documentation

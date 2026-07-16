@@ -30,21 +30,21 @@ security/compliance.
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Runtime | Node.js **≥ 20.19.0** (enforced in `.nvmrc`, `package.json` engines, CI; required by Prisma 7) |
-| Language | TypeScript 5.3+, **strict mode** |
-| Module system | ESM (`"type": "module"`) |
-| Build | `tsc` + Vite |
-| Test | Vitest 1.x (unit/integration) + Playwright (E2E) |
-| Lint | ESLint 9 (flat config) + Prettier |
-| Database | PostgreSQL + Prisma 7 |
-| Cache | Redis (`ioredis`) + in-process LRU (dual-layer) |
-| AI Models | OpenAI + Anthropic adapters (`core/adapters/`, `core/model/`) |
-| Observability | OpenTelemetry (`@opentelemetry/*`) |
-| Validation | Zod 4 |
-| Events | `eventemitter3` (NOT Node's built-in `events`) |
-| Other deps | `uuid`, `bcrypt`, `next` (API routes in `src/pages/api/`) |
+| Layer         | Technology                                                                                     |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| Runtime       | Node.js **≥ 20.19.0** (enforced in `.nvmrc`, `package.json` engines, CI; required by Prisma 7) |
+| Language      | TypeScript 5.3+, **strict mode**                                                               |
+| Module system | ESM (`"type": "module"`)                                                                       |
+| Build         | `tsc` + Vite                                                                                   |
+| Test          | Vitest 1.x (unit/integration) + Playwright (E2E)                                               |
+| Lint          | ESLint 9 (flat config) + Prettier                                                              |
+| Database      | PostgreSQL + Prisma 7                                                                          |
+| Cache         | Redis (`ioredis`) + in-process LRU (dual-layer)                                                |
+| AI Models     | OpenAI + Anthropic adapters (`core/adapters/`, `core/model/`)                                  |
+| Observability | OpenTelemetry (`@opentelemetry/*`)                                                             |
+| Validation    | Zod 4                                                                                          |
+| Events        | `eventemitter3` (NOT Node's built-in `events`)                                                 |
+| Other deps    | `uuid`, `bcrypt`, `next` (API routes in `src/pages/api/`)                                      |
 
 **Package manager**: `pnpm@11.10.0` (pinned in CI). The lockfile is
 `pnpm-lock.yaml`. **pnpm v11+ is required** — the project uses
@@ -58,6 +58,7 @@ pnpm silently ignores them. `.npmrc` pins the `npmmirror` registry and raises
 ## Essential Commands
 
 ### Setup
+
 ```bash
 nvm use              # uses .nvmrc → Node 20.19.0
 pnpm install         # .npmrc pins npmmirror + fetch-timeout; succeeds offline-ish
@@ -66,6 +67,7 @@ cp .env.example .env # then fill in real values
 ```
 
 ### Development
+
 ```bash
 pnpm dev             # vite dev server
 pnpm build           # tsc && vite build
@@ -74,11 +76,13 @@ pnpm typecheck       # tsc --noEmit  (FAST type check, no emit)
 ```
 
 ### Linting & Formatting
+
 ```bash
 pnpm lint            # eslint core --ext .ts,.tsx
 pnpm lint:fix        # eslint . --ext .ts,.tsx --fix
 pnpm format          # prettier --write "**/*.{ts,tsx,js,jsx,json,md}"
 ```
+
 > Note: `pnpm lint` scopes to `core/`; `pnpm lint:fix` runs on the whole repo.
 
 ### Testing
@@ -99,6 +103,7 @@ pnpm test:all        # unit && integration && e2e
 ```
 
 **Phased test suites** (defined in `package.json`):
+
 ```bash
 pnpm test:phase1     # unit + integration + e2e
 pnpm test:phase2     # performance + security
@@ -111,15 +116,18 @@ pnpm quick-test      # ./scripts/quick-start-tests.sh   (verify + subset of test
 **Verbose**: `pnpm test --reporter=verbose`
 
 ### Database (Prisma)
+
 ```bash
 pnpm test:db:migrate     # tsx scripts/create-yyc3-schema.ts
 pnpm test:db:schema      # tsx scripts/verify-yyc3-schema.ts
 pnpm test:db:connection  # tsx scripts/test-database-connection.ts
 ```
+
 Prisma client is generated to `../generated/prisma` (gitignored). The
 `DATABASE_URL` env var drives the connection (see `prisma.config.ts`).
 
 ### Documentation tooling
+
 ```bash
 pnpm docs:compliance:check  # dry-run check of doc headers
 pnpm docs:compliance:fix    # fix doc headers
@@ -128,6 +136,7 @@ pnpm verify                 # tsx scripts/verify-implementation.ts
 ```
 
 ### Clean
+
 ```bash
 pnpm clean   # rm -rf dist node_modules
 ```
@@ -195,9 +204,9 @@ web-dashboard/           # EMPTY (despite being referenced in docs)
 
 Defined in `tsconfig.json` and mirrored in all vitest configs:
 
-| Alias | Resolves to |
-|-------|-------------|
-| `@/*` | `./core/*` |
+| Alias      | Resolves to |
+| ---------- | ----------- |
+| `@/*`      | `./core/*`  |
 | `@tests/*` | `./tests/*` |
 
 **Use `@/` imports for core modules.** Avoid deep relative imports like
@@ -233,6 +242,7 @@ When creating a new file, copy the header from a neighbouring file and update
 `@file`, `@description`, and `@tags`. Set `@created`/`@updated` to today's date.
 
 ### Naming
+
 - **Components**: `PascalCase.tsx`
 - **Classes/Services/utils**: `PascalCase.ts` (e.g. `ErrorHandler.ts`, `Logger`)
 - **Config files**: `kebab-case.config.ts` (e.g. `vitest.config.ts`)
@@ -241,6 +251,7 @@ When creating a new file, copy the header from a neighbouring file and update
 - **Boolean vars**: prefer `is`/`has`/`should` prefixes
 
 ### TypeScript
+
 - **Strict mode** is on (`tsconfig.json`): `strict`, `noUnusedLocals`,
   `noUnusedParameters`, `noImplicitReturns`, `noFallthroughCasesInSwitch`.
 - **No `any`** without justification. Underscore-prefixed identifiers
@@ -249,27 +260,32 @@ When creating a new file, copy the header from a neighbouring file and update
 - Target: ES2020, module ESNext, `moduleResolution: bundler`.
 
 ### ESLint rules that bite (see `eslint.config.js`)
-| Rule | Level | Detail |
-|------|-------|--------|
-| `no-console` | **error** | Use the `logger` from `core/utils/logger.ts` instead. **Off** for: `tests/**`, `*.test.ts`, `*.spec.ts`, `core/examples/**`, `core/utils/logger.ts`, `core/performance/testing/**`. |
-| `no-debugger` | error | — |
-| `max-lines` | warn | 2000 (skips blanks/comments) |
-| `max-lines-per-function` | warn | 150 (skips blanks/comments) |
-| `complexity` | warn | max 30 |
-| `@typescript-eslint/no-unused-vars` | warn | `caughtErrors: 'none'` (catch params unchecked), `^_` ignored |
+
+| Rule                                | Level     | Detail                                                                                                                                                                              |
+| ----------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-console`                        | **error** | Use the `logger` from `core/utils/logger.ts` instead. **Off** for: `tests/**`, `*.test.ts`, `*.spec.ts`, `core/examples/**`, `core/utils/logger.ts`, `core/performance/testing/**`. |
+| `no-debugger`                       | error     | —                                                                                                                                                                                   |
+| `max-lines`                         | warn      | 2000 (skips blanks/comments)                                                                                                                                                        |
+| `max-lines-per-function`            | warn      | 150 (skips blanks/comments)                                                                                                                                                         |
+| `complexity`                        | warn      | max 30                                                                                                                                                                              |
+| `@typescript-eslint/no-unused-vars` | warn      | `caughtErrors: 'none'` (catch params unchecked), `^_` ignored                                                                                                                       |
 
 ### Logging
+
 Import and use the singleton logger — never raw `console.*` in `core/`:
+
 ```typescript
-import { logger } from '../utils/logger';   // or '@/utils/logger'
-logger.info('message', 'ContextTag', { metadataKey: value });
-logger.error('failed', 'ContextTag', { err }, error as Error);
+import { logger } from "../utils/logger"; // or '@/utils/logger'
+logger.info("message", "ContextTag", { metadataKey: value });
+logger.error("failed", "ContextTag", { err }, error as Error);
 ```
+
 The `Logger` supports levels (DEBUG/INFO/WARN/ERROR/FATAL), JSON or text format,
 and optional file output (enabled in production). It internally uses `console.*`,
 which is why `no-console` is disabled for that one file.
 
 ### Error Handling
+
 Use the typed `YYC3Error` hierarchy from `core/error-handler/ErrorTypes.ts`
 (`ValidationError`, `AuthenticationError`, `NotFoundError`, `ConflictError`,
 `TimeoutError`, `NetworkError`, `InternalError`, …). Each carries `code`,
@@ -277,16 +293,19 @@ Use the typed `YYC3Error` hierarchy from `core/error-handler/ErrorTypes.ts`
 operations and include context in logs.
 
 ### Events
+
 Use `eventemitter3` (imported as `import EventEmitter from 'eventemitter3'`),
 **not** Node's `events` module. `BaseAgent` and many systems extend it.
 
 ### Agents
+
 All AI agents extend `core/ai/BaseAgent.ts` (abstract; implements
 `setupCapabilities()` and `setupCommandHandlers()`). Register command handlers
 via `this.registerCommandHandler(action, fn)` and communicate through the
 `AgentManager` (bound to `window.agentManager` at runtime).
 
 ### Internationalisation
+
 Comments, log messages, `describe`/`it` test names, and user-facing strings are
 **Chinese by default**. When editing, preserve the language of surrounding code.
 
@@ -295,15 +314,17 @@ Comments, log messages, `describe`/`it` test names, and user-facing strings are
 ## Testing Approach
 
 ### Framework split
-| Type | Runner | Config | Naming | Location |
-|------|--------|--------|--------|----------|
-| Unit | Vitest | `vitest.config.ts` | `*.test.ts` | `tests/unit/**` |
-| Integration | Vitest | `vitest.integration.config.ts` | `*.integration.test.ts` (or `*.test.ts`) | `tests/integration/**` |
-| E2E | Playwright | `playwright.config.ts` | `*.spec.ts` / `*.e2e.test.ts` | `tests/e2e/**` |
-| Security | Vitest | `vitest.config.ts` (or quick) | `*.test.ts` | `tests/security/**` |
-| Performance | Vitest (gated by `RUN_PERF` env in some files) | `vitest.config.ts` | `*.test.ts` | `tests/performance/**` |
+
+| Type        | Runner                                         | Config                         | Naming                                   | Location               |
+| ----------- | ---------------------------------------------- | ------------------------------ | ---------------------------------------- | ---------------------- |
+| Unit        | Vitest                                         | `vitest.config.ts`             | `*.test.ts`                              | `tests/unit/**`        |
+| Integration | Vitest                                         | `vitest.integration.config.ts` | `*.integration.test.ts` (or `*.test.ts`) | `tests/integration/**` |
+| E2E         | Playwright                                     | `playwright.config.ts`         | `*.spec.ts` / `*.e2e.test.ts`            | `tests/e2e/**`         |
+| Security    | Vitest                                         | `vitest.config.ts` (or quick)  | `*.test.ts`                              | `tests/security/**`    |
+| Performance | Vitest (gated by `RUN_PERF` env in some files) | `vitest.config.ts`             | `*.test.ts`                              | `tests/performance/**` |
 
 ### Test environment quirks (`tests/setup.ts`)
+
 - **Environment is `node`**, but `core/` code touches the DOM. `setup.ts`
   installs global **mocks for `window`, `document`, `navigator`**, plus
   `performance.now`, `requestAnimationFrame`, etc. Tests that need real DOM
@@ -319,11 +340,13 @@ Comments, log messages, `describe`/`it` test names, and user-facing strings are
 - `beforeEach(() => vi.clearAllMocks())` runs globally.
 
 ### Coverage
+
 `vitest.config.ts` enforces **80% thresholds** (lines/functions/branches/statements)
 on `core/**/*.ts`. CI uploads coverage to Codecov. Coverage excludes `*.test.ts`,
 `*.spec.ts`, `**/types.ts`, `**/*.config.ts`, mocks/fixtures.
 
 ### E2E (Playwright)
+
 - `baseURL`: `http://localhost:3000` (override via `BASE_URL`).
 - Locales: `zh-CN`, timezone `Asia/Shanghai`.
 - Projects: chromium, firefox, webkit, Mobile Chrome, Mobile Safari, iPad.
@@ -332,6 +355,7 @@ on `core/**/*.ts`. CI uploads coverage to Codecov. Coverage excludes `*.test.ts`
 - First run: `pnpm exec playwright install`.
 
 ### Test-writing style (observed)
+
 ```typescript
 describe('ModuleName', () => {
   let instance: ModuleName;
@@ -345,6 +369,7 @@ describe('ModuleName', () => {
   });
 });
 ```
+
 Use descriptive Chinese `it` names, keep unit tests <100ms, integration <5s.
 
 ---
@@ -444,6 +469,7 @@ fixed in the working tree; ⚠️ need human action (often blocked on the abilit
 to run a full `pnpm install`, see below).
 
 ### ✅ Fixed
+
 - **README Node version** — badge + "环境要求" corrected from `>=18` to
   `>=20.19.0`; the `npm install` fallback was removed (pnpm-only).
 - **`.trae/rules/project_rules.md`** — hardcoded private path
@@ -470,6 +496,7 @@ to run a full `pnpm install`, see below).
   `npm audit ... continue-on-error: true`, which silently passed).
 
 ### ⚠️ Open — 1 remaining critical (dev-only)
+
 `vitest@1.6.1` (<3.2.6) — UI server arbitrary file read. This is a **devDep**
 and only exploitable when `pnpm test:ui` is running on an untrusted network.
 Cannot be fixed via `overrides` (1.x→3.x is a breaking API jump); needs a
@@ -477,16 +504,17 @@ Cannot be fixed via `overrides` (1.x→3.x is a breaking API jump); needs a
 deliberate vitest migration with a full test run. Tracked for a separate PR.
 
 ### ⚠️ Open — remaining high/moderate advisories (build-time transitive)
+
 Post-override audit (92 advisories: 6 low / 50 moderate / 35 high / 1 critical):
 
-| Package | Severity | Via | Reach | Fix path |
-|---------|----------|-----|-------|----------|
-| `tar@6.2.1` | high (×5) | `bcrypt>@mapbox/node-pre-gyp>tar` | build-time (native compile) | bump bcrypt to v6 (drops node-pre-gyp) — breaking |
-| `hono@4.11.4` | high | `@prisma/client>prisma>@prisma/dev>hono` | dev-only (`@prisma/dev`) | wait for Prisma to trim `@prisma/dev` |
-| `effect@3.18.4` | high | `@prisma/client>prisma>@prisma/config>effect` | Prisma internals | upstream Prisma |
-| `rollup@4.57.0` | high | `vite>rollup` (devDep) | build-time | bump vite to v6+/v8+ — breaking |
-| `minimatch@3.1.2` | high (×3) | `eslint>…>minimatch` (devDep) | lint-time | bump eslint to v10 — breaking |
-| `flatted@3.x` | high | `eslint>@eslint/eslintrc>…` (devDep) | lint-time | upstream eslint |
+| Package           | Severity  | Via                                           | Reach                       | Fix path                                          |
+| ----------------- | --------- | --------------------------------------------- | --------------------------- | ------------------------------------------------- |
+| `tar@6.2.1`       | high (×5) | `bcrypt>@mapbox/node-pre-gyp>tar`             | build-time (native compile) | bump bcrypt to v6 (drops node-pre-gyp) — breaking |
+| `hono@4.11.4`     | high      | `@prisma/client>prisma>@prisma/dev>hono`      | dev-only (`@prisma/dev`)    | wait for Prisma to trim `@prisma/dev`             |
+| `effect@3.18.4`   | high      | `@prisma/client>prisma>@prisma/config>effect` | Prisma internals            | upstream Prisma                                   |
+| `rollup@4.57.0`   | high      | `vite>rollup` (devDep)                        | build-time                  | bump vite to v6+/v8+ — breaking                   |
+| `minimatch@3.1.2` | high (×3) | `eslint>…>minimatch` (devDep)                 | lint-time                   | bump eslint to v10 — breaking                     |
+| `flatted@3.x`     | high      | `eslint>@eslint/eslintrc>…` (devDep)          | lint-time                   | upstream eslint                                   |
 
 **Assessment**: all remaining high-severity items are in **build/lint/dev**
 paths (not shipped to production runtime). They cannot reach end-users of the
@@ -494,6 +522,7 @@ paths (not shipped to production runtime). They cannot reach end-users of the
 would break the toolchain and is not recommended without a dedicated migration.
 
 ### Audit workflow for maintainers
+
 ```bash
 # 必须使用官方 registry（npmmirror 不支持 audit 端点）
 pnpm audit --registry=https://registry.npmjs.org
