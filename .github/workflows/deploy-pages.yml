@@ -17,9 +17,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install -g pnpm@11.10.0
-      - run: pnpm install --ignore-scripts --config.min-release-age=0
-      - run: pnpm run build
+          cache: "npm"
+      - run: npm install --ignore-scripts --no-package-lock
+      - run: npx vite build
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
