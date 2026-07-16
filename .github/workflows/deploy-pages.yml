@@ -41,12 +41,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-v22-
 
-      - name: Get pnpm store path
+      - name: Debug pnpm environment
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          node --version
+          pnpm --version
+          pnpm store path
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install
 
       - name: Build for Pages
         run: pnpm run build
