@@ -23,13 +23,14 @@ jobs:
         with:
           node-version: "22.13.0"
 
-      - name: Install pnpm via npm
-        run: |
-          npm install -g pnpm@11.10.0
-          pnpm --version
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+          standalone: true
 
-      - name: Install dependencies (relaxed)
-        run: pnpm install --no-strict-peer-dependencies
+      - name: Install dependencies
+        run: pnpm install
         env:
           PNPM_MINIMUM_RELEASE_AGE: 0
 
