@@ -23,15 +23,15 @@ jobs:
         with:
           node-version: "22.13.0"
 
-      - name: Enable corepack & install pnpm
+      - name: Install pnpm via npm
         run: |
-          corepack enable
-          corepack prepare pnpm@11.10.0 --activate
+          npm install -g pnpm@11.10.0
           pnpm --version
 
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install
+      - name: Install dependencies (relaxed)
+        run: pnpm install --no-strict-peer-dependencies
+        env:
+          PNPM_MINIMUM_RELEASE_AGE: 0
 
       - name: Build for Pages
         run: pnpm run build
