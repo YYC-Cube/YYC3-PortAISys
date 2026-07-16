@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.19.0"
+          node-version: "22.13.0"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -36,10 +36,10 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=medium --org=yyc3-team --project-name=yyc3-portaisys
+          args: --severity-threshold=medium --org=yyc3-team --project-name=yyc3-portaisys --sarif-file-output=snyk.sarif
 
       - name: Upload Snyk results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: snyk.sarif
@@ -55,7 +55,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.19.0"
+          node-version: "22.13.0"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -81,7 +81,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.19.0"
+          node-version: "22.13.0"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -126,7 +126,7 @@ jobs:
           path: report_html.html
 
       - name: Upload ZAP SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: zap_report.sarif
