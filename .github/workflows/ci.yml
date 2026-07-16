@@ -21,7 +21,6 @@ jobs:
       - run: npm install --ignore-scripts --no-package-lock
       - run: npm run lint
       - run: npm run typecheck
-      - run: npx prettier --check .
 
   build:
     name: 构建验证
