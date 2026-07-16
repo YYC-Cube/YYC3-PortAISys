@@ -22,8 +22,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install -g pnpm@11.10.0
-      - run: pnpm install
+      - run: |
+          git config --global user.email "ci@yyc3.top"
+          git config --global user.name "YYC3 CI"
+          npm install -g pnpm@11.10.0
+      - run: pnpm install --ignore-scripts
         env:
           PNPM_MINIMUM_RELEASE_AGE: 0
       - run: pnpm run build
