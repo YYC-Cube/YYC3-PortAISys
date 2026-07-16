@@ -1,0 +1,17 @@
+allowBuilds:
+  '@prisma/engines': true
+  bcrypt: true
+  esbuild: true
+  prisma: true
+  sharp: true
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - bcrypt
+  - esbuild
+  - prisma
+  - protobufjs
+  - sharp
+overrides:
+  protobufjs: '>=8.0.1'
+  js-yaml: '>=4.1.2'
