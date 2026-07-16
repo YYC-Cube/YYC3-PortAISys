@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0'
+          node-version: "22.13.0"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -36,9 +36,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-v22-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-pnpm-v22-
 
       - name: Install dependencies
         run: pnpm install
@@ -52,7 +52,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: "./dist"
 
   deploy:
     name: 部署到 GitHub Pages
