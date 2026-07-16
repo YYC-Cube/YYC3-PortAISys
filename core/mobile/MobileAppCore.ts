@@ -35,7 +35,9 @@ let _localAuthAPI: LocalAuthenticationModule | null = null;
 async function getLocationAPI(): Promise<LocationModule> {
   if (_locationAPI) return _locationAPI;
   try {
-    const mod = await import('expo-location');
+    // 使用变量避免 tsc 静态解析（模块在 RN/Expo 运行时才存在）
+    const moduleName = 'expo-location';
+    const mod = await import(/* @vite-ignore */ moduleName);
     _locationAPI = mod as unknown as LocationModule;
   } catch {
     _locationAPI = {} as LocationModule;
@@ -46,7 +48,8 @@ async function getLocationAPI(): Promise<LocationModule> {
 async function getLocalAuthAPI(): Promise<LocalAuthenticationModule> {
   if (_localAuthAPI) return _localAuthAPI;
   try {
-    const mod = await import('expo-local-authentication');
+    const moduleName = 'expo-local-authentication';
+    const mod = await import(/* @vite-ignore */ moduleName);
     _localAuthAPI = mod as unknown as LocalAuthenticationModule;
   } catch {
     _localAuthAPI = {} as LocalAuthenticationModule;

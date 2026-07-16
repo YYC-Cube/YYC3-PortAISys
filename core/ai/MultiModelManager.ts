@@ -488,11 +488,6 @@ export class MultiModelManager extends EventEmitter {
     return modelToUse;
   }
 
-  private checkModelAvailabilitySync(provider: string, modelId: string): boolean {
-    const key = `${provider}:${modelId}`;
-    return this.models.has(key);
-  }
-
   private selectVisionModel(modelToUse: string, selected: any): string {
     const visionModels = Array.from(this.models.values()).filter(m => {
       const caps = this.getCapabilities(m.id);
