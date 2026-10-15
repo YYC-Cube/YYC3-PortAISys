@@ -9,18 +9,23 @@ on:
   schedule:
     - cron: "0 0 * * 0"
 
+permissions:
+  contents: read
+
 jobs:
   lint-and-typecheck:
     name: 代码质量检查
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npm run lint
-      - run: npm run typecheck
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
 
   build:
     name: 构建验证
@@ -28,11 +33,13 @@ jobs:
     needs: lint-and-typecheck
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx vite build
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vite build
       - uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
@@ -45,11 +52,13 @@ jobs:
     needs: lint-and-typecheck
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx vitest run tests/unit --coverage
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run tests/unit --coverage
       - uses: codecov/codecov-action@v3
         with:
           files: ./coverage/coverage-final.json
@@ -63,11 +72,13 @@ jobs:
     needs: lint-and-typecheck
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx vitest run --config vitest.integration.config.ts
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run --config vitest.integration.config.ts
       - uses: codecov/codecov-action@v3
         with:
           files: ./coverage/coverage-final.json
@@ -79,12 +90,14 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx playwright install --with-deps
-      - run: npx playwright test
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps
+      - run: pnpm exec playwright test
         continue-on-error: true
       - uses: actions/upload-artifact@v4
         if: always()
@@ -100,11 +113,13 @@ jobs:
     needs: lint-and-typecheck
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx vitest run tests/performance --reporter=json
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run tests/performance --reporter=json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -119,13 +134,15 @@ jobs:
     needs: lint-and-typecheck
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npm audit --audit-level=high --registry=https://registry.npmjs.org
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --audit-level=high --registry=https://registry.npmjs.org
         continue-on-error: true
-      - run: npx vitest run tests/security --reporter=json
+      - run: pnpm exec vitest run tests/security --reporter=json
       - uses: snyk/actions/node@master
         continue-on-error: true
         with:
@@ -158,12 +175,14 @@ jobs:
     if: always()
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx tsx scripts/generate-ci-status.ts
-      - run: npx tsx scripts/generate-test-report.ts
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec tsx scripts/generate-ci-status.ts
+      - run: pnpm exec tsx scripts/generate-test-report.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:

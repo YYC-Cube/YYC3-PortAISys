@@ -9,17 +9,22 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   verify-implementation:
     name: 验证实现
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22.13.0'
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx tsx scripts/verify-implementation.ts
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec tsx scripts/verify-implementation.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -33,13 +38,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22.13.0'
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx vitest run tests/unit --coverage
-      - run: npx vitest run --config vitest.integration.config.ts
-      - run: npx playwright test
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run tests/unit --coverage
+      - run: pnpm exec vitest run --config vitest.integration.config.ts
+      - run: pnpm exec playwright test
         continue-on-error: true
       - uses: codecov/codecov-action@v3
         with:
@@ -59,12 +66,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22.13.0'
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx vitest run tests/performance --reporter=json
-      - run: npx vitest run tests/security --reporter=json
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run tests/performance --reporter=json
+      - run: pnpm exec vitest run tests/security --reporter=json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -85,25 +94,27 @@ jobs:
           - multimodal-tests
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22.13.0'
-      - run: npm install --ignore-scripts --no-package-lock
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
       - name: Run ${{ matrix.test-suite }}
         run: |
           case "${{ matrix.test-suite }}" in
             agent-tests)
-              npx vitest run tests/unit/ai/
+              pnpm exec vitest run tests/unit/ai/
               ;;
             plugin-tests)
-              npx vitest run --config vitest.integration.config.ts tests/integration/plugin-system.test.ts
+              pnpm exec vitest run --config vitest.integration.config.ts tests/integration/plugin-system.test.ts
               ;;
             mobile-tests)
-              npx vitest run --config vitest.integration.config.ts tests/integration/mobile-app.test.ts
+              pnpm exec vitest run --config vitest.integration.config.ts tests/integration/mobile-app.test.ts
               ;;
             multimodal-tests)
-              npx vitest run --config vitest.integration.config.ts tests/integration/multimodal.test.ts
-              npx vitest run --config vitest.integration.config.ts tests/integration/multi-model.test.ts
+              pnpm exec vitest run --config vitest.integration.config.ts tests/integration/multimodal.test.ts
+              pnpm exec vitest run --config vitest.integration.config.ts tests/integration/multi-model.test.ts
               ;;
           esac
       - uses: actions/upload-artifact@v4
@@ -119,11 +130,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22.13.0'
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx vitest run tests/e2e/complete-workflow.test.ts
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run tests/e2e/complete-workflow.test.ts
         continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || '' }}
@@ -145,11 +158,13 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: all-reports
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22.13.0'
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx tsx scripts/generate-test-report.ts --input=all-reports
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec tsx scripts/generate-test-report.ts --input=all-reports
       - uses: actions/upload-artifact@v4
         if: always()
         with:

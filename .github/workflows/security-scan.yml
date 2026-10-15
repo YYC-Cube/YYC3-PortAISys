@@ -9,16 +9,22 @@ on:
     - cron: "0 2 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   snyk-security:
     name: Snyk Security Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
       - uses: snyk/actions/node@master
         continue-on-error: true
         env:
@@ -36,11 +42,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npm audit --registry https://registry.npmjs.org
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --registry=https://registry.npmjs.org
         continue-on-error: true
 
   owasp-zap-scan:
@@ -49,13 +57,15 @@ jobs:
     needs: [snyk-security, pnpm-audit]
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.13.0"
-      - run: npm install --ignore-scripts --no-package-lock
-      - run: npx vite build
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vite build
         continue-on-error: true
-      - run: npx vite preview --port 3200 &
+      - run: pnpm exec vite preview --port 3200 --host &
         continue-on-error: true
       - run: |
           for i in {1..30}; do
@@ -97,5 +107,5 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Scan Results" >> $GITHUB_STEP_SUMMARY
           echo "- Snyk Security: 完成" >> $GITHUB_STEP_SUMMARY
-          echo "- npm Audit: 完成" >> $GITHUB_STEP_SUMMARY
+          echo "- pnpm Audit: 完成" >> $GITHUB_STEP_SUMMARY
           echo "- OWASP ZAP Scan: 完成" >> $GITHUB_STEP_SUMMARY
