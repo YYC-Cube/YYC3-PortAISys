@@ -20,7 +20,7 @@
     "inquirer": "^8.2.5",
     "lru-cache": "^11.2.4",
     "ora": "^5.4.1",
-    "simple-git": "^3.36.0",
+    "simple-git": "^4.0.1",
     "uuid": "^14.0.0"
   },
   "devDependencies": {
