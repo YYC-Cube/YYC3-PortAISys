@@ -15,6 +15,20 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { DocumentSyncManager } from '../../../core/documentation/DocumentSyncManager';
 import * as path from 'path';
 
+// vi.mock 会被提升到模块顶层执行（vitest v5 强制要求顶层定义）
+vi.mock('fs', () => ({
+  readFileSync: vi.fn(() => '# Test Content'),
+  writeFileSync: vi.fn(() => {}),
+  statSync: vi.fn(() => ({
+    mtimeMs: Date.now(),
+    isDirectory: () => false,
+    isFile: () => true
+  })),
+  readdirSync: vi.fn(() => []),
+  existsSync: vi.fn(() => true),
+  mkdirSync: vi.fn(() => {})
+}));
+
 describe('DocumentSyncManager', () => {
   let documentSyncManager: DocumentSyncManager;
   let tempDir: string;
@@ -23,19 +37,6 @@ describe('DocumentSyncManager', () => {
     vi.resetAllMocks();
 
     tempDir = path.join('/tmp', `test-${Date.now()}`);
-
-    vi.mock('fs', () => ({
-      readFileSync: vi.fn(() => '# Test Content'),
-      writeFileSync: vi.fn(() => {}),
-      statSync: vi.fn(() => ({
-        mtimeMs: Date.now(),
-        isDirectory: () => false,
-        isFile: () => true
-      })),
-      readdirSync: vi.fn(() => []),
-      existsSync: vi.fn(() => true),
-      mkdirSync: vi.fn(() => {})
-    }));
 
     documentSyncManager = new DocumentSyncManager({
       codeBasePath: tempDir,
