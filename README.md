@@ -1,7 +1,7 @@
 # YYC³ Portable Intelligent AI System
 
 <div align="center">
-  <img src="/yyc3-Family.png" alt="YYC³ PortAISys" style="max-width: 100%; height: auto; border-radius: 12px; margin-bottom: 20px;">
+  <img src="public/yyc3-family.png" alt="YYC³ PortAISys" style="max-width: 100%; height: auto; border-radius: 12px; margin-bottom: 20px;">
 
   <br>
 
@@ -25,6 +25,15 @@
   <img src="https://img.shields.io/badge/domain-portable.yyc3.top-4285F4?style=flat-square" alt="Domain">
   <img src="https://img.shields.io/badge/pwa-ready-5A0FC8?style=flat-square" alt="PWA">
   <img src="https://img.shields.io/badge/OS-macOS%20%7C%20Linux%20%7C%20Windows-0078D6?style=flat-square" alt="OS">
+
+<br>
+
+  <!-- 项目标签体系 / Topics（与仓库 Topics 同步） -->
+  <img src="https://img.shields.io/badge/🧠_AI层-ai--agents%20%7C%20multi--model%20%7C%20autonomous%20%7C%20closed--loop%20%7C%20llm-8A2BE2?style=flat-square" alt="AI 层标签">
+  <br>
+  <img src="https://img.shields.io/badge/🛠_工程层-typescript%20%7C%20react%20%7C%20nextjs%20%7C%20vite%20%7C%20radix--ui%20%7C%20shadcn--ui%20%7C%20tailwindcss%20%7C%20pwa-3178C6?style=flat-square" alt="工程层标签">
+  <br>
+  <img src="https://img.shields.io/badge/🛡_企业层-enterprise%20%7C%20security%20%7C%20observability-0F9D58?style=flat-square" alt="企业层标签">
 
 <br><br>
 
