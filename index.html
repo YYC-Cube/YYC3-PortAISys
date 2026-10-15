@@ -6,6 +6,13 @@
     <meta name="theme-color" content="#1a1a2e" />
     <meta name="description" content="YYC³ Portable Intelligent AI System — 言启象限 | 语枢未来" />
 
+    <!-- 安全策略（CSP / Referrer）— 消除 OWASP ZAP CSP 告警 -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https: wss:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
     <!-- Open Graph Meta -->
     <meta property="og:title" content="YYC³ PortAISys — 便携式智能AI系统" />
     <meta property="og:description" content="言启千行代码，语枢万物智能" />
