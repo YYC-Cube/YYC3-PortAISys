@@ -11,19 +11,19 @@
  * @tags typescript
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  SimplifiedPerformanceOptimizer,
-  MetricsCollector,
-  IssueAnalyzer,
-  ActionGenerator,
   ActionExecutor,
-  PerformanceDomain,
-  OptimizationStrategy,
-  OptimizationPriority,
+  ActionGenerator,
   DomainMetrics,
+  IssueAnalyzer,
+  MetricsCollector,
+  OptimizationAction,
+  OptimizationPriority,
+  OptimizationStrategy,
+  PerformanceDomain,
   PerformanceIssue,
-  OptimizationAction
+  SimplifiedPerformanceOptimizer
 } from '../../../core/performance/SimplifiedOptimizationEngine';
 
 describe('MetricsCollector', () => {
@@ -418,7 +418,7 @@ describe('ActionExecutor', () => {
         dependencies: []
       };
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
       const result = await executor.executeAction(action);
 
@@ -483,7 +483,8 @@ describe('SimplifiedPerformanceOptimizer', () => {
       expect(report).toBeDefined();
       expect(report.optimizationId).toBeDefined();
       expect(report.timestamp).toBeInstanceOf(Date);
-      expect(report.duration).toBeGreaterThan(0);
+      // duration 基于 Date.now() 差值，同毫秒内完成时为 0（快速机器时钟粒度）
+      expect(report.duration).toBeGreaterThanOrEqual(0);
       expect(report.issues).toBeInstanceOf(Array);
       expect(report.actions).toBeInstanceOf(Array);
       expect(report.executedActions).toBeInstanceOf(Array);
@@ -500,7 +501,7 @@ describe('SimplifiedPerformanceOptimizer', () => {
     });
 
     it('应该处理优化过程中的错误', async () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
       const report = await optimizer.optimizePerformance();
 
